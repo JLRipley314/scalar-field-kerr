@@ -84,6 +84,9 @@ class Sim:
          ]
       )
 #-----------------------------------------------------------------------------
+      self.lin_pos_m = [ m for m in self.lin_m if m>=0]
+      self.scd_pos_m = [ m for m in self.scd_m if m>=0]
+#-----------------------------------------------------------------------------
 ## for parallelism (if applied)
       self.num_threads= max(len(self.lin_m),len(self.scd_m))
 #-----------------------------------------------------------------------------

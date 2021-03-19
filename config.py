@@ -23,17 +23,20 @@ sim.evolve_time= float(250) ## units of black hole mass
 sim.num_saved_times= int(1000)
 #=============================================================================
 sim.nx= 64 ## num radial pts 
-sim.nl= 16 ## num l angular values
-sim.nm= 16 ## num m angular values 
+sim.nl= 16 ## num angular values
 #=============================================================================
 ## whether or not only to save horizon/scriplus/norm or full field vals 
 sim.sparse_save= True
 #=============================================================================
+sim.metric_recon=     True
+sim.scd_order=        True
 sim.constrained_evo = False
 
-sim.write_indep_res=  True
-sim.write_coefs=      False
-sim.write_coefs_swal= True
+sim.write_indep_res=           True
+sim.write_metric_recon_fields= False
+sim.write_scd_order_source=    True
+sim.write_coefs=               False
+sim.write_coefs_swal=          True
 #=============================================================================
 ## details of computer setup 
 
@@ -46,6 +49,16 @@ sim.walltime= '72:00:00' ## (hh:mm:ss)
 sim.memory=   '2048' ## MB 
 sim.email=    'lloydripley@gmail.com' ## for slurm notification
 #=============================================================================
+## we can only do metric reconstruction starting from psi4 for now.
+## For pure first order Teukolsky evolution we can consider other
+## spin weighted fields though.
+## psi4 is spin -2, boost -2
+## psi3 is spin -1, boost -1
+## psi2 is spin  0, boost  0 
+
+sim.psi_spin=  int(-2)
+sim.psi_boost= int(-2)
+#=============================================================================
 ## Initial data
 #=============================================================================
 ## l_ang:                  initial data is a particular swal function
@@ -56,17 +69,42 @@ sim.email=    'lloydripley@gmail.com' ## for slurm notification
 #=============================================================================
 ## initial data for all linear modes 
 #=============================================================================
-sim.m_ang=  [-2,    2]
-sim.l_ang=  [ 2,    2]
-sim.amp_re= [ 0.1,  0.1]
-sim.amp_im= [ 0.0,  0.0]
-sim.rl_0=   [ 1.01, 1.01]
-sim.ru_0=   [ 3.0 , 3.0]
-sim.initial_data_direction= "ii"
+sim.lin_m=  [-2,    2,   -3,    3,   -4,    4,   -5,    5,    -6,    6,   -7,    7]
+sim.l_ang=  [ 2,    2,    3,    3,    4,    4,    5,    5,     6,    6,    7,    7]
+sim.amp_re= [ 0.1,  0.1,  0.1,  0.1,  0.1,  0.1,  0.1,  0.1,   0.1,  0.1,  0.1,  0.1]
+sim.amp_im= [ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,   0.0,  0.0,  0.0,  0.0]
+sim.rl_0=   [ 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01,  1.01, 1.01, 1.01, 1.01]
+sim.ru_0=   [ 3.0 , 3.0,  3.0,  3.0,  3.0,  3.0,  3.0,  3.0,   3.0,  3.0,  3.0,  3.0]
+sim.initial_data_direction= "iiiiiiiiiiii"
+
+## rescale for smaller amps
+#sim.amp_re= [0.25*x for x in sim.amp_re]
+#sim.amp_im= [0.25*x for x in sim.amp_im]
+
+#sim.lin_m=  [-2,    2]
+#sim.l_ang=  [ 2,    2]
+#sim.amp_re= [ 0.1,  0.1]
+#sim.amp_im= [ 0.0,  0.0]
+#sim.rl_0=   [ 1.01, 1.01]
+#sim.ru_0=   [ 3.0 , 3.0]
+#sim.initial_data_direction= "ii"
+#=============================================================================
+## second order modes to evolve
+
+sim.scd_m= [x for x in sim.lin_m]
+for i in [-1,0,1]:
+   sim.scd_m.append(i)
+#=============================================================================
+## which m angular values to write to file
+
+sim.write_lin_m= sim.lin_m 
+
+sim.write_scd_m= sim.scd_m
 #=============================================================================
 ## multiple of when can begin second order evolution 
 
 sim.integrate_psi4_start_multiple= float(6.0)
+sim.scd_order_start_multiple= float(6.0)
 #=============================================================================
 if (sim.run_type == "basic_run"):
    sim.launch_run()
