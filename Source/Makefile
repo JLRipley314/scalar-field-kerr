@@ -9,6 +9,7 @@ CFLAGS= -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
 	-lshtns_omp -lfftw3_omp -lfftw3 -lm
 #=============================================================================
 OBJ= $(addprefix $(OBJDIR), \
+     cheb.o \
      field.o \
      main.o \
      )

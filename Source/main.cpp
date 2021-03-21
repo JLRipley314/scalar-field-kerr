@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 
+#include "cheb.hpp"
 #include "field.hpp"
 
 int main() {
