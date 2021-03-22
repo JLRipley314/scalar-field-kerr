@@ -10,10 +10,10 @@ Field3d::Field3d(
       const size_t ny,
       const size_t nz)
 :  name{name},
+   vals(nx*nx*nz,0),
    nx{nx},
    ny{ny},
-   nz{nz},
-   vals(nx*nx*nz,0)
+   nz{nz}
 {
 }
 /*=========================================================================*/

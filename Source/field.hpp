@@ -8,10 +8,6 @@
 
 /*=========================================================================*/
 class Field3d {
-   private:
-      const size_t nx;
-      const size_t ny;
-      const size_t nz;
    public:
       std::string name;
       std::vector<double> vals;
@@ -27,6 +23,11 @@ class Field3d {
       {
          return ny*nz*(i) + nz*(j) + (k);
       }
+
+   private:
+      const size_t nx;
+      const size_t ny;
+      const size_t nz;
 };
 /*=========================================================================*/
 #endif /* _FIELD_HPP_ */

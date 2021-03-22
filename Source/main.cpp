@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "cheb.hpp"
+#include "sphere.hpp"
 #include "field.hpp"
 
 int main() {
