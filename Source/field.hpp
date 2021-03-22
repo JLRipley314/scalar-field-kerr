@@ -7,7 +7,7 @@
 #include <vector>
 
 /*=========================================================================*/
-class Field {
+class Field3d {
    private:
       const size_t nx;
       const size_t ny;
@@ -16,12 +16,12 @@ class Field {
       std::string name;
       std::vector<double> vals;
 
-      Field(const std::string name, 
+      Field3d(const std::string name, 
             const size_t nx, 
             const size_t ny, 
             const size_t nz
          );
-      ~Field();
+      ~Field3d();
 
       inline size_t indx(const size_t i, const size_t j, const size_t k) 
       {

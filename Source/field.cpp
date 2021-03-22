@@ -4,7 +4,7 @@
 #include "field.hpp"
 
 /*=========================================================================*/
-Field::Field(
+Field3d::Field3d(
       const std::string name, 
       const size_t nx,
       const size_t ny,
@@ -17,6 +17,6 @@ Field::Field(
 {
 }
 /*=========================================================================*/
-Field::~Field()
+Field3d::~Field3d()
 {
 }

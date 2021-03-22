@@ -3,13 +3,24 @@
 #include "cheb.hpp"
 
 /*==========================================================================*/
-Cheb::Cheb(const int n, const double jacobian) 
+Cheb::Cheb(const int n, 
+      const double lower,
+      const double upper) 
 :  n{n},
-   jacobian{jacobian},
+   lower{lower},
+   upper{upper},
+   jacobian{((upper-lower)/2.0)},
+   pts(n,0),
    low_pass(n,0)
 {
    /* 
-    * for low pass filter 
+    * Chebyshev points on interval [lower, upper]
+    */
+   for (int i=0; i<n; i++) {
+      pts[i] = jacobian*cos(M_PI*double(i)/(n-1)) + ((upper+lower)/2.0);
+   }
+   /* 
+    * for low pass filter in Chebyshev space 
     */
    for (int i=0; i<n; i++) {
       low_pass[i] = exp(-40.0*pow(double(i)/n,10));
@@ -26,7 +37,6 @@ Cheb::Cheb(const int n, const double jacobian)
       in[i]  = 0;
       out[i] = 0;
    }
-
    plan_dct = fftw_plan_r2r_1d(n,in,out,FFTW_REDFT00,FFTW_PATIENT);
 }
 /*==========================================================================*/
@@ -134,4 +144,5 @@ Cheb::~Cheb()
    fftw_free(in);
    fftw_free(out);
    fftw_destroy_plan(plan_dct);
+   fftw_cleanup();
 }
