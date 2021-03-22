@@ -1,0 +1,38 @@
+#include "gtest/gtest.h"
+
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+#include "../Source/sphere.hpp"
+
+const double eps = 1e-14;
+/*
+ * Testing we can go to/from spherical harmonic space, 
+ * without changing the value of the array (to within truncation error). 
+ */
+TEST(SphereTest, toAndFrom) {
+   const size_t nl = pow(2,4);
+   Sphere::init(nl);
+
+   std::vector<double> po1(Sphere::nSph(),0);
+   std::vector<double> po2(Sphere::nSph(),0);
+   std::vector<cplx>   ylm(Sphere::nYlm(),0);
+
+   /* 
+    * fill in values
+    */
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      po1[Sphere::indx_Sph(ip,it)] = 1.0 + pow(sin(Sphere::theta(it)),2);
+   }
+   }
+
+   Sphere::to_Ylm(po1, ylm);
+   Sphere::to_Sph(ylm, po2);
+
+   for (size_t i=0; i<nl; i++) {
+      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
+   }
+   Sphere::cleanup();
+}

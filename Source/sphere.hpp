@@ -10,12 +10,22 @@
 #include <shtns.h>
 /*===========================================================================*/
 namespace Sphere {
-/*---------------------------------------------------------------------------*/
-   namespace {
-   }
-/*---------------------------------------------------------------------------*/
-   void init(const int nl, const int nm);
+/*===========================================================================*/
+   void init(const size_t nl);
    void cleanup();
+
+   void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph);
+   void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm);
+
+   size_t indx_Sph(const size_t i_ph, const size_t i_th);
+
+   double nlat();
+   double nphi();
+   double nSph();
+   double nYlm();
+
+   double theta(const size_t i_th);  
+   double phi(  const size_t i_ph);
 /*===========================================================================*/
 } /* Sphere */
 /*===========================================================================*/

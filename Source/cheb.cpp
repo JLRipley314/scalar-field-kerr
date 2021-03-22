@@ -174,4 +174,8 @@ void filter(std::vector<double> &ch, std::vector<double> &v)
    to_po(ch,v);
 }
 /*==========================================================================*/
+size_t n() { return n_; }
+double lower() { return lower_; }
+double upper() { return upper_; }
+/*==========================================================================*/
 } /* Cheb */
