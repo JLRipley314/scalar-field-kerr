@@ -37,12 +37,15 @@ TEST(SphereTest, toAndFrom) {
 
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
-      std::cout
-         <<std::setw(16)<<Sphere::theta(it)
-         <<std::setw(16)<<Sphere::phi(ip)
-         <<std::setw(16)<<po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)]
-         <<std::endl;
-//      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
+//      std::cout
+//         <<std::setw(16)<<Sphere::theta(it)
+//         <<std::setw(16)<<Sphere::phi(ip)
+//         <<std::setw(16)<<po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)]
+//         <<std::endl;
+      EXPECT_TRUE(
+            abs(po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)])
+            < eps
+         );
    }
    }
    Sphere::cleanup();
