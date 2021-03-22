@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <vector>
 
@@ -23,14 +24,18 @@ TEST(ChebTest, toAndFrom) {
     * fill in values
     */
    for (size_t i=0; i<nr; i++) {
-      po1[i] = 1;
+      po1[i] = Cheb::pt(i);
    }
 
    Cheb::to_ch(po1, ch);
    Cheb::to_po(ch, po2);
 
    for (size_t i=0; i<nr; i++) {
-//      std::cout<<i<<"\t"<<po1[i]<<"\t"<<po2[i]<<std::endl;
+      std::cout
+         <<std::setw(16)<<i
+         <<std::setw(16)<<ch[i]
+         <<std::setw(16)<<po1[i]-po2[i]
+         <<std::endl;
 //      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
    }
    Cheb::cleanup();

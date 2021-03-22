@@ -19,7 +19,6 @@ TEST(SphereTest, toAndFrom) {
    std::vector<double> po1(Sphere::nSph(),0);
    std::vector<double> po2(Sphere::nSph(),0);
    std::vector<cplx>   ylm(Sphere::nYlm(),0);
-
    /* 
     * fill in values
     */
@@ -31,7 +30,6 @@ TEST(SphereTest, toAndFrom) {
          ;
    }
    }
-
    Sphere::to_Ylm(po1, ylm);
    Sphere::to_Sph(ylm, po2);
 

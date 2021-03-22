@@ -11,8 +11,6 @@ SHTNS_LIB = -L/lib/x86_64-linux-gnu -L/home/jripley/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra \
 	 -lshtns -lfftw3 -lm \
-
-vpath $(SRC)
 #=============================================================================
 OBJ = main.o \
       test_cheb.o $(SRC)/cheb.o \

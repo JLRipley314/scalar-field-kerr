@@ -25,7 +25,8 @@ namespace {
    double *Sph_; /* spherical space */
    cplx   *Ylm_; /* spherical harmonic coefficients */
 
-   std::vector<double> lap;
+   std::vector<double> lap; /* Laplace-Beltrami operator on the unit sphere:
+                               \Delta Y_{lm} = -l(l+1) Y_{lm} */
 }
 /*==========================================================================*/
 void init(const size_t nl)
@@ -45,7 +46,7 @@ void init(const size_t nl)
          nlat_, nphi_
       );
    /* 
-    * Set Laplacian in spherical harmonic space 
+    * Set Laplacian in spherical harmonic space: \Delta Y_{lm} = -l(l+1) Y_{lm}
     */
    lap.resize(lmax_,0);
    for (size_t i=0; i<lmax_; i++) {
@@ -97,6 +98,9 @@ void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
    }
 }
 /*==========================================================================*/
+/* Laplace-Beltrami operator on the unit sphere:
+ * \Delta Y_{lm} = -l(l+1) Y_{lm} */
+/*==========================================================================*/
 void laplace_beltrami(
       const std::vector<double> v, 
       std::vector<double> ddv)
@@ -111,7 +115,6 @@ void laplace_beltrami(
 
    for (size_t lm=0; lm<nYlm_; lm++) {
       const size_t l = shtns_->li[lm];
-
       Ylm_[lm] *= lap[l];
    }
    SH_to_spat(shtns_, Ylm_, Sph_);
@@ -123,7 +126,7 @@ void laplace_beltrami(
 /*==========================================================================*/
 void cleanup()
 {
-   assert(Sph_ !=nullptr);
+   assert(Sph_!=nullptr);
    assert(Ylm_!=nullptr);
    fftw_free(Sph_);
    fftw_free(Ylm_);

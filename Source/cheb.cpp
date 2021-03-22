@@ -94,8 +94,8 @@ void to_ch(const std::vector<double> &po, std::vector<double> &ch)
    /*
     * normalize Chebyshev coefficients
     */
-   ch[0]    = out_[0]   /2.0*(n_-1);
-   ch[n_-1] = out_[n_-1]/2.0*(n_-1);
+   ch[0]    = out_[0]   /(2.0*(n_-1));
+   ch[n_-1] = out_[n_-1]/(2.0*(n_-1));
    for (size_t i=1; i<n_-1; i++) {
       ch[i] = out_[i]/(n_-1);
    }
@@ -114,14 +114,16 @@ void to_po(const std::vector<double> &ch, std::vector<double> &po)
       in_[i]  = ch[i];
       out_[i] = po[i];
    }
-   fftw_execute(plan_dct_);
    /*
-    * normalize transform to position space 
+    * normalize coefficients for Fourier transform 
     */
-   po[0]    = out_[0];
-   po[n_-1] = out_[n_-1];
    for (size_t i=1; i<n_-1; i++) {
-      po[i] = out_[i]/2.0;
+      in_[i] /= 2.0;
+   }
+   fftw_execute(plan_dct_);
+
+   for (size_t i=0; i<n_; i++) {
+      po[i] = out_[i];
    }
 }
 /*==========================================================================*/
@@ -177,5 +179,6 @@ void filter(std::vector<double> &ch, std::vector<double> &v)
 size_t n() { return n_; }
 double lower() { return lower_; }
 double upper() { return upper_; }
+double pt(const size_t i)    { return pts_[i]; }
 /*==========================================================================*/
 } /* Cheb */
