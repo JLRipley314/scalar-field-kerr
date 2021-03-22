@@ -13,7 +13,7 @@ const double eps = 1e-14;
  * without changing the value of the array (to within truncation error). 
  */
 TEST(SphereTest, toAndFrom) {
-   const size_t nl = pow(2,4);
+   const size_t nl = pow(2,5);
    Sphere::init(nl);
 
    std::vector<double> po1(Sphere::nSph(),0);

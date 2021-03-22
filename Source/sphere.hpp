@@ -19,13 +19,15 @@ namespace Sphere {
 
    size_t indx_Sph(const size_t i_ph, const size_t i_th);
 
-   double nlat();
-   double nphi();
-   double nSph();
-   double nYlm();
+   size_t nlat();
+   size_t nphi();
+   size_t nSph();
+   size_t nYlm();
 
    double theta(const size_t i_th);  
    double phi(  const size_t i_ph);
+
+   std::vector<double> compute_ylm(const int l_ang, const int m_ang);
 /*===========================================================================*/
 } /* Sphere */
 /*===========================================================================*/

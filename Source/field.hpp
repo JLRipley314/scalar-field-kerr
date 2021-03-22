@@ -21,10 +21,16 @@ class Field3d {
 
       inline size_t indx(const size_t i, const size_t j, const size_t k) 
       {
-         return ny*nz*(i) + nz*(j) + (k);
+         return ny*nz*i + nz*j + k;
       }
 
-   private:
+      void row1(const size_t j, const size_t k, std::vector<double> &v); 
+      void row2(const size_t i, const size_t k, std::vector<double> &v); 
+      void row3(const size_t i, const size_t j, std::vector<double> &v); 
+      void row12(const size_t k, std::vector<double> &v); 
+      void row13(const size_t j, std::vector<double> &v); 
+      void row23(const size_t i, std::vector<double> &v); 
+
       const size_t nx;
       const size_t ny;
       const size_t nz;

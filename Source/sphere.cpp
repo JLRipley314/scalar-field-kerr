@@ -33,7 +33,7 @@ void init(const size_t nl)
 {
    lmax_ = nl;
    mmax_ = lmax_;
-   nlat_ = 2*lmax_; 
+   nlat_ = lmax_ + 2; 
    if (nl%2==0) { nphi_ = 3*mmax_; } 
    else {         nphi_ = 2*mmax_; }
 
@@ -134,10 +134,10 @@ void cleanup()
    shtns_destroy(shtns_);
 }
 /*==========================================================================*/
-double nlat() { return nlat_; }
-double nphi() { return nphi_; }
-double nSph() { return nSph_; }
-double nYlm() { return nYlm_; }
+size_t nlat() { return nlat_; }
+size_t nphi() { return nphi_; }
+size_t nSph() { return nSph_; }
+size_t nYlm() { return nYlm_; }
 /*==========================================================================*/
 double theta(const size_t i_th)
 {
@@ -146,6 +146,20 @@ double theta(const size_t i_th)
 double phi(const size_t i_ph)
 {
    return i_ph*2.0*M_PI/((shtns_->nphi)*(shtns_->mres));
+}
+/*==========================================================================*/
+/* returns values for spherical harmonic in real space Y_{l_ang,m_ang} */
+/*==========================================================================*/
+std::vector<double> compute_ylm(const int l_ang, const int m_ang)
+{
+   std::vector<cplx>   in(nYlm_,{0.0,0.0});
+   std::vector<double> out(nSph_,0.0);
+
+   in[LM(shtns_,l_ang,m_ang)] = 1;
+
+   to_Sph(in, out);
+
+   return out;
 }
 /*==========================================================================*/
 } /* Sphere */

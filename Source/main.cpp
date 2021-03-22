@@ -12,7 +12,9 @@ int main() {
    Cheb::init(nr, 0.0, 1.0);
    Sphere::init(nl);
 
-   Field3d f("scalar",nr,Sphere::nlat(),Sphere::nphi());
+   Field3d f("psi",nr,Sphere::nlat(),Sphere::nphi());
+
+   ID::ingoing_pulse(f);
 
    Cheb::cleanup();
    Sphere::cleanup();

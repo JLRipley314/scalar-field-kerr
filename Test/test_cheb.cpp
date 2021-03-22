@@ -31,12 +31,12 @@ TEST(ChebTest, toAndFrom) {
    Cheb::to_po(ch, po2);
 
    for (size_t i=0; i<nr; i++) {
-      std::cout
-         <<std::setw(16)<<i
-         <<std::setw(16)<<ch[i]
-         <<std::setw(16)<<po1[i]-po2[i]
-         <<std::endl;
-//      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
+//      std::cout
+//         <<std::setw(16)<<i
+//         <<std::setw(16)<<ch[i]
+//         <<std::setw(16)<<po1[i]-po2[i]
+//         <<std::endl;
+      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
    }
    Cheb::cleanup();
 }
