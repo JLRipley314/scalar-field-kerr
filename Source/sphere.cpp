@@ -9,13 +9,16 @@ namespace {
 
    size_t lmax_; /* highest l mode resolved */  
    size_t mmax_; /* highest azimuthal wavenumber described */
+   
+   size_t nYlm_; /* number of spherical harmonic coefficients */
+   size_t nSph_; /* number of spatial points */
 
    const size_t mres_ = 1;  /* angular periodicity (2*pi/mres) */
 
    const double eps_ = 1e-12; /* polar optimization threshold */
 
-   size_t nlat_; /* nlat gauss nodes (0,pi) 
-                    from sampling theorem need nlat > 2*lmax */
+   size_t nlat_; /* nlat Gauss-Legendre nodes (0,pi) 
+                    from sampling theorem need nlat > lmax */
    size_t nphi_; /* nphi equally spaced nodes; from [0,2*pi/mres)
                     from sampling theorem need nphi > 2*mmax */
 
@@ -29,11 +32,10 @@ void init(const size_t nl)
 {
    lmax_ = nl;
    mmax_ = lmax_;
-   if (nl%2==0) {
-      nlat_ = 3*lmax_; nphi_ = 3*mmax_;
-   } else {
-      nlat_ = 2*lmax_; nphi_ = 2*mmax_;
-   }
+   nlat_ = 2*lmax_; 
+   if (nl%2==0) { nphi_ = 3*mmax_; } 
+   else {         nphi_ = 2*mmax_; }
+
    shtns_verbose(1);     /* displays informations during initialization. */
    shtns_use_threads(0); /* enable multi-threaded transforms (if supported). */
    
@@ -56,6 +58,9 @@ void init(const size_t nl)
    Ylm_ = (cplx *)   fftw_malloc(         shtns_->nlm * sizeof(cplx));
    assert(Sph_!=nullptr);
    assert(Ylm_!=nullptr);
+
+   nSph_ = NSPAT_ALLOC(shtns_);
+   nYlm_ = shtns_->nlm;
 }
 /*==========================================================================*/
 /* spatial index */
@@ -63,39 +68,32 @@ void init(const size_t nl)
 inline size_t I_SPH(const size_t i_ph, const size_t i_th) {
    return i_ph*nlat_ + i_th;
 }
+/*==========================================================================*/
 size_t indx_Sph(const size_t i_ph, const size_t i_th) {
    return i_ph*nlat_ + i_th;
 }
 /*==========================================================================*/
 void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
 {
-   for (size_t ip=0; ip<nphi_; ip++) {
-   for (size_t it=0; it<nlat_; it++) {
-      Sph_[I_SPH(ip,it)] = sph[I_SPH(ip,it)];
-   }
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_[i] = sph[i];
    }
    spat_to_SH(shtns_, Sph_, Ylm_); 
 
-   for (size_t il=0;   il<=lmax_;  il++) {
-   for (size_t im=-il; im<=il;     im++) {
-      ylm[LM(shtns_,il,im)] = Ylm_[LM(shtns_,il,im)]; 
-   }
+   for (size_t lm=0; lm<nYlm_; lm++) {
+      ylm[lm] = Ylm_[lm]; 
    }
 }
 /*==========================================================================*/
 void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
 {
-   for (size_t il=0;   il<=lmax_;  il++) {
-   for (size_t im=-il; im<=il;     im++) {
-      Ylm_[LM(shtns_,il,im)] = ylm[LM(shtns_,il,im)]; 
-   }
+   for (size_t lm=0; lm<nYlm_; lm++) {
+      Ylm_[lm] = ylm[lm];
    }
    SH_to_spat(shtns_, Ylm_, Sph_); 
 
-   for (size_t ip=0; ip<nphi_; ip++) {
-   for (size_t it=0; it<nlat_; it++) {
-      sph[I_SPH(ip,it)] = Sph_[I_SPH(ip,it)];
-   }
+   for (size_t i=0; i<nSph_; i++) {
+      sph[i] = Sph_[i];
    }
 }
 /*==========================================================================*/
@@ -106,22 +104,20 @@ void laplace_beltrami(
    assert(v.size()  ==nlat_*nphi_);
    assert(ddv.size()==nlat_*nphi_);
 
-   for (size_t ip=0; ip<nphi_; ip++) {
-   for (size_t it=0; it<nlat_; it++) {
-      Sph_[I_SPH(ip,it)] = v[I_SPH(ip,it)];
-   }
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_[i] = v[i];
    }
    spat_to_SH(shtns_, Sph_, Ylm_);
-   for (size_t il=0;   il<=lmax_; il++) {
-   for (size_t im=-il; im<=il;    im++) {
-      Ylm_[LM(shtns_,il,im)] *= lap[il];
-   }
+
+   for (size_t lm=0; lm<nYlm_; lm++) {
+      const size_t l = shtns_->li[lm];
+
+      Ylm_[lm] *= lap[l];
    }
    SH_to_spat(shtns_, Ylm_, Sph_);
-   for (size_t ip=0; ip<nphi_; ip++) {
-   for (size_t it=0; it<nlat_; it++) {
-      ddv[I_SPH(ip,it)] = Sph_[I_SPH(ip,it)]; 
-   }
+
+   for (size_t i=0; i<nSph_; i++) {
+      ddv[i] = Sph_[i];
    }
 }
 /*==========================================================================*/
@@ -137,8 +133,8 @@ void cleanup()
 /*==========================================================================*/
 double nlat() { return nlat_; }
 double nphi() { return nphi_; }
-double nSph() { return nlat_*nphi_; }
-double nYlm() { return shtns_->nlm;  }
+double nSph() { return nSph_; }
+double nYlm() { return nYlm_; }
 /*==========================================================================*/
 double theta(const size_t i_th)
 {
@@ -146,7 +142,7 @@ double theta(const size_t i_th)
 }
 double phi(const size_t i_ph)
 {
-   return PHI_RAD(shtns_,i_ph);
+   return i_ph*2.0*M_PI/((shtns_->nphi)*(shtns_->mres));
 }
 /*==========================================================================*/
 } /* Sphere */

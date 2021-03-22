@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <vector>
 
@@ -24,15 +25,25 @@ TEST(SphereTest, toAndFrom) {
     */
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
-      po1[Sphere::indx_Sph(ip,it)] = 1.0 + pow(sin(Sphere::theta(it)),2);
+      po1[Sphere::indx_Sph(ip,it)] = 
+            1.0 
+         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
+         ;
    }
    }
 
    Sphere::to_Ylm(po1, ylm);
    Sphere::to_Sph(ylm, po2);
 
-   for (size_t i=0; i<nl; i++) {
-      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      std::cout
+         <<std::setw(16)<<Sphere::theta(it)
+         <<std::setw(16)<<Sphere::phi(ip)
+         <<std::setw(16)<<po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)]
+         <<std::endl;
+//      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
+   }
    }
    Sphere::cleanup();
 }
