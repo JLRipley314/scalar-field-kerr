@@ -7,43 +7,41 @@
 /* Class to store Chebyshev points over interval [lower,upper]
  * and compute Chebyshev derivatives */
 /*===========================================================================*/
-class Cheb {
-   private:
-      const int n;
+namespace Cheb {
+/*---------------------------------------------------------------------------*/
+   namespace {
+         int n_;
 
-      const double lower;
-      const double upper;
-      const double jacobian; /* (upper-lower)/2.0 */
-      /* 
-       * Chebyshev points over interval [lower,upper] 
-       */
-      std::vector<double> pts;
+         double lower_;
+         double upper_;
+         double jacobian_; 
+         /* 
+          * Chebyshev points over interval [lower,upper] 
+          */
+         std::vector<double> pts_;
 
-      std::vector<double> low_pass;
-      /* 
-       * for fftw Fourier transform 
-       */
-      double *in;
-      double *out;
-      fftw_plan plan_dct;
+         std::vector<double> low_pass_;
+         /* 
+          * for fftw Fourier transform 
+          */
+         double *in_;
+         double *out_;
+         fftw_plan plan_dct_;
+   }
+/*---------------------------------------------------------------------------*/
+   void init(const int n, const double lower, const double upper);
+   void cleanup();
 
-   public:
-      Cheb(const int n, 
-            const double lower, 
-            const double upper
+   void to_ch(const std::vector<double> &po, std::vector<double> &ch);
+   void to_po(const std::vector<double> &ch, std::vector<double> &po);
+
+   void der(const std::vector<double> &v, 
+         std::vector<double> &ch, std::vector<double> &dv
          );
-      ~Cheb();
 
-      void to_ch(const std::vector<double> &po, std::vector<double> &ch);
-      void to_po(const std::vector<double> &ch, std::vector<double> &po);
+   void filter(std::vector<double> &ch, std::vector<double> &v);
 
-      void der(const std::vector<double> &v, 
-            std::vector<double> &ch, std::vector<double> &dv
-            );
-
-      void filter(std::vector<double> &ch, std::vector<double> &v);
-
-      inline double pt(const size_t i) { return pts[i]; }
+   inline double pt(const size_t i) { return pts_[i]; }
 };
 /*===========================================================================*/
 #endif /* _CHEB_HPP_ */
