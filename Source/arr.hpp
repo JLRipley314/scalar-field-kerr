@@ -1,8 +1,9 @@
-#ifndef _ARR_HPP_
-#define _ARR_HPP_
 /*
  * Routines to manipulate 3d arrays 
  */
+#ifndef _ARR_HPP_
+#define _ARR_HPP_
+
 #include <vector>
 /*=========================================================================*/
 namespace Arr3d {

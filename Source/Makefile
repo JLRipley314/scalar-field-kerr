@@ -10,9 +10,9 @@ SHTNS_LIB = -L/lib/x86_64-linux-gnu -L/home/jripley/shtns/Library/lib
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra \
 	 -lshtns -lfftw3 -lm
 #=============================================================================
-OBJ = params.o cheb.o sphere.o arr.o initial_data.o main.o
+OBJ = params.o io.o cheb.o sphere.o arr.o initial_data.o main.o
 
-DEPS = params.hpp cheb.hpp sphere.hpp initial_data.hpp arr.hpp
+DEPS = params.hpp io.hpp cheb.hpp sphere.hpp initial_data.hpp arr.hpp
 #=============================================================================
 .PHONY: all
 all: default.run

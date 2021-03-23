@@ -1,3 +1,7 @@
+/*
+ * utility routines for reading from parameter file
+ * and accessing parameters in code
+ */
 #ifndef _PARAMS_HPP_
 #define _PARAMS_HPP_
 

@@ -1,9 +1,9 @@
+/*
+ * Stores Chebyshev points over interval [lower,upper]
+ * and computes Chebyshev derivatives 
+ */
 #ifndef _CHEB_HPP_
 #define _CHEB_HPP_
-/*===========================================================================*/
-/* Stores Chebyshev points over interval [lower,upper]
- * and computes Chebyshev derivatives */
-/*===========================================================================*/
 
 #include <vector>
 #include <fftw3.h>

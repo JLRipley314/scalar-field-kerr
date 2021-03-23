@@ -1,8 +1,9 @@
+/*
+ * Spherical harmonics and derivatives 
+ */
 #ifndef _SPHERE_HPP_
 #define _SPHERE_HPP_
-/*===========================================================================*/
-/* Spherical harmonics and derivatives */
-/*===========================================================================*/
+
 #include <vector>
 #include <complex>
 #include <cmath>

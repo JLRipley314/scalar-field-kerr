@@ -1,3 +1,6 @@
+/*
+ * writes initial data for scalar field variables 
+ */
 #ifndef _ID_HPP_
 #define _ID_HPP_
 
