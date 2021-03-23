@@ -5,7 +5,8 @@
 namespace Sphere {
 /*==========================================================================*/
 namespace {
-   shtns_cfg shtns_; /* spherical harmonic struct */
+   const size_t mres_ = 1;     /* angular periodicity (2*pi/mres) */
+   const double eps_  = 1e-12; /* polar optimization threshold */
 
    size_t lmax_; /* highest l mode resolved */  
    size_t mmax_; /* highest azimuthal wavenumber described */
@@ -13,29 +14,40 @@ namespace {
    size_t nYlm_; /* number of spherical harmonic coefficients */
    size_t nSph_; /* number of spatial points */
 
-   const size_t mres_ = 1;  /* angular periodicity (2*pi/mres) */
-
-   const double eps_ = 1e-12; /* polar optimization threshold */
 
    size_t nlat_; /* nlat Gauss-Legendre nodes (0,pi) 
                     from sampling theorem need nlat > lmax */
    size_t nphi_; /* nphi equally spaced nodes; from [0,2*pi/mres)
                     from sampling theorem need nphi > 2*mmax */
 
-   double *Sph_; /* spherical space */
-   cplx   *Ylm_; /* spherical harmonic coefficients */
+   shtns_cfg shtns_; /* spherical harmonic struct */
+   double *Sph_;     /* spherical space */
+   cplx   *Ylm_;     /* spherical harmonic coefficients */
 
    std::vector<double> lap; /* Laplace-Beltrami operator on the unit sphere:
                                \Delta Y_{lm} = -l(l+1) Y_{lm} */
 }
 /*==========================================================================*/
-void init(const size_t nl)
+size_t nlat() { return nlat_; }
+size_t nphi() { return nphi_; }
+size_t nSph() { return nSph_; }
+size_t nYlm() { return nYlm_; }
+/*==========================================================================*/
+double theta(const size_t i_th)
+{
+   return acos(shtns_->ct[i_th]);
+}
+double phi(const size_t i_ph)
+{
+   return i_ph*2.0*M_PI/((shtns_->nphi)*(shtns_->mres));
+}
+/*==========================================================================*/
+void init(const size_t nl, const size_t nlat, const size_t nphi)
 {
    lmax_ = nl;
    mmax_ = lmax_;
-   nlat_ = lmax_ + 2; 
-   if (nl%2==0) { nphi_ = 3*mmax_; } 
-   else {         nphi_ = 2*mmax_; }
+   nlat_ = nlat; 
+   nphi_ = nphi; 
 
    shtns_verbose(1);     /* displays informations during initialization. */
    shtns_use_threads(0); /* enable multi-threaded transforms (if supported). */
@@ -64,14 +76,23 @@ void init(const size_t nl)
    nYlm_ = shtns_->nlm;
 }
 /*==========================================================================*/
-/* spatial index */
-/*==========================================================================*/
-inline size_t I_SPH(const size_t i_ph, const size_t i_th) {
-   return i_ph*nlat_ + i_th;
+void cleanup()
+{
+   assert(Sph_!=nullptr);
+   assert(Ylm_!=nullptr);
+   fftw_free(Sph_);
+   fftw_free(Ylm_);
+
+   shtns_destroy(shtns_);
 }
 /*==========================================================================*/
-size_t indx_Sph(const size_t i_ph, const size_t i_th) {
-   return i_ph*nlat_ + i_th;
+/* NOTE the indexing! we are using "SHT_NATIVE_LAYOUT", so in
+ * fact theta varies the fastest; we do access in that order though
+ * as the ``canonical'' ordering is (theta,phi) */
+/*==========================================================================*/
+size_t indx_Sph(const size_t i_th, const size_t i_ph)
+{
+   return nlat_*i_ph + i_th;
 }
 /*==========================================================================*/
 void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
@@ -122,30 +143,6 @@ void laplace_beltrami(
    for (size_t i=0; i<nSph_; i++) {
       ddv[i] = Sph_[i];
    }
-}
-/*==========================================================================*/
-void cleanup()
-{
-   assert(Sph_!=nullptr);
-   assert(Ylm_!=nullptr);
-   fftw_free(Sph_);
-   fftw_free(Ylm_);
-
-   shtns_destroy(shtns_);
-}
-/*==========================================================================*/
-size_t nlat() { return nlat_; }
-size_t nphi() { return nphi_; }
-size_t nSph() { return nSph_; }
-size_t nYlm() { return nYlm_; }
-/*==========================================================================*/
-double theta(const size_t i_th)
-{
-   return acos(shtns_->ct[i_th]);
-}
-double phi(const size_t i_ph)
-{
-   return i_ph*2.0*M_PI/((shtns_->nphi)*(shtns_->mres));
 }
 /*==========================================================================*/
 /* returns values for spherical harmonic in real space Y_{l_ang,m_ang} */

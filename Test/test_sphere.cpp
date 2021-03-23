@@ -13,8 +13,10 @@ const double eps = 1e-14;
  * without changing the value of the array (to within truncation error). 
  */
 TEST(SphereTest, toAndFrom) {
-   const size_t nl = pow(2,5);
-   Sphere::init(nl);
+   const size_t nl   = pow(2,5);
+   const size_t nlat = nl + 2;
+   const size_t nphi = 3*nl;
+   Sphere::init(nl, nlat, nphi);
 
    std::vector<double> po1(Sphere::nSph(),0);
    std::vector<double> po2(Sphere::nSph(),0);
@@ -24,7 +26,7 @@ TEST(SphereTest, toAndFrom) {
     */
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
-      po1[Sphere::indx_Sph(ip,it)] = 
+      po1[Sphere::indx_Sph(it,ip)] = 
             1.0 
          +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
          ;
@@ -38,10 +40,10 @@ TEST(SphereTest, toAndFrom) {
 //      std::cout
 //         <<std::setw(16)<<Sphere::theta(it)
 //         <<std::setw(16)<<Sphere::phi(ip)
-//         <<std::setw(16)<<po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)]
+//         <<std::setw(16)<<po1[Sphere::indx_Sph(it,ip)]-po2[Sphere::indx_Sph(it,ip)]
 //         <<std::endl;
       EXPECT_TRUE(
-            abs(po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)])
+            abs(po1[Sphere::indx_Sph(it,ip)]-po2[Sphere::indx_Sph(it,ip)])
             < eps
          );
    }

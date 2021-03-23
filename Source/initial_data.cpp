@@ -1,6 +1,10 @@
 #include "initial_data.hpp"
+#include "arr.hpp"
+#include "params.hpp"
 #include "sphere.hpp"
 
+using Arr3d::indx;
+using Sphere::indx_Sph;
 /*==========================================================================*/
 namespace ID 
 {
@@ -8,19 +12,22 @@ namespace ID
 /* time symmetric compact bump for phi of angular dependence Y_{lm} */
 /*==========================================================================*/
 void ingoing_pulse(
-      const double amp,
-      const double width,
-      const double rl,
-      const double ru,
-      const int l_ang,
-      const in m_ang,
-      const std::vector<double> rv,
-      Field3d &f,
-      Field3d &q,
-      Field3d &f
-   )
+      const std::vector<double> &rv,
+      std::vector<double> &f,
+      std::vector<double> &p,
+      std::vector<double> &q)
 {
-   assert(r.size()==f.nx());
+   const size_t nx   = Params::nx();
+   const size_t nlat = Params::nlat();
+   const size_t nphi = Params::nphi();
+
+   const double cl  = Params::cl();
+   const double amp = Params::amp();
+   const double rl  = Params::r_l();
+   const double ru  = Params::r_u();
+
+   const int l_ang  = Params::l_ang();
+   const int m_ang  = Params::m_ang();
 
    double max_val = 0.0;
 
@@ -29,38 +36,38 @@ void ingoing_pulse(
 
    std::vector<double> ylm = Sphere::compute_ylm(l_ang, m_ang);
 
-   for (size_t i=0; i<f.nx; i++) {
-   for (size_t j=0; j<f.ny; j++) {
-   for (size_t k=0; k<f.nz; k++) {
-      double r    = rv[i];
+   for (size_t ix=0; ix<nx;   ix++) {
+   for (size_t it=0; it<nlat; it++) {
+   for (size_t ip=0; ip<nphi; ip++) {
+      double r    = rv[ix];
       double bump = 0.0;
 
       if ((r<ru) && (r>rl)) {
          bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
       }
-      f.vals[f.indx(i,j,k)] = (((r-rl)/width)**2) * (((ru-r)/width)**2) * bump; 
+      f[indx(ix,it,ip)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
 
-      q.vals[q.indx(i,j,j)] = (
+      q[indx(ix,it,ip)] = (
          (2.0*(((r-rl)/width)   )*pow(((ru-r)/width),2))
       -  (2.0*pow((r-rl)/width,2)*((ru-r)/width       ))
-      +  (1.0*(1.0_             )*pow(((ru-r)/width),2))
+      +  (1.0*(1.0              )*pow(((ru-r)/width),2))
       -  (2.0*pow((r-rl)/width,2)*(1.0                ))
       )*bump/width;
 
-      q.vals[q.indx(i,j,j)] *= -pow(r/cl,2);
+      q[indx(ix,it,ip)] *= -pow(r/cl,2);
       /*
        * time symmetric for now
        */ 
-      p.vals[p.indx(i,j,j)] = 0.0;
+      p[indx(ix,it,ip)] = 0.0;
       /*
        * give angular structure Y_{lm} 
        */
-      f.vals[f.indx(i,j,k)] *= ylm[Sphere::indx_Sph(j,k)];
-      q.vals[q.indx(i,j,k)] *= ylm[Sphere::indx_Sph(j,k)];
-      p.vals[p.indx(i,j,k)] *= ylm[Sphere::indx_Sph(j,k)];
+      f[indx(ix,it,ip)] *= ylm[indx_Sph(it,ip)];
+      q[indx(ix,it,ip)] *= ylm[indx_Sph(it,ip)];
+      p[indx(ix,it,ip)] *= ylm[indx_Sph(it,ip)];
 
-      if (abs(f.vals[f.indx(i,j,k)]) > max_val) {
-         max_val = abs(f.vals[f.indx(i,j,k)])
+      if (abs(f[indx(ix,it,ip)]) > max_val) {
+         max_val = abs(f[indx(ix,it,ip)]);
       }
    }
    }
@@ -68,12 +75,12 @@ void ingoing_pulse(
    /* 
     * rescale so initial amplitude is amp
     */
-   for (size_t i=0; i<f.nx; i++) {
-   for (size_t j=0; j<f.ny; j++) {
-   for (size_t k=0; k<f.nz; k++) {
-      p.vals[f.indx(i,j,k)] *= amp / max_val;
-      p.vals[q.indx(i,j,k)] *= amp / max_val;
-      p.vals[q.indx(i,j,k)] *= amp / max_val; 
+   for (size_t ix=0; ix<nx;   ix++) {
+   for (size_t it=0; it<nlat; it++) {
+   for (size_t ip=0; ip<nphi; ip++) {
+      p[indx(ix,it,ip)] *= amp / max_val;
+      p[indx(ix,it,ip)] *= amp / max_val;
+      p[indx(ix,it,ip)] *= amp / max_val; 
    }
    }
    }
@@ -81,5 +88,3 @@ void ingoing_pulse(
 /*==========================================================================*/
 } /* ID */
 /*==========================================================================*/
-#endif /* _ID_HPP_ */
-

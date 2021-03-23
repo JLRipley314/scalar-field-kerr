@@ -1,7 +1,7 @@
 #ifndef _SPHERE_HPP_
 #define _SPHERE_HPP_
 /*===========================================================================*/
-/* Spherical harmonics and derivatives */ 
+/* Spherical harmonics and derivatives */
 /*===========================================================================*/
 #include <vector>
 #include <complex>
@@ -11,13 +11,13 @@
 /*===========================================================================*/
 namespace Sphere {
 /*===========================================================================*/
-   void init(const size_t nl);
+   void init(const size_t nl, const size_t nlat, const size_t nphi);
    void cleanup();
 
    void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph);
    void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm);
 
-   size_t indx_Sph(const size_t i_ph, const size_t i_th);
+   size_t indx_Sph(const size_t i_th, const size_t i_ph);
 
    size_t nlat();
    size_t nphi();
