@@ -13,15 +13,6 @@ class Sim:
 #=============================================================================
    def __init__(self,args:List[str])->None:
       self.home_dir= str(os.getcwd())
-
-      assert len(args) > 1, (
-         'argv[1] is empty-meed a run_type to run!'
-      )	
-      self.run_type = args[1]
-      if (len(args)>2 and args[2]=='debug'):
-         self.debug=True
-      else:
-         self.debug=False
 #=============================================================================
    def make_output_dir(self)->None:
       time_of_day= time.asctime().split()

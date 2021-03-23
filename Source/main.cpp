@@ -16,9 +16,9 @@ int main(int argc, char **argv)
 
    Params::init(output_dir);
 
-   Cheb::init(  Params::nx(), Params::rbl(),  Params::rbu());
-   Sphere::init(Params::nl(), Params::nlat(), Params::nphi());
    Arr3d::init( Params::nx(), Params::nlat(), Params::nphi());
+   Sphere::init(Params::nl(), Params::nlat(), Params::nphi());
+   Cheb::init(  Params::nx(), Params::rbl(),  Params::rbu());
 
    std::vector<double> f = Arr3d::arr3d(0.0);
    std::vector<double> p = Arr3d::arr3d(0.0);
