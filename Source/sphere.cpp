@@ -145,6 +145,29 @@ void laplace_beltrami(
    }
 }
 /*==========================================================================*/
+/* low pass filter in spherical harmonic coefficient space
+ * Note that only positive m are stored in spherical harmonic space,
+ * as we only deal with real scalar fields. */
+/*==========================================================================*/
+void filter(std::vector<double> &v)
+{
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_[i] = v[i];
+   }
+   spat_to_SH(shtns_, Sph_, Ylm_);
+
+   for (size_t l=0; l<lmax_; l++) {
+   for (size_t m=0; m<l;     m++) {
+      Ylm_[LM(shtns_,l,m)] *= exp(-36*pow(double(l)/lmax_,10)*pow(double(m)/lmax_,10));
+   }
+   }
+   SH_to_spat(shtns_, Ylm_, Sph_);
+
+   for (size_t i=0; i<nSph_; i++) {
+      v[i] = Sph_[i];
+   }
+}
+/*==========================================================================*/
 /* returns values for spherical harmonic in real space Y_{l_ang,m_ang} */
 /*==========================================================================*/
 std::vector<double> compute_ylm(const int l_ang, const int m_ang)

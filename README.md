@@ -1,7 +1,7 @@
 # Scalar field dynamics around a Kerr black hole
 
 A c++(14) and python code that solves the equations of 
-motion for real and complex scalar fields around a Kerr black hole.
+motion for a real scalar field around a Kerr black hole.
 
 Look under **Releases** for the latest stable version of this code.
 
@@ -15,8 +15,11 @@ Runtime parameters are configured in the `setup.py` file.
 * SHTns:
 	https://nschaeff.bitbucket.io/shtns/
 
-* OpenMP: 
+* OpenMP (optional): 
 	https://www.openmp.org/
+
+* googletest (optional; for unit testing; see Test/): 
+	https://github.com/google/googletest
 
 I have successfully compiled the code with g++
 

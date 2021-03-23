@@ -27,6 +27,10 @@ namespace Sphere {
    double theta(const size_t i_th);  
    double phi(  const size_t i_ph);
 
+   void laplace_beltrami(const std::vector<double> v, std::vector<double> ddv);
+
+   void filter(std::vector<double> &v);
+
    std::vector<double> compute_ylm(const int l_ang, const int m_ang);
 /*===========================================================================*/
 } /* Sphere */

@@ -18,6 +18,12 @@ namespace {
 
       std::vector<double> low_pass_;
       /* 
+       * stand-in for chebyshev coefficients and position space
+       * for some routines 
+       */
+      std::vector<double> internal_po_;
+      std::vector<double> internal_ch_;
+      /* 
        * for fftw Fourier transform 
        */
       double *in_;
@@ -36,6 +42,8 @@ void init(const int n, const double lower, const double upper)
 
    pts_.resize(n_,0.0);
    low_pass_.resize(n_,0.0);
+   internal_po_.resize(n_,0.0);
+   internal_ch_.resize(n_,0.0);
    /* 
     * Chebyshev points on interval [lower, upper]
     */
@@ -129,34 +137,32 @@ void to_po(const std::vector<double> &ch, std::vector<double> &po)
 /*==========================================================================*/
 /* Compute derivative over interval */
 /*==========================================================================*/
-void der(const std::vector<double> &v, 
-      std::vector<double> &ch, std::vector<double> &dv)
+void der(const std::vector<double> &v, std::vector<double> &dv)
 {
    assert(v.size()==n_);
-   assert(ch.size()==n_);
    assert(dv.size()==n_);
 
-   to_ch(v,ch);
+   to_ch(v,internal_ch_);
    /*
     * to start Chebyshev derivative recurrence relation 
     */
-   ch[n_-1] = 0;
-   ch[n_-2] = 0;
+   internal_ch_[n_-1] = 0;
+   internal_ch_[n_-2] = 0;
    /* 
     * use dv as a temporary array
     */
-   for (size_t i=0; i<n_; i++) {dv[i] = ch[i];}
+   for (size_t i=0; i<n_; i++) {dv[i] = internal_ch_[i];}
    /* 
     * apply Chebyshev derivative recurrence relation 
     */
    for (size_t i=n_-2; i>=1; i--) { 
-      ch[i-1] = 2.0*(i-1)*dv[i] + ch[i+1];
+      internal_ch_[i-1] = 2.0*(i-1)*dv[i] + internal_ch_[i+1];
    } 
-   ch[0] /= 2.0;
+   internal_ch_[0] /= 2.0;
    /* 
     * Normalize derivative to inverval 
     */
-   to_po(ch,dv);
+   to_po(internal_ch_,dv);
    for (size_t i=0; i<n_; i++) {
       dv[i] *= jacobian_;
    }
@@ -164,16 +170,15 @@ void der(const std::vector<double> &v,
 /*==========================================================================*/
 /* Low pass filter of Chebyshev coefficients */
 /*==========================================================================*/
-void filter(std::vector<double> &ch, std::vector<double> &v)
+void filter(std::vector<double> &v)
 {
-   assert(ch.size()==n_);
    assert(v.size()==n_);
 
-   to_ch(v,ch);
+   to_ch(v,internal_ch_);
    for (size_t i=0; i<n_; i++) { 
-      ch[i] *= low_pass_[i];
+      internal_ch_[i] *= low_pass_[i];
    } 
-   to_po(ch,v);
+   to_po(internal_ch_,v);
 }
 /*==========================================================================*/
 size_t n() { return n_; }
