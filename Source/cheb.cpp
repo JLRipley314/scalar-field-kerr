@@ -139,7 +139,7 @@ void to_po(const std::vector<double> &ch, std::vector<double> &po)
 /*==========================================================================*/
 void der(const std::vector<double> &v, std::vector<double> &dv)
 {
-   assert(v.size()==n_);
+   assert(v.size( )==n_);
    assert(dv.size()==n_);
 
    to_ch(v,internal_ch_);
@@ -151,12 +151,14 @@ void der(const std::vector<double> &v, std::vector<double> &dv)
    /* 
     * use dv as a temporary array
     */
-   for (size_t i=0; i<n_; i++) {dv[i] = internal_ch_[i];}
+   for (size_t i=0; i<n_; i++) {
+      dv[i] = internal_ch_[i];
+   }
    /* 
     * apply Chebyshev derivative recurrence relation 
     */
    for (size_t i=n_-2; i>=1; i--) { 
-      internal_ch_[i-1] = 2.0*(i-1)*dv[i] + internal_ch_[i+1];
+      internal_ch_[i-1] = 2.0*i*dv[i] + internal_ch_[i+1];
    } 
    internal_ch_[0] /= 2.0;
    /* 
@@ -164,7 +166,7 @@ void der(const std::vector<double> &v, std::vector<double> &dv)
     */
    to_po(internal_ch_,dv);
    for (size_t i=0; i<n_; i++) {
-      dv[i] *= jacobian_;
+      dv[i] /= jacobian_;
    }
 }
 /*==========================================================================*/

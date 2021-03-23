@@ -5,7 +5,7 @@ motion for a real scalar field around a Kerr black hole.
 
 Look under **Releases** for the latest stable version of this code.
 
-Runtime parameters are configured in the `setup.py` file.
+Runtime parameters are configured in the `config.py` file.
 
 ## Libraries
 

@@ -8,12 +8,12 @@
 
 #include "../Source/cheb.hpp"
 
-const double eps = 1e-14;
 /*==========================================================================*/
 /* Testing we can go to/from Chebyshev space,
  * without changing the value of the array (to within truncation error). 
  */
 TEST(cheb_test, to_and_from) {
+   const double eps = 1e-14;
    const size_t nr = pow(2,5);
    Cheb::init(nr, 0.0, 1.0);
 
@@ -64,5 +64,31 @@ TEST(cheb_test, filter_is_TVD) {
       tv2 += abs(po2[i+1] - po2[i]);
    }
    EXPECT_TRUE(tv2 < tv1);
+   Cheb::cleanup();
+}
+/*==========================================================================*/
+/* Testing we can compute derivatives of simple functions 
+ */
+TEST(cheb_test, derivatives) {
+   const double eps = 5e-14;
+   const size_t nr = pow(2,5);
+   Cheb::init(nr, 0.0, 1.0);
+
+   std::vector<double> v(  nr,0);
+   std::vector<double> dv1(nr,0);
+   std::vector<double> dv2(nr,0);
+   /* 
+    * fill in values
+    */
+   for (size_t i=0; i<nr; i++) {
+      v[i]   = Cheb::pt(i)*sin(Cheb::pt(i));
+      dv1[i] = Cheb::pt(i)*cos(Cheb::pt(i)) + sin(Cheb::pt(i));
+   }
+
+   Cheb::der(v, dv2);
+
+   for (size_t i=0; i<nr; i++) {
+      EXPECT_TRUE(abs(dv1[i] - dv2[i]) < eps);
+   }
    Cheb::cleanup();
 }
