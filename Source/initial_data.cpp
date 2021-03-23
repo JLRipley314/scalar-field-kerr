@@ -1,6 +1,7 @@
 #include "initial_data.hpp"
 #include "arr.hpp"
 #include "params.hpp"
+#include "cheb.hpp"
 #include "sphere.hpp"
 
 using Arr3d::indx;
@@ -12,7 +13,6 @@ namespace ID
 /* time symmetric compact bump for phi of angular dependence Y_{lm} */
 /*==========================================================================*/
 void ingoing_pulse(
-      const std::vector<double> &rv,
       std::vector<double> &f,
       std::vector<double> &p,
       std::vector<double> &q)
@@ -39,7 +39,7 @@ void ingoing_pulse(
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t it=0; it<nlat; it++) {
    for (size_t ip=0; ip<nphi; ip++) {
-      double r    = rv[ix];
+      double r    = Cheb::pt(ix);
       double bump = 0.0;
 
       if ((r<ru) && (r>rl)) {

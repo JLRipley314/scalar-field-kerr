@@ -16,6 +16,10 @@ void init(const size_t nx, const size_t ny, const size_t nz)
    nz_ = nz;
 }
 /*=========================================================================*/
+void cleanup()
+{
+};
+/*=========================================================================*/
 std::vector<double> arr3d(const double val)
 {
    std::vector<double> out(nx_*ny_*nz_,val);

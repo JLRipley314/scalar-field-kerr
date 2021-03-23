@@ -8,7 +8,6 @@ namespace ID
 {
 /*==========================================================================*/
 void ingoing_pulse(
-      const std::vector<double> &rv,
       std::vector<double> &f,
       std::vector<double> &p,
       std::vector<double> &q
