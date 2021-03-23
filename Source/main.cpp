@@ -1,28 +1,31 @@
+#include <cassert>
 #include <cmath>
 #include <iostream>
+#include <string>
 
+#include "params.hpp"
 #include "cheb.hpp"
 #include "sphere.hpp"
 #include "arr.hpp"
 #include "initial_data.hpp"
 
-int main() {
-   const size_t nr = pow(2,6);
-   const size_t nl = pow(2,4);
-   const size_t nlat = nl + 2;
-   const size_t nphi = 3*nl;
-   
-   const double lower = 0.0;
-   const double upper = 1.0;
+int main(int argc, char **argv)
+{
+   assert(argc==2);
+   const std::string output_dir= argv[1];
 
-   Cheb::init(  nr, lower, upper);
-   Sphere::init(nl, nlat, nphi);
-   Arr3d::init( nr, nlat, nphi);
+   Params::init(output_dir);
 
-   std::vector<double> f = Arr3d::arr3d(1.0);
-   std::vector<double> p = Arr3d::arr3d(1.0);
-   std::vector<double> q = Arr3d::arr3d(1.0);
+   Cheb::init(  Params::nx(), Params::rbl(),  Params::rbu());
+   Sphere::init(Params::nl(), Params::nlat(), Params::nphi());
+   Arr3d::init( Params::nx(), Params::nlat(), Params::nphi());
 
+   std::vector<double> f = Arr3d::arr3d(0.0);
+   std::vector<double> p = Arr3d::arr3d(0.0);
+   std::vector<double> q = Arr3d::arr3d(0.0);
+   /* 
+    * initial data 
+    */
    ID::ingoing_pulse(f,p,q);
 
    Cheb::  cleanup();

@@ -20,6 +20,7 @@ namespace Params
    {
       size_t nt_;
       size_t nx_;
+      size_t nl_;
       size_t nlat_;
       size_t nphi_;
       int t_step_save_;
@@ -29,6 +30,9 @@ namespace Params
 
       double curv_;
       double cl_;
+
+      double rbl_;
+      double rbu_;
 
       int initial_exc_i_;
 
@@ -68,6 +72,7 @@ namespace Params
    /*========================================================================*/
     size_t nt() {return nt_;};
     size_t nx() {return nx_;};
+    size_t nl() {return nl_;};
     size_t nlat() {return nlat_;};
     size_t nphi() {return nphi_;};
     int t_step_save() {return t_step_save_;};
@@ -77,6 +82,9 @@ namespace Params
 
     double curv() {return curv_;};
     double cl()   {return cl_;};
+
+    double rbl()   {return rbl_;};
+    double rbu()   {return rbu_;};
 
     int initial_exc_i() {return initial_exc_i_;};
 
@@ -101,6 +109,7 @@ namespace Params
    {
       nt_   = stoi(read(output_dir,"nt"));
       nx_   = stoi(read(output_dir,"nx"));
+      nl_   = stoi(read(output_dir,"nl"));
       nlat_ = stoi(read(output_dir,"nlat"));
       nphi_ = stoi(read(output_dir,"nphi"));
 
@@ -112,6 +121,9 @@ namespace Params
 
       curv_ = stod(read(output_dir,"curvature"));
       cl_ =   stod(read(output_dir,"compactification_scale"));
+
+      rbl_ =   stod(read(output_dir,"r_bound_lower"));
+      rbu_ =   stod(read(output_dir,"r_bound_upper"));
 
       initial_exc_i_ = stoi(read(output_dir,"initial_exc_i"));
 

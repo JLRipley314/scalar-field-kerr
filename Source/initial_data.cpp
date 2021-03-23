@@ -36,10 +36,10 @@ void ingoing_pulse(
 
    std::vector<double> ylm = Sphere::compute_ylm(l_ang, m_ang);
 
-   for (size_t ix=0; ix<nx;   ix++) {
+   for (size_t ix=0; ix<nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
    for (size_t it=0; it<nlat; it++) {
    for (size_t ip=0; ip<nphi; ip++) {
-      double r    = Cheb::pt(ix);
+      double r    = pow(cl,2)/Cheb::pt(ix);
       double bump = 0.0;
 
       if ((r<ru) && (r>rl)) {

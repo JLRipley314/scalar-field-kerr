@@ -6,8 +6,16 @@
 /*===========================================================================*/
 namespace Params
 {
+  /* 
+   * read in params from file
+   */ 
+   void init(const std::string output_dir);
+   /*
+    * parameters 
+    */
    size_t nt();
    size_t nx();
+   size_t nl();
    size_t nlat();
    size_t nphi();
    int t_step_save();
@@ -19,18 +27,23 @@ namespace Params
    double curv();
    double cl();
 
+   double rbl();
+   double rbu();
+
    int initial_exc_i();
 
    double bh_mass();
-/*---------------------------------------------------------------------------*/
-/* for the potentials */
+   /* 
+    * for the potentials 
+    */
    double V_0();
    double V_1();
    double V_2();
    double V_3();
    double V_4();
-/*---------------------------------------------------------------------------*/
-/* for the initial data */
+   /* 
+    * for the initial data 
+    */
    std::string id();
 
    double amp();
@@ -39,7 +52,5 @@ namespace Params
 
    int l_ang();
    int m_ang();
-   
-   void init(const std::string output_dir);
 }
 #endif // _PARAMS_HPP_
