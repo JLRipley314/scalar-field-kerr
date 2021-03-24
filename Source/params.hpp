@@ -22,7 +22,7 @@ namespace Params
    size_t nl();
    size_t nlat();
    size_t nphi();
-   int t_step_save();
+   size_t t_step_save();
 
    int direction();
 

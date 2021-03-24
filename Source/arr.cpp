@@ -26,7 +26,7 @@ std::vector<double> arr3d(const double val)
    return out;
 }
 /*=========================================================================*/
-void row1(const size_t j, const size_t k, 
+void get_row1(const size_t j, const size_t k, 
       const std::vector<double> &in,
       std::vector<double> &out) 
 {
@@ -37,7 +37,7 @@ void row1(const size_t j, const size_t k,
    }
 } 
 /*=========================================================================*/
-void row2(const size_t i, const size_t k, 
+void get_row2(const size_t i, const size_t k, 
       const std::vector<double> &in,
       std::vector<double> &out) 
 {
@@ -48,7 +48,7 @@ void row2(const size_t i, const size_t k,
    }
 } 
 /*=========================================================================*/
-void row3(const size_t i, const size_t j, 
+void get_row3(const size_t i, const size_t j, 
       const std::vector<double> &in,
       std::vector<double> &out) 
 {
@@ -59,7 +59,7 @@ void row3(const size_t i, const size_t j,
    }
 } 
 /*=========================================================================*/
-void row12(const size_t k, 
+void get_row12(const size_t k, 
       const std::vector<double> &in,
       std::vector<double> &out)
 {
@@ -72,7 +72,7 @@ void row12(const size_t k,
    }
 }
 /*=========================================================================*/
-void row13(const size_t j, 
+void get_row13(const size_t j, 
       const std::vector<double> &in,
       std::vector<double> &out)
 {
@@ -85,7 +85,7 @@ void row13(const size_t j,
    }
 }
 /*=========================================================================*/
-void row23(const size_t i, 
+void get_row23(const size_t i, 
       const std::vector<double> &in,
       std::vector<double> &out)
 {
@@ -94,6 +94,78 @@ void row23(const size_t i,
    for (size_t j=0; j<ny_; j++) {
    for (size_t k=0; k<nz_; k++) {
       out[INDX2D(nz_,j,k)] = in[INDX3D(ny_,nz_,i,j,k)];
+   }
+   }
+}
+/*=========================================================================*/
+void set_row1(const size_t j, const size_t k, 
+      const std::vector<double> &in,
+      std::vector<double> &out) 
+{
+   assert(in.size() ==nx_);
+   assert(out.size()==nx_*ny_*nz_);
+   for (size_t i=0; i<nx_; i++) {
+      out[INDX3D(ny_,nz_,i,j,k)] = in[i];
+   }
+} 
+/*=========================================================================*/
+void set_row2(const size_t i, const size_t k, 
+      const std::vector<double> &in,
+      std::vector<double> &out) 
+{
+   assert(in.size() ==ny_);
+   assert(out.size()==nx_*ny_*nz_);
+   for (size_t j=0; j<ny_; j++) {
+      out[INDX3D(ny_,nz_,i,j,k)] = in[j];
+   }
+} 
+/*=========================================================================*/
+void set_row3(const size_t i, const size_t j, 
+      const std::vector<double> &in,
+      std::vector<double> &out) 
+{
+   assert(in.size() ==nz_);
+   assert(out.size()==nx_*ny_*nz_);
+   for (size_t k=0; k<nz_; k++) {
+      out[INDX3D(ny_,nz_,i,j,k)] = in[k];
+   }
+} 
+/*=========================================================================*/
+void set_row12(const size_t k, 
+      const std::vector<double> &in,
+      std::vector<double> &out)
+{
+   assert(in.size() ==nx_*ny_);
+   assert(out.size()==nx_*ny_*nz_);
+   for (size_t i=0; i<nx_; i++) {
+   for (size_t j=0; j<ny_; j++) {
+      out[INDX3D(ny_,nz_,i,j,k)] = in[INDX2D(ny_,i,j)];
+   }
+   }
+}
+/*=========================================================================*/
+void set_row13(const size_t j, 
+      const std::vector<double> &in,
+      std::vector<double> &out)
+{
+   assert(in.size() ==nx_*nz_);
+   assert(out.size()==nx_*ny_*nz_);
+   for (size_t i=0; i<nx_; i++) {
+   for (size_t k=0; k<nz_; k++) {
+      out[INDX3D(ny_,nz_,i,j,k)] = in[INDX2D(nz_,i,k)];
+   }
+   }
+}
+/*=========================================================================*/
+void set_row23(const size_t i, 
+      const std::vector<double> &in,
+      std::vector<double> &out)
+{
+   assert(in.size() ==ny_*nz_);
+   assert(out.size()==nx_*ny_*nz_);
+   for (size_t j=0; j<ny_; j++) {
+   for (size_t k=0; k<nz_; k++) {
+      out[INDX3D(ny_,nz_,i,j,k)] = in[INDX2D(nz_,j,k)];
    }
    }
 }

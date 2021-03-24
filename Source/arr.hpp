@@ -24,27 +24,52 @@ inline size_t indx(const size_t i, const size_t j, const size_t k)
    return ny_*nz_*i + nz_*j + k;
 }
 
-void row1(const size_t j, const size_t k, 
+void get_row1(const size_t j, const size_t k, 
       const std::vector<double> &in,
       std::vector<double> &out
    ); 
-void row2(const size_t i, const size_t k, 
+void get_row2(const size_t i, const size_t k, 
       const std::vector<double> &in,
       std::vector<double> &out
    ); 
-void row3(const size_t i, const size_t j, 
+void get_row3(const size_t i, const size_t j, 
       const std::vector<double> &in,
       std::vector<double> &out
    ); 
-void row12(const size_t k, 
+void get_row12(const size_t k, 
       const std::vector<double> &in,
       std::vector<double> &out
    );
-void row13(const size_t j, 
+void get_row13(const size_t j, 
       const std::vector<double> &in,
       std::vector<double> &out
    );
-void row23(const size_t i, 
+void get_row23(const size_t i, 
+      const std::vector<double> &in,
+      std::vector<double> &out
+   );
+
+void set_row1(const size_t j, const size_t k, 
+      const std::vector<double> &in,
+      std::vector<double> &out
+   ); 
+void set_row2(const size_t i, const size_t k, 
+      const std::vector<double> &in,
+      std::vector<double> &out
+   ); 
+void set_row3(const size_t i, const size_t j, 
+      const std::vector<double> &in,
+      std::vector<double> &out
+   ); 
+void set_row12(const size_t k, 
+      const std::vector<double> &in,
+      std::vector<double> &out
+   );
+void set_row13(const size_t j, 
+      const std::vector<double> &in,
+      std::vector<double> &out
+   );
+void set_row23(const size_t i, 
       const std::vector<double> &in,
       std::vector<double> &out
    );

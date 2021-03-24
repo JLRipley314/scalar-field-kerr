@@ -1,6 +1,17 @@
 #include <cassert>
 #include "sphere.hpp"
 
+/* 
+ * for thread safe versions
+ */
+#define ALLOCATE_TMP \
+   double *Sph_tmp = (double *) fftw_malloc( NSPAT_ALLOC(shtns_) * sizeof(double)); \
+   cplx   *Ylm_tmp = (cplx *)   fftw_malloc(         shtns_->nlm * sizeof(cplx));   \
+   assert(Sph_tmp!=nullptr); \
+   assert(Ylm_tmp!=nullptr);
+#define FREE_TMP \
+   fftw_free(Sph_tmp); \
+   fftw_free(Ylm_tmp);
 /*==========================================================================*/
 namespace Sphere {
 /*==========================================================================*/
@@ -50,7 +61,7 @@ void init(const size_t nl, const size_t nlat, const size_t nphi)
    nphi_ = nphi; 
 
    shtns_verbose(1);     /* displays informations during initialization. */
-   shtns_use_threads(0); /* enable multi-threaded transforms (if supported). */
+   shtns_use_threads(1); /* enable multi-threaded transforms (if supported). */
    
    shtns_ = shtns_init( 
          shtns_type(int(sht_gauss) | int(SHT_NATIVE_LAYOUT)), 
@@ -86,11 +97,7 @@ void cleanup()
    shtns_destroy(shtns_);
 }
 /*==========================================================================*/
-/* NOTE the indexing! we are using "SHT_NATIVE_LAYOUT", so in
- * fact theta varies the fastest; we do access in that order though
- * as the ``canonical'' ordering is (theta,phi) */
-/*==========================================================================*/
-size_t indx_Sph(const size_t i_th, const size_t i_ph)
+size_t indx_Sph(const size_t i_ph, const size_t i_th)
 {
    return nlat_*i_ph + i_th;
 }
@@ -107,6 +114,21 @@ void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
    }
 }
 /*==========================================================================*/
+void to_Ylm_threadsafe(const std::vector<double> &sph, std::vector<cplx> &ylm)
+{
+   ALLOCATE_TMP;
+
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_tmp[i] = sph[i];
+   }
+   spat_to_SH(shtns_, Sph_tmp, Ylm_tmp); 
+
+   for (size_t lm=0; lm<nYlm_; lm++) {
+      ylm[lm] = Ylm_tmp[lm]; 
+   }
+   FREE_TMP;
+}
+/*==========================================================================*/
 void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
 {
    for (size_t lm=0; lm<nYlm_; lm++) {
@@ -117,6 +139,21 @@ void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
    for (size_t i=0; i<nSph_; i++) {
       sph[i] = Sph_[i];
    }
+}
+/*==========================================================================*/
+void to_Sph_threadsafe(const std::vector<cplx> &ylm, std::vector<double> &sph)
+{
+   ALLOCATE_TMP;
+
+   for (size_t lm=0; lm<nYlm_; lm++) {
+      Ylm_tmp[lm] = ylm[lm];
+   }
+   SH_to_spat(shtns_, Ylm_tmp, Sph_tmp); 
+
+   for (size_t i=0; i<nSph_; i++) {
+      sph[i] = Sph_tmp[i];
+   }
+   FREE_TMP;
 }
 /*==========================================================================*/
 /* Laplace-Beltrami operator on the unit sphere:
@@ -145,6 +182,87 @@ void laplace_beltrami(
    }
 }
 /*==========================================================================*/
+/* Laplace-Beltrami operator on the unit sphere:
+ * \Delta Y_{lm} = -l(l+1) Y_{lm} 
+ * Allocates memory to make thread safe. */
+/*==========================================================================*/
+void laplace_beltrami_threadsafe(
+      const std::vector<double> v, 
+      std::vector<double> ddv)
+{
+   ALLOCATE_TMP;
+
+   assert(v.size()  ==nlat_*nphi_);
+   assert(ddv.size()==nlat_*nphi_);
+
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_tmp[i] = v[i];
+   }
+   spat_to_SH(shtns_, Sph_tmp, Ylm_tmp);
+
+   for (size_t lm=0; lm<nYlm_; lm++) {
+      const size_t l = shtns_->li[lm];
+      Ylm_tmp[lm] *= lap[l];
+   }
+   SH_to_spat(shtns_, Ylm_tmp, Sph_tmp);
+
+   for (size_t i=0; i<nSph_; i++) {
+      ddv[i] = Sph_tmp[i];
+   }
+   FREE_TMP;
+}
+/*==========================================================================*/
+void partial_phi(const std::vector<double> v, std::vector<double> dv)
+{
+   assert(v.size() ==nlat_*nphi_);
+   assert(dv.size()==nlat_*nphi_);
+
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_[i] = v[i];
+   }
+   spat_to_SH(shtns_, Sph_, Ylm_);
+
+   const cplx img = sqrt(-1.0);
+
+   for (size_t l=0; l<lmax_; l++) {
+   for (size_t m=0; m<l;     m++) {
+      Ylm_[LM(shtns_,l,m)] *= img*cplx(m);
+   }
+   }
+   SH_to_spat(shtns_, Ylm_, Sph_);
+
+   for (size_t i=0; i<nSph_; i++) {
+      dv[i] = Sph_[i];
+   }
+}
+/*==========================================================================*/
+void partial_phi_threadsafe(const std::vector<double> v, std::vector<double> dv)
+{
+   ALLOCATE_TMP;
+
+   assert(v.size() ==nlat_*nphi_);
+   assert(dv.size()==nlat_*nphi_);
+
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_tmp[i] = v[i];
+   }
+   spat_to_SH(shtns_, Sph_tmp, Ylm_tmp);
+
+   const cplx img = sqrt(-1.0);
+
+   for (size_t l=0; l<lmax_; l++) {
+   for (size_t m=0; m<l;     m++) {
+      Ylm_[LM(shtns_,l,m)] *= img*cplx(m);
+   }
+   }
+   SH_to_spat(shtns_, Ylm_tmp, Sph_tmp);
+
+   for (size_t i=0; i<nSph_; i++) {
+      dv[i] = Sph_tmp[i];
+   }
+   FREE_TMP;
+}
+/*==========================================================================*/
 /* low pass filter in spherical harmonic coefficient space
  * Note that only positive m are stored in spherical harmonic space,
  * as we only deal with real scalar fields. */
@@ -168,6 +286,27 @@ void filter(std::vector<double> &v)
    }
 }
 /*==========================================================================*/
+void filter_threadsafe(std::vector<double> &v)
+{
+   ALLOCATE_TMP;
+   for (size_t i=0; i<nSph_; i++) {
+      Sph_tmp[i] = v[i];
+   }
+   spat_to_SH(shtns_, Sph_tmp, Ylm_tmp);
+
+   for (size_t l=0; l<lmax_; l++) {
+   for (size_t m=0; m<l;     m++) {
+      Ylm_tmp[LM(shtns_,l,m)] *= exp(-36*pow(double(l)/lmax_,10)*pow(double(m)/lmax_,10));
+   }
+   }
+   SH_to_spat(shtns_, Ylm_tmp, Sph_tmp);
+
+   for (size_t i=0; i<nSph_; i++) {
+      v[i] = Sph_tmp[i];
+   }
+   FREE_TMP;
+}
+/*==========================================================================*/
 /* returns values for spherical harmonic in real space Y_{l_ang,m_ang} */
 /*==========================================================================*/
 std::vector<double> compute_ylm(const int l_ang, const int m_ang)
@@ -183,3 +322,6 @@ std::vector<double> compute_ylm(const int l_ang, const int m_ang)
 }
 /*==========================================================================*/
 } /* Sphere */
+
+#undef ALLOCATE_TMP
+#undef FREE_TMP

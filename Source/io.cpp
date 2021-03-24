@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iomanip>
 #include <cassert>
-#include <string>
 
 #include "io.hpp"
 
@@ -26,12 +25,12 @@ void write(const std::string outdir, const double time, const Field &f)
       for (int i=0; i<n-1; ++i) {
          out<<std::setprecision(16)<<f.np1[i]<<",";
       }		
-      out<<f.np1[n-1]<<endl;
+      out<<f.np1[n-1]<<std::endl;
    }
    else {
       std::cout
          <<"ERROR(Csv::write): "+file_name+" does not exist"
-         <<endl;
+         <<std::endl;
    }
    out.close();
 }

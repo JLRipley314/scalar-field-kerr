@@ -17,8 +17,11 @@ namespace Sphere {
 
    void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph);
    void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm);
-
-   size_t indx_Sph(const size_t i_th, const size_t i_ph);
+   /*
+    * NOTE the indexing! we are using "SHT_NATIVE_LAYOUT", so in
+    * fact theta varies the fastest; i.e. we index as (phi, theta) 
+    */
+   size_t indx_Sph(const size_t i_ph, const size_t i_th);
 
    size_t nlat();
    size_t nphi();
@@ -29,8 +32,24 @@ namespace Sphere {
    double phi(  const size_t i_ph);
 
    void laplace_beltrami(const std::vector<double> v, std::vector<double> ddv);
-
+   void partial_phi(const std::vector<double> v, std::vector<double> dv);
    void filter(std::vector<double> &v);
+   /*
+    * Thread safe: can be used in parallelized loops. 
+    */
+   void to_Sph_threadsafe(
+         const std::vector<cplx> &ylm, std::vector<double> &sph
+      );
+   void to_Ylm_threadsafe(
+         const std::vector<double> &sph, std::vector<cplx> &ylm
+      );
+   void laplace_beltrami_threadsafe(
+         const std::vector<double> v, std::vector<double> ddv
+      );
+   void partial_phi_threadsafe(
+         const std::vector<double> v, std::vector<double> dv
+      );
+   void filter_threadsafe(std::vector<double> &v);
 
    std::vector<double> compute_ylm(const int l_ang, const int m_ang);
 /*===========================================================================*/

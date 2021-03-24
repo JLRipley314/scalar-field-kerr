@@ -37,37 +37,37 @@ void ingoing_pulse(
    std::vector<double> ylm = Sphere::compute_ylm(l_ang, m_ang);
 
    for (size_t ix=0; ix<nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
-   for (size_t it=0; it<nlat; it++) {
    for (size_t ip=0; ip<nphi; ip++) {
+   for (size_t it=0; it<nlat; it++) {
       double r    = pow(cl,2)/Cheb::pt(ix);
       double bump = 0.0;
 
       if ((r<ru) && (r>rl)) {
          bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
       }
-      f[indx(ix,it,ip)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
+      f[indx(ix,ip,it)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
 
-      q[indx(ix,it,ip)] = (
+      q[indx(ix,ip,it)] = (
          (2.0*(((r-rl)/width)   )*pow(((ru-r)/width),2))
       -  (2.0*pow((r-rl)/width,2)*((ru-r)/width       ))
       +  (1.0*(1.0              )*pow(((ru-r)/width),2))
       -  (2.0*pow((r-rl)/width,2)*(1.0                ))
       )*bump/width;
 
-      q[indx(ix,it,ip)] *= -pow(r/cl,2);
+      q[indx(ix,ip,it)] *= -pow(r/cl,2);
       /*
        * time symmetric for now
        */ 
-      p[indx(ix,it,ip)] = 0.0;
+      p[indx(ix,ip,it)] = 0.0;
       /*
        * give angular structure Y_{lm} 
        */
-      f[indx(ix,it,ip)] *= ylm[indx_Sph(it,ip)];
-      q[indx(ix,it,ip)] *= ylm[indx_Sph(it,ip)];
-      p[indx(ix,it,ip)] *= ylm[indx_Sph(it,ip)];
+      f[indx(ix,ip,it)] *= ylm[indx_Sph(ip,it)];
+      q[indx(ix,ip,it)] *= ylm[indx_Sph(ip,it)];
+      p[indx(ix,ip,it)] *= ylm[indx_Sph(ip,it)];
 
-      if (abs(f[indx(ix,it,ip)]) > max_val) {
-         max_val = abs(f[indx(ix,it,ip)]);
+      if (abs(f[indx(ix,ip,it)]) > max_val) {
+         max_val = abs(f[indx(ix,ip,it)]);
       }
    }
    }
@@ -78,9 +78,9 @@ void ingoing_pulse(
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t it=0; it<nlat; it++) {
    for (size_t ip=0; ip<nphi; ip++) {
-      p[indx(ix,it,ip)] *= amp / max_val;
-      p[indx(ix,it,ip)] *= amp / max_val;
-      p[indx(ix,it,ip)] *= amp / max_val; 
+      p[indx(ix,ip,it)] *= amp / max_val;
+      p[indx(ix,ip,it)] *= amp / max_val;
+      p[indx(ix,ip,it)] *= amp / max_val; 
    }
    }
    }

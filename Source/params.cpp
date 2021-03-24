@@ -23,7 +23,7 @@ namespace Params
       size_t nl_;
       size_t nlat_;
       size_t nphi_;
-      int t_step_save_;
+      size_t t_step_save_;
       int direction_;
 
       double dt_;
@@ -75,7 +75,7 @@ namespace Params
     size_t nl() {return nl_;};
     size_t nlat() {return nlat_;};
     size_t nphi() {return nphi_;};
-    int t_step_save() {return t_step_save_;};
+    size_t t_step_save() {return t_step_save_;};
     int direction() {return direction_;};
 
     double dt() {return dt_;};
