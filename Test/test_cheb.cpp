@@ -28,8 +28,20 @@ TEST(cheb_test, to_and_from) {
       po1[i] = tan(Cheb::pt(i));
    }
 
+   /* 
+    * Threadsafe transforms
+    */
    Cheb::to_ch(po1, ch);
    Cheb::to_po(ch, po2);
+
+   for (size_t i=0; i<nr; i++) {
+      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
+   }
+   /* 
+    * Thread safe transforms 
+    */
+   Cheb::to_ch_ts(po1, ch);
+   Cheb::to_po_ts(ch, po2);
 
    for (size_t i=0; i<nr; i++) {
       EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);

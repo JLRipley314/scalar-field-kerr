@@ -15,15 +15,20 @@ namespace Cheb {
 
    void to_ch(const std::vector<double> &po, std::vector<double> &ch);
    void to_po(const std::vector<double> &ch, std::vector<double> &po);
-
    void der(const std::vector<double> &v, std::vector<double> &dv);
-
    void filter(std::vector<double> &v);
 
    size_t n();   
    double lower();   
    double upper();   
    double pt(const size_t i);
+   /*
+    * Thread safe: can be used in parallelized loops. 
+    */
+   void to_ch_ts(const std::vector<double> &po, std::vector<double> &ch);
+   void to_po_ts(const std::vector<double> &ch, std::vector<double> &po);
+   void der_ts(const std::vector<double> &v, std::vector<double> &dv);
+   void filter_ts(std::vector<double> &v);
 /*===========================================================================*/
 } /* Cheb */
 /*===========================================================================*/

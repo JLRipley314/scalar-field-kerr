@@ -35,8 +35,11 @@ namespace {
    double *Sph_;     /* spherical space */
    cplx   *Ylm_;     /* spherical harmonic coefficients */
 
-   std::vector<double> lap; /* Laplace-Beltrami operator on the unit sphere:
+   std::vector<double> lap_; /* Laplace-Beltrami operator on the unit sphere:
                                \Delta Y_{lm} = -l(l+1) Y_{lm} */
+
+   std::vector<double> low_pass_; /* low pass filter in 
+                                     Spherical harmonic space */
 }
 /*==========================================================================*/
 size_t nlat() { return nlat_; }
@@ -60,7 +63,7 @@ void init(const size_t nl, const size_t nlat, const size_t nphi)
    nlat_ = nlat; 
    nphi_ = nphi; 
 
-   shtns_verbose(1);     /* displays informations during initialization. */
+   shtns_verbose(0);     /* displays informations during initialization. */
    shtns_use_threads(1); /* enable multi-threaded transforms (if supported). */
    
    shtns_ = shtns_init( 
@@ -71,9 +74,16 @@ void init(const size_t nl, const size_t nlat, const size_t nphi)
    /* 
     * Set Laplacian in spherical harmonic space: \Delta Y_{lm} = -l(l+1) Y_{lm}
     */
-   lap.resize(lmax_,0);
+   lap_.resize(lmax_,0);
    for (size_t i=0; i<lmax_; i++) {
-      lap[i] = - i*(i+1);
+      lap_[i] = - i*(i+1);
+   }
+   /* 
+    * Low pass filter in spherical harmonic space 
+    */
+   low_pass_.resize(lmax_,0);
+   for (size_t i=0; i<lmax_; i++) {
+      low_pass_[i] = exp(-36*pow(double(i)/lmax_,10));
    }
    /* 
     * Memory allocation : the use of fftw_malloc is required because we need proper 16-byte alignement.
@@ -114,7 +124,7 @@ void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
    }
 }
 /*==========================================================================*/
-void to_Ylm_threadsafe(const std::vector<double> &sph, std::vector<cplx> &ylm)
+void to_Ylm_ts(const std::vector<double> &sph, std::vector<cplx> &ylm)
 {
    ALLOCATE_TMP;
 
@@ -141,7 +151,7 @@ void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
    }
 }
 /*==========================================================================*/
-void to_Sph_threadsafe(const std::vector<cplx> &ylm, std::vector<double> &sph)
+void to_Sph_ts(const std::vector<cplx> &ylm, std::vector<double> &sph)
 {
    ALLOCATE_TMP;
 
@@ -173,7 +183,7 @@ void laplace_beltrami(
 
    for (size_t lm=0; lm<nYlm_; lm++) {
       const size_t l = shtns_->li[lm];
-      Ylm_[lm] *= lap[l];
+      Ylm_[lm] *= lap_[l];
    }
    SH_to_spat(shtns_, Ylm_, Sph_);
 
@@ -186,7 +196,7 @@ void laplace_beltrami(
  * \Delta Y_{lm} = -l(l+1) Y_{lm} 
  * Allocates memory to make thread safe. */
 /*==========================================================================*/
-void laplace_beltrami_threadsafe(
+void laplace_beltrami_ts(
       const std::vector<double> v, 
       std::vector<double> ddv)
 {
@@ -202,7 +212,7 @@ void laplace_beltrami_threadsafe(
 
    for (size_t lm=0; lm<nYlm_; lm++) {
       const size_t l = shtns_->li[lm];
-      Ylm_tmp[lm] *= lap[l];
+      Ylm_tmp[lm] *= lap_[l];
    }
    SH_to_spat(shtns_, Ylm_tmp, Sph_tmp);
 
@@ -236,7 +246,7 @@ void partial_phi(const std::vector<double> v, std::vector<double> dv)
    }
 }
 /*==========================================================================*/
-void partial_phi_threadsafe(const std::vector<double> v, std::vector<double> dv)
+void partial_phi_ts(const std::vector<double> v, std::vector<double> dv)
 {
    ALLOCATE_TMP;
 
@@ -252,7 +262,7 @@ void partial_phi_threadsafe(const std::vector<double> v, std::vector<double> dv)
 
    for (size_t l=0; l<lmax_; l++) {
    for (size_t m=0; m<l;     m++) {
-      Ylm_[LM(shtns_,l,m)] *= img*cplx(m);
+      Ylm_tmp[LM(shtns_,l,m)] *= img*cplx(m);
    }
    }
    SH_to_spat(shtns_, Ylm_tmp, Sph_tmp);
@@ -276,7 +286,7 @@ void filter(std::vector<double> &v)
 
    for (size_t l=0; l<lmax_; l++) {
    for (size_t m=0; m<l;     m++) {
-      Ylm_[LM(shtns_,l,m)] *= exp(-36*pow(double(l)/lmax_,10)*pow(double(m)/lmax_,10));
+      Ylm_[LM(shtns_,l,m)] *= low_pass_[l]*low_pass_[m];
    }
    }
    SH_to_spat(shtns_, Ylm_, Sph_);
@@ -286,7 +296,7 @@ void filter(std::vector<double> &v)
    }
 }
 /*==========================================================================*/
-void filter_threadsafe(std::vector<double> &v)
+void filter_ts(std::vector<double> &v)
 {
    ALLOCATE_TMP;
    for (size_t i=0; i<nSph_; i++) {
@@ -296,7 +306,7 @@ void filter_threadsafe(std::vector<double> &v)
 
    for (size_t l=0; l<lmax_; l++) {
    for (size_t m=0; m<l;     m++) {
-      Ylm_tmp[LM(shtns_,l,m)] *= exp(-36*pow(double(l)/lmax_,10)*pow(double(m)/lmax_,10));
+      Ylm_tmp[LM(shtns_,l,m)] *= low_pass_[l]*low_pass_[m];
    }
    }
    SH_to_spat(shtns_, Ylm_tmp, Sph_tmp);
@@ -311,7 +321,7 @@ void filter_threadsafe(std::vector<double> &v)
 /*==========================================================================*/
 std::vector<double> compute_ylm(const int l_ang, const int m_ang)
 {
-   std::vector<cplx>   in(nYlm_,{0.0,0.0});
+   std::vector<cplx>   in(nYlm_, 0.0);
    std::vector<double> out(nSph_,0.0);
 
    in[LM(shtns_,l_ang,m_ang)] = 1;

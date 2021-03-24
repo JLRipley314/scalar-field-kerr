@@ -2,6 +2,17 @@
 #include <cassert>
 #include "cheb.hpp"
 
+/* 
+ * for thread safe versions
+ */
+#define ALLOCATE_TMP \
+   double *in_tmp  = (double *)fftw_malloc(n_*sizeof(double)); \
+   double *out_tmp = (double *)fftw_malloc(n_*sizeof(double)); \
+   assert(in_tmp !=nullptr); \
+   assert(out_tmp!=nullptr);
+#define FREE_TMP \
+   fftw_free(in_tmp); \
+   fftw_free(out_tmp);
 /*==========================================================================*/
 namespace Cheb {
 /*==========================================================================*/
@@ -98,7 +109,7 @@ void to_ch(const std::vector<double> &po, std::vector<double> &ch)
       in_[i]  = po[i];
       out_[i] = ch[i];
    }
-   fftw_execute(plan_dct_);
+   fftw_execute_r2r(plan_dct_, in_, out_);
    /*
     * normalize Chebyshev coefficients
     */
@@ -107,6 +118,30 @@ void to_ch(const std::vector<double> &po, std::vector<double> &ch)
    for (size_t i=1; i<n_-1; i++) {
       ch[i] = out_[i]/(n_-1);
    }
+}
+/*==========================================================================*/
+void to_ch_ts(const std::vector<double> &po, std::vector<double> &ch) 
+{
+   ALLOCATE_TMP;
+   /*
+    * compute Fourier transform
+    */
+   assert(po.size()==n_);
+   assert(ch.size()==n_);
+   for (size_t i=0; i<n_; i++) {
+      in_tmp[i]  = po[i];
+      out_tmp[i] = ch[i];
+   }
+   fftw_execute_r2r(plan_dct_, in_tmp, out_tmp);
+   /*
+    * normalize Chebyshev coefficients
+    */
+   ch[0]    = out_tmp[0]   /(2.0*(n_-1));
+   ch[n_-1] = out_tmp[n_-1]/(2.0*(n_-1));
+   for (size_t i=1; i<n_-1; i++) {
+      ch[i] = out_tmp[i]/(n_-1);
+   }
+   FREE_TMP;
 }
 /*==========================================================================*/
 /* Chebyshev space to position space */
@@ -128,11 +163,37 @@ void to_po(const std::vector<double> &ch, std::vector<double> &po)
    for (size_t i=1; i<n_-1; i++) {
       in_[i] /= 2.0;
    }
-   fftw_execute(plan_dct_);
+   fftw_execute_r2r(plan_dct_, in_, out_);
 
    for (size_t i=0; i<n_; i++) {
       po[i] = out_[i];
    }
+}
+/*==========================================================================*/
+void to_po_ts(const std::vector<double> &ch, std::vector<double> &po) 
+{
+   ALLOCATE_TMP;
+   /*
+    * compute Fourier transform
+    */
+   assert(ch.size()==n_);
+   assert(po.size()==n_);
+   for (size_t i=0; i<n_; i++) {
+      in_tmp[i]  = ch[i];
+      out_tmp[i] = po[i];
+   }
+   /*
+    * normalize coefficients for Fourier transform 
+    */
+   for (size_t i=1; i<n_-1; i++) {
+      in_tmp[i] /= 2.0;
+   }
+   fftw_execute_r2r(plan_dct_, in_tmp, out_tmp);
+
+   for (size_t i=0; i<n_; i++) {
+      po[i] = out_tmp[i];
+   }
+   FREE_TMP;
 }
 /*==========================================================================*/
 /* Compute derivative over interval */
@@ -170,6 +231,41 @@ void der(const std::vector<double> &v, std::vector<double> &dv)
    }
 }
 /*==========================================================================*/
+void der_ts(const std::vector<double> &v, std::vector<double> &dv)
+{
+   std::vector<double> internal_ch_tmp(n_,0);
+
+   assert(v.size( )==n_);
+   assert(dv.size()==n_);
+
+   to_ch_ts(v,internal_ch_tmp);
+   /*
+    * to start Chebyshev derivative recurrence relation 
+    */
+   internal_ch_tmp[n_-1] = 0;
+   internal_ch_tmp[n_-2] = 0;
+   /* 
+    * use dv as a temporary array
+    */
+   for (size_t i=0; i<n_; i++) {
+      dv[i] = internal_ch_tmp[i];
+   }
+   /* 
+    * apply Chebyshev derivative recurrence relation 
+    */
+   for (size_t i=n_-2; i>=1; i--) { 
+      internal_ch_tmp[i-1] = 2.0*i*dv[i] + internal_ch_tmp[i+1];
+   } 
+   internal_ch_tmp[0] /= 2.0;
+   /* 
+    * Normalize derivative to inverval 
+    */
+   to_po_ts(internal_ch_tmp,dv);
+   for (size_t i=0; i<n_; i++) {
+      dv[i] /= jacobian_;
+   }
+}
+/*==========================================================================*/
 /* Low pass filter of Chebyshev coefficients */
 /*==========================================================================*/
 void filter(std::vector<double> &v)
@@ -183,9 +279,24 @@ void filter(std::vector<double> &v)
    to_po(internal_ch_,v);
 }
 /*==========================================================================*/
+void filter_ts(std::vector<double> &v)
+{
+   std::vector<double> internal_ch_tmp(n_,0);
+   assert(v.size()==n_);
+
+   to_ch_ts(v,internal_ch_tmp);
+   for (size_t i=0; i<n_; i++) { 
+      internal_ch_tmp[i] *= low_pass_[i];
+   } 
+   to_po_ts(internal_ch_tmp,v);
+}
+/*==========================================================================*/
 size_t n() { return n_; }
 double lower() { return lower_; }
 double upper() { return upper_; }
 double pt(const size_t i)    { return pts_[i]; }
 /*==========================================================================*/
 } /* Cheb */
+
+#undef ALLOCATE_TMP
+#undef FREE_TMP
