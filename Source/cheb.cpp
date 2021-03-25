@@ -294,7 +294,7 @@ void filter_ts(std::vector<double> &v)
 size_t n() { return n_; }
 double lower() { return lower_; }
 double upper() { return upper_; }
-double pt(const size_t i)    { return pts_[i]; }
+double pt(const size_t i) { return pts_[i]; }
 /*==========================================================================*/
 } /* Cheb */
 
