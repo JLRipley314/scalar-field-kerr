@@ -1,6 +1,7 @@
 #include <cassert>
 #include "sphere.hpp"
 
+#include <iostream>
 /* 
  * for thread safe versions
  */
@@ -76,7 +77,7 @@ void init(const size_t nl, const size_t nlat, const size_t nphi)
     */
    lap_.resize(lmax_,0);
    for (size_t i=0; i<lmax_; i++) {
-      lap_[i] = - i*(i+1);
+      lap_[i] = - double(i)*double(i+1.0);
    }
    /* 
     * Low pass filter in spherical harmonic space 
@@ -170,8 +171,8 @@ void to_Sph_ts(const std::vector<cplx> &ylm, std::vector<double> &sph)
  * \Delta Y_{lm} = -l(l+1) Y_{lm} */
 /*==========================================================================*/
 void laplace_beltrami(
-      const std::vector<double> v, 
-      std::vector<double> ddv)
+      const std::vector<double> &v, 
+      std::vector<double> &ddv)
 {
    assert(v.size()  ==nlat_*nphi_);
    assert(ddv.size()==nlat_*nphi_);
@@ -181,9 +182,10 @@ void laplace_beltrami(
    }
    spat_to_SH(shtns_, Sph_, Ylm_);
 
-   for (size_t lm=0; lm<nYlm_; lm++) {
-      const size_t l = shtns_->li[lm];
-      Ylm_[lm] *= lap_[l];
+   for (size_t l=0; l<lmax_; l++) {
+   for (size_t m=0; m<=l;    m++) {
+      Ylm_[LM(shtns_,l,m)] *= lap_[l];
+   }
    }
    SH_to_spat(shtns_, Ylm_, Sph_);
 
@@ -192,13 +194,9 @@ void laplace_beltrami(
    }
 }
 /*==========================================================================*/
-/* Laplace-Beltrami operator on the unit sphere:
- * \Delta Y_{lm} = -l(l+1) Y_{lm} 
- * Allocates memory to make thread safe. */
-/*==========================================================================*/
 void laplace_beltrami_ts(
-      const std::vector<double> v, 
-      std::vector<double> ddv)
+      const std::vector<double> &v, 
+      std::vector<double> &ddv)
 {
    ALLOCATE_TMP;
 
@@ -210,9 +208,10 @@ void laplace_beltrami_ts(
    }
    spat_to_SH(shtns_, Sph_tmp, Ylm_tmp);
 
-   for (size_t lm=0; lm<nYlm_; lm++) {
-      const size_t l = shtns_->li[lm];
-      Ylm_tmp[lm] *= lap_[l];
+   for (size_t l=0; l<lmax_; l++) {
+   for (size_t m=0; m<=l;    m++) {
+      Ylm_tmp[LM(shtns_,l,m)] *= lap_[l];
+   }
    }
    SH_to_spat(shtns_, Ylm_tmp, Sph_tmp);
 
@@ -222,7 +221,9 @@ void laplace_beltrami_ts(
    FREE_TMP;
 }
 /*==========================================================================*/
-void partial_phi(const std::vector<double> v, std::vector<double> dv)
+/* partial_{\phi} operator */
+/*==========================================================================*/
+void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 {
    assert(v.size() ==nlat_*nphi_);
    assert(dv.size()==nlat_*nphi_);
@@ -232,10 +233,10 @@ void partial_phi(const std::vector<double> v, std::vector<double> dv)
    }
    spat_to_SH(shtns_, Sph_, Ylm_);
 
-   const cplx img = sqrt(-1.0);
+   const cplx img(0,1);
 
    for (size_t l=0; l<lmax_; l++) {
-   for (size_t m=0; m<l;     m++) {
+   for (size_t m=0; m<=l;    m++) {
       Ylm_[LM(shtns_,l,m)] *= img*cplx(m);
    }
    }
@@ -246,7 +247,7 @@ void partial_phi(const std::vector<double> v, std::vector<double> dv)
    }
 }
 /*==========================================================================*/
-void partial_phi_ts(const std::vector<double> v, std::vector<double> dv)
+void partial_phi_ts(const std::vector<double> &v, std::vector<double> &dv)
 {
    ALLOCATE_TMP;
 
@@ -258,10 +259,10 @@ void partial_phi_ts(const std::vector<double> v, std::vector<double> dv)
    }
    spat_to_SH(shtns_, Sph_tmp, Ylm_tmp);
 
-   const cplx img = sqrt(-1.0);
+   const cplx img(0,1);
 
    for (size_t l=0; l<lmax_; l++) {
-   for (size_t m=0; m<l;     m++) {
+   for (size_t m=0; m<=l;    m++) {
       Ylm_tmp[LM(shtns_,l,m)] *= img*cplx(m);
    }
    }
@@ -327,6 +328,18 @@ std::vector<double> compute_ylm(const int l_ang, const int m_ang)
    in[LM(shtns_,l_ang,m_ang)] = 1;
 
    to_Sph(in, out);
+
+   return out;
+}
+/*==========================================================================*/
+std::vector<double> compute_ylm_ts(const int l_ang, const int m_ang)
+{
+   std::vector<cplx>   in(nYlm_, 0.0);
+   std::vector<double> out(nSph_,0.0);
+
+   in[LM(shtns_,l_ang,m_ang)] = 1;
+
+   to_Sph_ts(in, out);
 
    return out;
 }
