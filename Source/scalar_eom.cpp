@@ -10,17 +10,23 @@ namespace {
    std::vector<double> p_f;
    std::vector<double> p_p;
    std::vector<double> p_q;
-
-   std::vector<double> p_drp;
-   std::vector<double> p_drq;
-
-   std::vector<double> p_dphiq;
-
-   std::vector<double> p_lapf;
+   std::vector<double> p_dr_p;
+   std::vector<double> p_dr_q;
+   std::vector<double> p_dphi_q;
+   std::vector<double> p_lap_f;
 }
 /*==========================================================================*/
 void init()
 {
+   const size_t ntotal = Params::nx_nlat_nphi();
+   p_f.resize(ntotal,0);
+   p_p.resize(ntotal,0);
+   p_q.resize(ntotal,0);
+   p_dr_p.resize(ntotal,0);
+   p_dr_q.resize(ntotal,0);
+   p_dphi_q.resize(ntotal,0);
+   p_lap_f.resize(ntotal,0);
+
    const size_t nx   = Params::nx();
    const size_t nlat = Params::nlat();
    const size_t nphi = Params::nphi();
@@ -47,12 +53,12 @@ void init()
       p_p[indx] = (2.0*m/Sigma) / pow(r,2);
       p_q[indx] = 2.0*((1.0/r) - (m/pow(r,2)))/Sigma;
 
-      p_drp[indx] = 2.0*m*(1.0/r)/Sigma;
-      p_drq[indx] = (Delta/Sigma) / pow(r,2);
+      p_dr_p[indx] = 2.0*m*(1.0/r)/Sigma;
+      p_dr_q[indx] = (Delta/Sigma) / pow(r,2);
 
-      p_dphiq[indx] = (2.0*a/Sigma) / pow(r,2);
+      p_dphi_q[indx] = (2.0*a/Sigma) / pow(r,2);
 
-      p_lapf[indx] = (1.0/Sigma) / pow(r,2);
+      p_lap_f[indx] = (1.0/Sigma) / pow(r,2);
 
       double pre = 1.0 + (2.0*m*(1.0/r)/Sigma);
 
@@ -60,12 +66,12 @@ void init()
       p_p[indx] /= pre;
       p_q[indx] /= pre;
 
-      p_drp[indx] /= pre;
-      p_drq[indx] /= pre;
+      p_dr_p[indx] /= pre;
+      p_dr_q[indx] /= pre;
 
-      p_dphiq[indx] /= pre;
+      p_dphi_q[indx] /= pre;
 
-      p_lapf[indx] /= pre;
+      p_lap_f[indx] /= pre;
    }
    }
    }
@@ -149,12 +155,12 @@ void set_k(
       +  p_p[i]*p[i] 
       +  p_q[i]*q[i]
 
-      +  p_drp[i]*dr_p[i] 
-      +  p_drq[i]*dr_q[i]
+      +  p_dr_p[i]*dr_p[i] 
+      +  p_dr_q[i]*dr_q[i]
 
-      +  p_dphiq[i]*dphi_q[i]
+      +  p_dphi_q[i]*dphi_q[i]
 
-      +  p_lapf[i]*lap_f[i]
+      +  p_lap_f[i]*lap_f[i]
       ;
       q_k[i] = dr_p[i];
    }
