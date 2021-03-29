@@ -4,6 +4,7 @@
 #ifndef _SCALAR_EOM_HPP_ 
 #define _SCALAR_EOM_HPP_
 
+#include <vector>
 #include "field.hpp"
 
 /*==========================================================================*/

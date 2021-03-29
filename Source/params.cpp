@@ -37,6 +37,7 @@ namespace Params
       int initial_exc_i_;
 
       double bh_mass_;
+      double bh_spin_;
 
       double V_0_;
       double V_1_;
@@ -70,40 +71,45 @@ namespace Params
       }
    }
    /*========================================================================*/
-    size_t nt() {return nt_;};
-    size_t nx() {return nx_;};
-    size_t nl() {return nl_;};
-    size_t nlat() {return nlat_;};
-    size_t nphi() {return nphi_;};
-    size_t t_step_save() {return t_step_save_;};
-    int direction() {return direction_;};
+   size_t nt() {return nt_;};
+   size_t nx() {return nx_;};
+   size_t nl() {return nl_;};
 
-    double dt() {return dt_;};
+   size_t nx_nlat_nphi() { return nx_*nlat_*nphi_; }
+   size_t nxn() {return nl_;};
 
-    double curv() {return curv_;};
-    double cl()   {return cl_;};
+   size_t nlat() {return nlat_;};
+   size_t nphi() {return nphi_;};
+   size_t t_step_save() {return t_step_save_;};
+   int direction() {return direction_;};
 
-    double rbl()   {return rbl_;};
-    double rbu()   {return rbu_;};
+   double dt() {return dt_;};
 
-    int initial_exc_i() {return initial_exc_i_;};
+   double curv() {return curv_;};
+   double cl()   {return cl_;};
 
-    double bh_mass() {return bh_mass_;};
+   double rbl()   {return rbl_;};
+   double rbu()   {return rbu_;};
 
-    double V_0() {return V_0_;};
-    double V_1() {return V_1_;};
-    double V_2() {return V_2_;};
-    double V_3() {return V_3_;};
-    double V_4() {return V_4_;};
+   int initial_exc_i() {return initial_exc_i_;};
 
-    std::string id() {return id_;};
+   double bh_mass() {return bh_mass_;};
+   double bh_spin() {return bh_spin_;};
 
-    double amp() {return amp_;};
-    double r_l() {return r_l_;};
-    double r_u() {return r_u_;};
+   double V_0() {return V_0_;};
+   double V_1() {return V_1_;};
+   double V_2() {return V_2_;};
+   double V_3() {return V_3_;};
+   double V_4() {return V_4_;};
 
-    int l_ang() {return l_ang_;};
-    int m_ang() {return m_ang_;};
+   std::string id() {return id_;};
+
+   double amp() {return amp_;};
+   double r_l() {return r_l_;};
+   double r_u() {return r_u_;};
+
+   int l_ang() {return l_ang_;};
+   int m_ang() {return m_ang_;};
    /*========================================================================*/
    void init(const string output_dir)
    {
@@ -128,6 +134,7 @@ namespace Params
       initial_exc_i_ = stoi(read(output_dir,"initial_exc_i"));
 
       bh_mass_ = stod(read(output_dir,"bh_mass"));
+      bh_spin_ = stod(read(output_dir,"bh_spin"));
       /*---------------------------------------------------------------------*/
       /* for the potentials */
       V_0_ = stod(read(output_dir,"V_0"));

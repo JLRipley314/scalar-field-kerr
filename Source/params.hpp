@@ -20,6 +20,9 @@ namespace Params
    size_t nt();
    size_t nx();
    size_t nl();
+
+   size_t nx_nlat_nphi();
+
    size_t nlat();
    size_t nphi();
    size_t t_step_save();
@@ -37,6 +40,7 @@ namespace Params
    int initial_exc_i();
 
    double bh_mass();
+   double bh_spin();
    /* 
     * for the potentials 
     */

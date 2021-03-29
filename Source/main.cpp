@@ -26,9 +26,9 @@ int main(int argc, char **argv)
     */
    Eom::init();
 
-   Field f("f", Params::nx()*Params::nlat()*Params::nphi(), 0.0);
-   Field p("p", Params::nx()*Params::nlat()*Params::nphi(), 0.0);
-   Field q("q", Params::nx()*Params::nlat()*Params::nphi(), 0.0);
+   Field f("f", Params::nx_nlat_nphi(), 0.0);
+   Field p("p", Params::nx_nlat_nphi(), 0.0);
+   Field q("q", Params::nx_nlat_nphi(), 0.0);
    /* 
     * initial data 
     */
