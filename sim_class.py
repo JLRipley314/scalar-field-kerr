@@ -2,12 +2,6 @@
 import subprocess, os, sys, time, shutil
 from typing import List 
 from math import log
-
-sys.path.insert(1,os.getcwd()+'/src/tables/')
-#=============================================================================
-from tables_cheb     import save_cheb
-from tables_legendre import save_roots_weights_Legendre
-from tables_swal     import save_Gauss_quad_vals_swaL 
 #=============================================================================
 class Sim:
 #=============================================================================
@@ -51,53 +45,19 @@ class Sim:
          /self.horizon
       )
 
-      self.rl= [self.horizon*x for x in self.rl_0]
-      self.ru= [self.horizon*x for x in self.ru_0]
+      self.rl= self.horizon*self.rl_0
+      self.ru= self.horizon*self.ru_0
 #-----------------------------------------------------------------------------
       absa = abs(self.black_hole_spin/self.black_hole_mass)
       self.constraint_damping = abs(
          (1.0/self.black_hole_mass)*pow(abs(1.0-absa+1.0e-6),-0.5)
       )
 #-----------------------------------------------------------------------------
-## when to begin metric reconstruction
-      self.integrate_psi4_start_time = self.black_hole_mass*max(
-         [  self.integrate_psi4_start_multiple*(
-               (2.0/self.black_hole_mass)*(x - self.horizon)
-            +  4.0*log(max(x,self.horizon)/self.horizon)
-            ) for x in self.ru
-         ]
-      )
-      self.scd_order_start_time = self.black_hole_mass*max(
-         [  self.scd_order_start_multiple*(
-               (2.0/self.black_hole_mass)*(x - self.horizon)
-            +  4.0*log(max(x,self.horizon)/self.horizon)
-            ) for x in self.ru
-         ]
-      )
-#-----------------------------------------------------------------------------
-      self.lin_pos_m = [ m for m in self.lin_m if m>=0]
-      self.scd_pos_m = [ m for m in self.scd_m if m>=0]
-#-----------------------------------------------------------------------------
-## for parallelism (if applied)
-      self.num_threads= max(len(self.lin_m),len(self.scd_m))
-#-----------------------------------------------------------------------------
-## Gauss points for integration
-## want to exactly integrate polynomials of order
-## 2l + 2m(i.e. lmin) + alpha + beta (so being a bit conservative here) 
-      lmin= max(max([abs(m) for m in self.lin_m]),abs(self.psi_spin))
-      self.ny= (self.nl
-      +	int(abs(2*lmin))
-      + int(abs(2*max([abs(m) for m in self.lin_m])+self.psi_spin))
-      +	int(abs(2*max([abs(m) for m in self.lin_m])-self.psi_spin))
-      )
-      if (self.ny%2!=0):
-         self.ny+= 1
-#-----------------------------------------------------------------------------
 ## consider characteristic speeds: it looks like max is ~2/3 so can multiply
 ## the factor 6/N^2 by up to (3/2) (need to experiment)
 #-----------------------------------------------------------------------------
       self.dt= float(
-         9.*pow(max(self.nx,self.ny),-2)
+         9.*pow(max(self.nx,self.nl),-2)
       )
 #-----------------------------------------------------------------------------
       self.nt= int(
@@ -109,23 +69,6 @@ class Sim:
       )	
       if (self.t_step_save==0):
          self.t_step_save= 1
-#-----------------------------------------------------------------------------
-      self.max_m= max(
-         max(self.lin_m),
-         max(self.scd_m),
-         1)
-      self.min_m= min(
-         min(self.lin_m),
-         min(self.scd_m),
-         1)
-#-----------------------------------------------------------------------------
-      self.max_s=  3
-      self.min_s= -3
-#-----------------------------------------------------------------------------
-      assert(len(self.lin_m)==len(set(self.lin_m)))
-      assert(len(self.scd_m)==len(set(self.scd_m)))
-      assert(len(self.write_lin_m)==len(set(self.write_lin_m)))
-      assert(len(self.write_scd_m)==len(set(self.write_scd_m)))
 #=============================================================================
    def make_tables_dir(self)->None:
       self.tables_dir= self.output_dir+"/tables"
@@ -182,11 +125,6 @@ class Sim:
 
       self.make_output_dir()
 
-      self.make_tables_dir()
-      save_cheb(self.tables_dir,self.nx)
-      save_roots_weights_Legendre(self.tables_dir,self.ny)
-      self.make_Gauss_pts()
-
       self.write_sim_params()
       if self.recompile==True:
          self.then_recompile()
@@ -205,11 +143,6 @@ class Sim:
          subprocess.call('sbatch run.slurm', shell='True')		
       else:
          raise ValueError('computer= '+self.computer+' not yet supported')
-#=============================================================================
-   def make_Gauss_pts(self)->None:
-      for spin in [-3,-2,-1,0,1,2,3]:
-         for m_ang in range(self.min_m,self.max_m+1):
-            save_Gauss_quad_vals_swaL(self.tables_dir,spin,m_ang,self.nl,self.ny) 
 #=============================================================================
    def then_recompile(self)->None:
       subprocess.call('make clean_obj'+self.bin_name,shell=True)

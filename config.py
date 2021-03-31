@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 #=============================================================================
-## parameter file for evolution: 
-## with sim_class.py, config.py sets up output directory, and launches run.
-## usage:
-## ./config.py
+import argparse
+parser = argparse.ArgumentParser(
+  description="Launches simulation run, given parameters")
 #=============================================================================
 import sys, time
 from sim_class import Sim
@@ -40,8 +39,8 @@ sim.sparse_save= True
 #=============================================================================
 sim.l_ang=  2 
 sim.amp= 0.01 
-sim.rl= 4.2 
-sim.ru= 5.8
+sim.rl_0= 4.2 
+sim.ru_0= 5.8
 sim.initial_data_direction= "i"
 #=============================================================================
 ## details of computer setup 
