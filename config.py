@@ -30,8 +30,10 @@ sim.compactification_length= float(1)
 sim.evolve_time= float(250) ## units of black hole mass
 sim.num_saved_times= int(1000)
 
-sim.nx= 64 ## num radial pts 
-sim.nl= 16 ## num angular values
+sim.nx= 64 ## number of radial pts 
+sim.nl= 16 ## number of angular values
+sim.nlat = 32 ## number of theta collocation points 
+sim.nphi = 16 ## number of phi collocation points; should be a multiple of 4 
 #-----------------------------------------------------------------------------
 ## Initial data:
 ##
@@ -45,7 +47,7 @@ sim.l_ang=  2
 sim.amp= 0.01 
 sim.rl_0= 4.2 
 sim.ru_0= 5.8
-sim.initial_data_direction= "i"
+sim.initial_data_direction= "ingoing"
 #-----------------------------------------------------------------------------
 ## details of computer setup 
 

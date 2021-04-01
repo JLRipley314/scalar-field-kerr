@@ -27,17 +27,12 @@ namespace Params
    size_t nphi();
    size_t t_step_save();
 
-   int direction();
-
    double dt();
 
-   double curv();
    double cl();
 
-   double rbl();
-   double rbu();
-
-   int initial_exc_i();
+   double rmax();
+   double rmin();
 
    double bh_mass();
    double bh_spin();
@@ -53,6 +48,8 @@ namespace Params
     * for the initial data 
     */
    std::string id();
+
+   std::string initial_data_direction();
 
    double amp();
    double r_l();

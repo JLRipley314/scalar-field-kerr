@@ -14,14 +14,14 @@
 int main(int argc, char **argv)
 {
    assert(argc==3);
-   const std::string output_dir= argv[1];
-   const std::string param_file= argv[2];
+   const std::string param_file= argv[1];
+   const std::string output_dir= argv[2];
 
    Params::init(param_file);
 
    Arr3d::init( Params::nx(), Params::nphi(), Params::nlat());
    Sphere::init(Params::nl(), Params::nphi(), Params::nlat());
-   Cheb::init(  Params::nx(), Params::rbl(),  Params::rbu());
+   Cheb::init(  Params::nx(), Params::rmin(), Params::rmax());
    /* 
     * equations of motion 
     */

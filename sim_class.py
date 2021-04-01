@@ -23,8 +23,6 @@ class Sim:
          self.output_dir= "Output/"+self.output_stem
       else:
          self.output_dir=self.out_stem+self.output_stem
-      else:
-         raise ValueError("self.computer="+self.computer+" not supported")
       os.makedirs(self.output_dir)
 #=============================================================================
    def set_derived_params(self)->None:
@@ -39,11 +37,13 @@ class Sim:
       ,0.5)
 
       self.horizon= self.black_hole_mass+sqrt_term
+      self.r_min = self.horizon
 
-      self.R_max= float(
+      self.r_max= float(
          pow(self.compactification_length,2)
          /self.horizon
       )
+
 
       self.rl= self.horizon*self.rl_0
       self.ru= self.horizon*self.ru_0
@@ -75,7 +75,7 @@ class Sim:
       with open(self.parameter_file,'w') as f:
          attrs= vars(self)
          for param in attrs:
-            f.write('{} := {}\n'.format(param,attrs[param]))	
+            f.write('{} {}\n'.format(param,attrs[param]))	
 #=============================================================================
    def write_slurm_script(self, run_str:str):
       with open('{}/run.slurm'.format(self.home_dir), 'w') as f:
@@ -105,7 +105,6 @@ class Sim:
 #=============================================================================
    def launch_run(self)->None:
       self.set_derived_params()
-      self.write_sim_params()
       
       if self.output_dir is None:
          self.make_output_dir()
@@ -113,11 +112,13 @@ class Sim:
       if self.recompile==True:
          self.then_recompile()
 
-      self.output_file= self.output_dir+'/Output.txt'
+      self.write_sim_params()
+
+      self.output_file= self.output_dir+'/out.txt'
       run_str= (
-         './bin/'+self.bin_name
-         +' '+self.output_dir
+         './Bin/'+self.bin_name
          +' '+self.parameter_file
+         +' '+self.output_dir
          +' > '+self.output_file+' 2>&1 &'
       )
       if (self.debug):

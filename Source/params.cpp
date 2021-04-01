@@ -1,13 +1,7 @@
 #include <cassert>
 #include <fstream>
-using std::ifstream;
 #include <iostream>
-using std::cout; 
-using std::endl;
 #include <string>
-using std::string;
-using std::stoi;
-using std::stod;
 #include <iomanip>
 #include <fstream>
 
@@ -24,17 +18,13 @@ namespace Params
       size_t nlat_;
       size_t nphi_;
       size_t t_step_save_;
-      int direction_;
 
       double dt_;
 
-      double curv_;
       double cl_;
 
-      double rbl_;
-      double rbu_;
-
-      int initial_exc_i_;
+      double rmin_;
+      double rmax_;
 
       double bh_mass_;
       double bh_spin_;
@@ -46,6 +36,7 @@ namespace Params
       double V_4_;
 
       std::string id_;
+      std::string initial_data_direction_;
 
       double amp_;
       double r_l_;
@@ -54,19 +45,21 @@ namespace Params
       int l_ang_;
       int m_ang_;
 
-      string read(const string output_dir, const string find_this_var)
+      std::string read(
+            const std::string param_file, 
+            const std::string find_this_var)
       {
-         ifstream infile(output_dir+"/params.txt");
+         std::ifstream infile(param_file);
          assert(infile.good());
 
-         string name, val;
+         std::string name, val;
 
          while (infile >> name >> val) {
             if (name==find_this_var) {
                return val;
             }
          }
-         cout << "ERROR: did not find " << find_this_var << endl;
+         std::cout<<"ERROR: did not find "<<find_this_var<<std::endl;
          std::quick_exit(0);
       }
    }
@@ -81,17 +74,13 @@ namespace Params
    size_t nlat() {return nlat_;};
    size_t nphi() {return nphi_;};
    size_t t_step_save() {return t_step_save_;};
-   int direction() {return direction_;};
 
    double dt() {return dt_;};
 
-   double curv() {return curv_;};
-   double cl()   {return cl_;};
+   double cl() {return cl_;};
 
-   double rbl()   {return rbl_;};
-   double rbu()   {return rbu_;};
-
-   int initial_exc_i() {return initial_exc_i_;};
+   double rmax() {return rmax_;};
+   double rmin() {return rmin_;};
 
    double bh_mass() {return bh_mass_;};
    double bh_spin() {return bh_spin_;};
@@ -104,6 +93,8 @@ namespace Params
 
    std::string id() {return id_;};
 
+   std::string initial_data_direction() {return initial_data_direction_;};
+
    double amp() {return amp_;};
    double r_l() {return r_l_;};
    double r_u() {return r_u_;};
@@ -111,47 +102,44 @@ namespace Params
    int l_ang() {return l_ang_;};
    int m_ang() {return m_ang_;};
    /*========================================================================*/
-   void init(const string output_dir)
+   void init(const std::string param_file)
    {
-      nt_   = stoi(read(output_dir,"nt"));
-      nx_   = stoi(read(output_dir,"nx"));
-      nl_   = stoi(read(output_dir,"nl"));
-      nlat_ = stoi(read(output_dir,"nlat"));
-      nphi_ = stoi(read(output_dir,"nphi"));
+      nt_   = std::stoi(read(param_file,"nt"));
+      nx_   = std::stoi(read(param_file,"nx"));
+      nl_   = std::stoi(read(param_file,"nl"));
+      nlat_ = std::stoi(read(param_file,"nlat"));
+      nphi_ = std::stoi(read(param_file,"nphi"));
 
-      t_step_save_ = stoi(read(output_dir,"t_step_save"));
+      t_step_save_ = std::stoi(read(param_file,"t_step_save"));
 
-      direction_ = stoi(read(output_dir,"direction"));
+      dt_ = std::stod(read(param_file,"dt"));
 
-      dt_ = stod(read(output_dir,"dt"));
+      cl_ =   std::stod(read(param_file,"compactification_length"));
 
-      curv_ = stod(read(output_dir,"curvature"));
-      cl_ =   stod(read(output_dir,"compactification_scale"));
+      rmax_ =   std::stod(read(param_file,"r_max"));
+      rmin_ =   std::stod(read(param_file,"r_min"));
 
-      rbl_ =   stod(read(output_dir,"r_bound_lower"));
-      rbu_ =   stod(read(output_dir,"r_bound_upper"));
-
-      initial_exc_i_ = stoi(read(output_dir,"initial_exc_i"));
-
-      bh_mass_ = stod(read(output_dir,"bh_mass"));
-      bh_spin_ = stod(read(output_dir,"bh_spin"));
+      bh_mass_ = std::stod(read(param_file,"black_hole_mass"));
+      bh_spin_ = std::stod(read(param_file,"black_hole_spin"));
       /*---------------------------------------------------------------------*/
       /* for the potentials */
-      V_0_ = stod(read(output_dir,"V_0"));
-      V_1_ = stod(read(output_dir,"V_1"));
-      V_2_ = stod(read(output_dir,"V_2"));
-      V_3_ = stod(read(output_dir,"V_3"));
-      V_4_ = stod(read(output_dir,"V_4"));
+      V_0_ = std::stod(read(param_file,"V_0"));
+      V_1_ = std::stod(read(param_file,"V_1"));
+      V_2_ = std::stod(read(param_file,"V_2"));
+      V_3_ = std::stod(read(param_file,"V_3"));
+      V_4_ = std::stod(read(param_file,"V_4"));
       /*---------------------------------------------------------------------*/
       /* for the initial data */
-      id_ = read(output_dir,"initial_data_type");
+      id_ = read(param_file,"initial_data_type");
 
-      amp_ = stod(read(output_dir,"amp"));
-      r_l_ = stod(read(output_dir,"r_l"));
-      r_u_ = stod(read(output_dir,"r_u"));
+      initial_data_direction_ = read(param_file,"initial_data_direction");
 
-      l_ang_ = stoi(read(output_dir,"l_ang"));
-      m_ang_ = stoi(read(output_dir,"m_ang"));
+      amp_ = std::stod(read(param_file,"amp"));
+      r_l_ = std::stod(read(param_file,"r_l"));
+      r_u_ = std::stod(read(param_file,"r_u"));
+
+      l_ang_ = std::stoi(read(param_file,"l_ang"));
+      m_ang_ = std::stoi(read(param_file,"m_ang"));
    }
    /*========================================================================*/
 }
