@@ -6,3 +6,4 @@ test:
 
 clean:
 	$(MAKE) clean --directory=Bin/
+	$(MAKE) clean --directory=Output/

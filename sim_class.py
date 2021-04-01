@@ -5,7 +5,7 @@ from math import log
 #=============================================================================
 class Sim:
 #=============================================================================
-   def __init__(self,args:List[str])->None:
+   def __init__(self)->None:
       self.home_dir= str(os.getcwd())
 #=============================================================================
    def make_output_dir(self)->None:
@@ -20,9 +20,9 @@ class Sim:
       +	'_nl'+str(self.nl)
       )
       if (self.computer=="home"):
-         self.output_dir= "output/"+self.output_stem
-      elif (self.computer=="della"):
-         self.output_dir=self.della_out_stem+self.output_stem
+         self.output_dir= "Output/"+self.output_stem
+      else:
+         self.output_dir=self.out_stem+self.output_stem
       else:
          raise ValueError("self.computer="+self.computer+" not supported")
       os.makedirs(self.output_dir)
@@ -70,25 +70,14 @@ class Sim:
       if (self.t_step_save==0):
          self.t_step_save= 1
 #=============================================================================
-   def make_tables_dir(self)->None:
-      self.tables_dir= self.output_dir+"/tables"
-      os.makedirs(self.tables_dir)
-#=============================================================================
    def write_sim_params(self)->None:
-      with open(self.output_dir+'/sim_params.txt','w') as f:
+      self.parameter_file = self.output_dir+'/params.txt'
+      with open(self.parameter_file,'w') as f:
          attrs= vars(self)
          for param in attrs:
-            if type(attrs[param])!=list:
-               f.write('{} {}\n'.format(param,attrs[param]))	
-            else:
-               f.write('len_'+param+' '+str(len(attrs[param]))+'\n')
-
-               write_str= param
-               for val in attrs[param]:
-                  write_str+= ' '+str(val)
-               f.write(write_str+'\n')
+            f.write('{} := {}\n'.format(param,attrs[param]))	
 #=============================================================================
-   def write_slurm_script(self):
+   def write_slurm_script(self, run_str:str):
       with open('{}/run.slurm'.format(self.home_dir), 'w') as f:
          f.write('#!/bin/sh\n')
          f.write('#SBATCH -J fteuk\t\t# job name\n')
@@ -107,9 +96,6 @@ class Sim:
          #------------
          ## executable
          #------------
-         run_str= './bin/{} {}\n\n'.format(self.bin_name, self.output_dir)
-         if (self.debug):
-            run_str= 'valgrind -v --track-origins=yes --leak-check=full '+run_str
          f.write('\n'+run_str)
 
       shutil.copyfile(
@@ -117,32 +103,31 @@ class Sim:
       '{}/run.slurm'.format(self.output_dir)
       )
 #=============================================================================
-   def compile(self)->None:
-      subprocess.call('make '+self.bin_name,shell=True)
-#=============================================================================
    def launch_run(self)->None:
       self.set_derived_params()
-
-      self.make_output_dir()
-
       self.write_sim_params()
+      
+      if self.output_dir is None:
+         self.make_output_dir()
+
       if self.recompile==True:
          self.then_recompile()
 
-      self.output_file= self.output_dir+'/output.txt'
+      self.output_file= self.output_dir+'/Output.txt'
+      run_str= (
+         './bin/'+self.bin_name
+         +' '+self.output_dir
+         +' '+self.parameter_file
+         +' > '+self.output_file+' 2>&1 &'
+      )
+      if (self.debug):
+         run_str= 'valgrind -v --track-origins=yes --leak-check=full '+run_str
       if (self.computer=='home'):
-         run_str= (
-            'time ./bin/'+self.bin_name+' '+self.output_dir+' > '+self.output_file+' 2>&1 &'
-         )
-         if (self.debug):
-            run_str= 'valgrind -v --track-origins=yes --leak-check=full '+run_str
          os.environ['OMP_NUM_THREADS']= str(self.num_threads)
          subprocess.call(run_str,shell=True) 
-      elif (self.computer=='della'):
-         self.write_slurm_script()
-         subprocess.call('sbatch run.slurm', shell='True')		
       else:
-         raise ValueError('computer= '+self.computer+' not yet supported')
+         self.write_slurm_script(run_str)
+         subprocess.call('sbatch run.slurm', shell='True')		
 #=============================================================================
    def then_recompile(self)->None:
       subprocess.call('make clean_obj'+self.bin_name,shell=True)
