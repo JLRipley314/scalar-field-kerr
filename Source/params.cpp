@@ -68,7 +68,7 @@ namespace Params
    size_t nx() {return nx_;};
    size_t nl() {return nl_;};
 
-   size_t nx_nlat_nphi() { return nx_*nlat_*nphi_; }
+   size_t nx_nphi_nlat() { return nx_*nphi_*nlat_; }
    size_t nxn() {return nl_;};
 
    size_t nlat() {return nlat_;};

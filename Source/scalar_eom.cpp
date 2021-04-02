@@ -18,7 +18,7 @@ namespace {
 /*==========================================================================*/
 void init()
 {
-   const size_t ntotal = Params::nx_nlat_nphi();
+   const size_t ntotal = Params::nx_nphi_nlat();
    p_f.resize(ntotal,0);
    p_p.resize(ntotal,0);
    p_q.resize(ntotal,0);
@@ -148,7 +148,7 @@ void set_k(
 
    set_spherical_lap(f, lap_f);
 
-   for (size_t i=0; i<Params::nx_nlat_nphi(); i++) {
+   for (size_t i=0; i<Params::nx_nphi_nlat(); i++) {
       f_k[i] = p[i];
       p_k[i] = 
          p_f[i]*f[i] 
@@ -171,7 +171,7 @@ void set_k(
 void time_step(Field &f, Field &p, Field &q)
 {
    const double dt = Params::dt();
-   const size_t n = Params::nx_nlat_nphi();
+   const size_t n = Params::nx_nphi_nlat();
 
    std::vector<double> dr_f(  n);
    std::vector<double> lap_f( n);

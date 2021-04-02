@@ -12,7 +12,7 @@ class Field
    public:
       Field(
             const std::string name,
-            const size_t num,
+            const size_t size,
             const double init_val
          );
 

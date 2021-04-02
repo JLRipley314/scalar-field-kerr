@@ -16,7 +16,7 @@ TEST(sphere_test, to_and_from) {
    const size_t nl   = pow(2,5);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nphi, nlat);
 
    std::vector<double> po1(Sphere::nSph(),0);
    std::vector<double> po2(Sphere::nSph(),0);
@@ -69,7 +69,7 @@ TEST(sphere_test, partial_phi) {
    const size_t nl   = pow(2,5);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nphi, nlat);
 
    std::vector<double> v(  Sphere::nSph(),0);
    std::vector<double> dv1(Sphere::nSph(),0);
@@ -125,7 +125,7 @@ TEST(sphere_test, laplace_beltrami) {
    const size_t nl   = pow(2,5);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nphi, nlat);
 
    std::vector<double> v(   Sphere::nSph(),0);
    std::vector<double> ddv1(Sphere::nSph(),0);
@@ -184,7 +184,7 @@ TEST(sphere_test, filter_is_TVD) {
    const size_t nl   = pow(2,5);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nphi, nlat);
 
    std::vector<double> po1(Sphere::nSph(),0);
    std::vector<double> po2(Sphere::nSph(),0);

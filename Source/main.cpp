@@ -33,9 +33,9 @@ int main(int argc, char **argv)
    Eom::init();
 
    std::cout<<"Initializing Fields"<<std::endl;
-   Field f("f", Params::nx_nlat_nphi(), 0.0);
-   Field p("p", Params::nx_nlat_nphi(), 0.0);
-   Field q("q", Params::nx_nlat_nphi(), 0.0);
+   Field f("f", Params::nx_nphi_nlat(), 0.0);
+   Field p("p", Params::nx_nphi_nlat(), 0.0);
+   Field q("q", Params::nx_nphi_nlat(), 0.0);
 
    std::cout<<"Setting initial data"<<std::endl;
    ID::ingoing_pulse(f.n, p.n, q.n);
