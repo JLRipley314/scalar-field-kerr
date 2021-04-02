@@ -119,7 +119,7 @@ class Sim:
          './Bin/'+self.bin_name
          +' '+self.parameter_file
          +' '+self.output_dir
-         +' > '+self.output_file+' 2>&1 &'
+         +' | tee '+self.output_file#+' 2>&1 &'
       )
       if (self.debug):
          run_str= 'valgrind -v --track-origins=yes --leak-check=full '+run_str

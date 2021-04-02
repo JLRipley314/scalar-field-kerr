@@ -57,7 +57,7 @@ double phi(const size_t i_ph)
    return i_ph*2.0*M_PI/((shtns_->nphi)*(shtns_->mres));
 }
 /*==========================================================================*/
-void init(const size_t nl, const size_t nlat, const size_t nphi)
+void init(const size_t nl, const size_t nphi, const size_t nlat)
 {
    lmax_ = nl;
    mmax_ = lmax_;

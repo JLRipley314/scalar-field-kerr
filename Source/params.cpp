@@ -29,7 +29,6 @@ namespace Params
       double bh_mass_;
       double bh_spin_;
 
-      double V_0_;
       double V_1_;
       double V_2_;
       double V_3_;
@@ -39,8 +38,8 @@ namespace Params
       std::string initial_data_direction_;
 
       double amp_;
-      double r_l_;
-      double r_u_;
+      double rl_;
+      double ru_;
 
       int l_ang_;
       int m_ang_;
@@ -56,6 +55,7 @@ namespace Params
 
          while (infile >> name >> val) {
             if (name==find_this_var) {
+               std::cout<<name<<" "<<val<<std::endl;
                return val;
             }
          }
@@ -85,7 +85,6 @@ namespace Params
    double bh_mass() {return bh_mass_;};
    double bh_spin() {return bh_spin_;};
 
-   double V_0() {return V_0_;};
    double V_1() {return V_1_;};
    double V_2() {return V_2_;};
    double V_3() {return V_3_;};
@@ -96,8 +95,8 @@ namespace Params
    std::string initial_data_direction() {return initial_data_direction_;};
 
    double amp() {return amp_;};
-   double r_l() {return r_l_;};
-   double r_u() {return r_u_;};
+   double rl() {return rl_;};
+   double ru() {return ru_;};
 
    int l_ang() {return l_ang_;};
    int m_ang() {return m_ang_;};
@@ -123,7 +122,6 @@ namespace Params
       bh_spin_ = std::stod(read(param_file,"black_hole_spin"));
       /*---------------------------------------------------------------------*/
       /* for the potentials */
-      V_0_ = std::stod(read(param_file,"V_0"));
       V_1_ = std::stod(read(param_file,"V_1"));
       V_2_ = std::stod(read(param_file,"V_2"));
       V_3_ = std::stod(read(param_file,"V_3"));
@@ -135,8 +133,8 @@ namespace Params
       initial_data_direction_ = read(param_file,"initial_data_direction");
 
       amp_ = std::stod(read(param_file,"amp"));
-      r_l_ = std::stod(read(param_file,"r_l"));
-      r_u_ = std::stod(read(param_file,"r_u"));
+      rl_ = std::stod(read(param_file,"rl"));
+      ru_ = std::stod(read(param_file,"ru"));
 
       l_ang_ = std::stoi(read(param_file,"l_ang"));
       m_ang_ = std::stoi(read(param_file,"m_ang"));

@@ -23,8 +23,8 @@ void ingoing_pulse(
 
    const double cl  = Params::cl();
    const double amp = Params::amp();
-   const double rl  = Params::r_l();
-   const double ru  = Params::r_u();
+   const double rl  = Params::rl();
+   const double ru  = Params::ru();
 
    const int l_ang  = Params::l_ang();
    const int m_ang  = Params::m_ang();

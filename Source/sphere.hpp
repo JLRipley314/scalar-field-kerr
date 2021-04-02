@@ -12,7 +12,7 @@
 /*===========================================================================*/
 namespace Sphere {
 /*===========================================================================*/
-   void init(const size_t nl, const size_t nlat, const size_t nphi);
+   void init(const size_t nl, const size_t nphi, const size_t nlat);
    void cleanup();
 
    /*

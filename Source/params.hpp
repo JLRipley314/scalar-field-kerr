@@ -39,7 +39,6 @@ namespace Params
    /* 
     * for the potentials 
     */
-   double V_0();
    double V_1();
    double V_2();
    double V_3();
@@ -52,8 +51,8 @@ namespace Params
    std::string initial_data_direction();
 
    double amp();
-   double r_l();
-   double r_u();
+   double rl();
+   double ru();
 
    int l_ang();
    int m_ang();

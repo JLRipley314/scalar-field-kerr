@@ -4,6 +4,8 @@ all:
 test:
 	$(MAKE) --directory=Test/
 
-clean:
+clean_bin:
 	$(MAKE) clean --directory=Bin/
+
+clean_out:
 	$(MAKE) clean --directory=Output/
