@@ -46,20 +46,6 @@ TEST(sphere_test, to_and_from) {
          );
    }
    }
-   /* 
-    * Threadsafe transform 
-    */
-   Sphere::to_Ylm_ts(po1, ylm);
-   Sphere::to_Sph_ts(ylm, po2);
-
-   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
-   for (size_t it=0; it<Sphere::nlat(); it++) {
-      EXPECT_LT(
-            abs(po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)]),
-            1e-14
-         );
-   }
-   }
    Sphere::cleanup();
 }
 /*==========================================================================*/
@@ -94,19 +80,6 @@ TEST(sphere_test, partial_phi) {
     * Default transform 
     */
    Sphere::partial_phi(v, dv1);
-
-   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
-   for (size_t it=0; it<Sphere::nlat(); it++) {
-      EXPECT_LT(
-            abs(dv1[Sphere::indx_Sph(ip,it)]-dv2[Sphere::indx_Sph(ip,it)]),
-            5e-14
-         );
-   }
-   }
-   /* 
-    * Threadsafe transform 
-    */
-   Sphere::partial_phi_ts(v, dv1);
 
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
@@ -161,19 +134,6 @@ TEST(sphere_test, laplace_beltrami) {
          );
    }
    }
-   /* 
-    * Threadsafe transform 
-    */
-   Sphere::laplace_beltrami_ts(v, ddv1);
-
-   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
-   for (size_t it=0; it<Sphere::nlat(); it++) {
-      EXPECT_LT(
-            abs(ddv1[Sphere::indx_Sph(ip,it)]-ddv2[Sphere::indx_Sph(ip,it)]),
-            5e-12
-         );
-   }
-   }
    Sphere::cleanup();
 }
 /*==========================================================================*/
@@ -211,33 +171,6 @@ TEST(sphere_test, filter_is_TVD) {
     */
    double tv1 = 0;
    double tv2 = 0;
-   for (size_t ip=1; ip<Sphere::nphi()-1; ip++) {
-   for (size_t it=1; it<Sphere::nlat()-1; it++) {
-      tv1 += 
-         abs(po1[Sphere::indx_Sph(ip  ,it)]
-         -   po1[Sphere::indx_Sph(ip+1,it)])
-         +  
-         abs(po1[Sphere::indx_Sph(ip,it  )]
-          -  po1[Sphere::indx_Sph(ip,it+1)]);
-
-      tv2 += 
-         abs(po2[Sphere::indx_Sph(ip  ,it)]
-         -   po2[Sphere::indx_Sph(ip+1,it)])
-         +  
-         abs(po2[Sphere::indx_Sph(ip,it  )]
-          -  po2[Sphere::indx_Sph(ip,it+1)]);
-   }
-   }
-   EXPECT_LT(tv2, tv1);
-   /* 
-    * Threadsafe filter 
-    */
-   Sphere::filter(po2);
-   /* 
-    * compute total variations 
-    */
-   tv1 = 0;
-   tv2 = 0;
    for (size_t ip=1; ip<Sphere::nphi()-1; ip++) {
    for (size_t it=1; it<Sphere::nlat()-1; it++) {
       tv1 += 

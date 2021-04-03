@@ -3,7 +3,8 @@
 
 #include <iostream>
 /* 
- * for thread safe versions
+ * Need to use fftw_malloc instead of vectors
+ * when using shtns. 
  */
 #define ALLOCATE_TMP \
    double *Sph_tmp = (double *) fftw_malloc( NSPAT_ALLOC(shtns_) * sizeof(double)); \
@@ -33,8 +34,6 @@ namespace {
                     from sampling theorem need nphi > 2*mmax */
 
    shtns_cfg shtns_; /* spherical harmonic struct */
-   double *Sph_;     /* spherical space */
-   cplx   *Ylm_;     /* spherical harmonic coefficients */
 
    std::vector<double> lap_; /* Laplace-Beltrami operator on the unit sphere:
                                \Delta Y_{lm} = -l(l+1) Y_{lm} */
@@ -86,25 +85,12 @@ void init(const size_t nl, const size_t nphi, const size_t nlat)
    for (size_t i=0; i<lmax_; i++) {
       low_pass_[i] = exp(-36*pow(double(i)/lmax_,10));
    }
-   /* 
-    * Memory allocation : the use of fftw_malloc is required because we need proper 16-byte alignement.
-    */
-   Sph_ = (double *) fftw_malloc( NSPAT_ALLOC(shtns_) * sizeof(double));
-   Ylm_ = (cplx *)   fftw_malloc(         shtns_->nlm * sizeof(cplx));
-   assert(Sph_!=nullptr);
-   assert(Ylm_!=nullptr);
-
    nSph_ = NSPAT_ALLOC(shtns_);
    nYlm_ = shtns_->nlm;
 }
 /*==========================================================================*/
 void cleanup()
 {
-   assert(Sph_!=nullptr);
-   assert(Ylm_!=nullptr);
-   fftw_free(Sph_);
-   fftw_free(Ylm_);
-
    shtns_destroy(shtns_);
 }
 /*==========================================================================*/
@@ -114,18 +100,6 @@ size_t indx_Sph(const size_t i_ph, const size_t i_th)
 }
 /*==========================================================================*/
 void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
-{
-   for (size_t i=0; i<nSph_; i++) {
-      Sph_[i] = sph[i];
-   }
-   spat_to_SH(shtns_, Sph_, Ylm_); 
-
-   for (size_t lm=0; lm<nYlm_; lm++) {
-      ylm[lm] = Ylm_[lm]; 
-   }
-}
-/*==========================================================================*/
-void to_Ylm_ts(const std::vector<double> &sph, std::vector<cplx> &ylm)
 {
    ALLOCATE_TMP;
 
@@ -142,18 +116,6 @@ void to_Ylm_ts(const std::vector<double> &sph, std::vector<cplx> &ylm)
 /*==========================================================================*/
 void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
 {
-   for (size_t lm=0; lm<nYlm_; lm++) {
-      Ylm_[lm] = ylm[lm];
-   }
-   SH_to_spat(shtns_, Ylm_, Sph_); 
-
-   for (size_t i=0; i<nSph_; i++) {
-      sph[i] = Sph_[i];
-   }
-}
-/*==========================================================================*/
-void to_Sph_ts(const std::vector<cplx> &ylm, std::vector<double> &sph)
-{
    ALLOCATE_TMP;
 
    for (size_t lm=0; lm<nYlm_; lm++) {
@@ -167,34 +129,7 @@ void to_Sph_ts(const std::vector<cplx> &ylm, std::vector<double> &sph)
    FREE_TMP;
 }
 /*==========================================================================*/
-/* Laplace-Beltrami operator on the unit sphere:
- * \Delta Y_{lm} = -l(l+1) Y_{lm} */
-/*==========================================================================*/
 void laplace_beltrami(
-      const std::vector<double> &v, 
-      std::vector<double> &ddv)
-{
-   assert(v.size()  ==nlat_*nphi_);
-   assert(ddv.size()==nlat_*nphi_);
-
-   for (size_t i=0; i<nSph_; i++) {
-      Sph_[i] = v[i];
-   }
-   spat_to_SH(shtns_, Sph_, Ylm_);
-
-   for (size_t l=0; l<lmax_; l++) {
-   for (size_t m=0; m<=l;    m++) {
-      Ylm_[LM(shtns_,l,m)] *= lap_[l];
-   }
-   }
-   SH_to_spat(shtns_, Ylm_, Sph_);
-
-   for (size_t i=0; i<nSph_; i++) {
-      ddv[i] = Sph_[i];
-   }
-}
-/*==========================================================================*/
-void laplace_beltrami_ts(
       const std::vector<double> &v, 
       std::vector<double> &ddv)
 {
@@ -224,30 +159,6 @@ void laplace_beltrami_ts(
 /* partial_{\phi} operator */
 /*==========================================================================*/
 void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
-{
-   assert(v.size() ==nlat_*nphi_);
-   assert(dv.size()==nlat_*nphi_);
-
-   for (size_t i=0; i<nSph_; i++) {
-      Sph_[i] = v[i];
-   }
-   spat_to_SH(shtns_, Sph_, Ylm_);
-
-   const cplx img(0,1);
-
-   for (size_t l=0; l<lmax_; l++) {
-   for (size_t m=0; m<=l;    m++) {
-      Ylm_[LM(shtns_,l,m)] *= img*cplx(m);
-   }
-   }
-   SH_to_spat(shtns_, Ylm_, Sph_);
-
-   for (size_t i=0; i<nSph_; i++) {
-      dv[i] = Sph_[i];
-   }
-}
-/*==========================================================================*/
-void partial_phi_ts(const std::vector<double> &v, std::vector<double> &dv)
 {
    ALLOCATE_TMP;
 
@@ -279,25 +190,6 @@ void partial_phi_ts(const std::vector<double> &v, std::vector<double> &dv)
  * as we only deal with real scalar fields. */
 /*==========================================================================*/
 void filter(std::vector<double> &v)
-{
-   for (size_t i=0; i<nSph_; i++) {
-      Sph_[i] = v[i];
-   }
-   spat_to_SH(shtns_, Sph_, Ylm_);
-
-   for (size_t l=0; l<lmax_; l++) {
-   for (size_t m=0; m<l;     m++) {
-      Ylm_[LM(shtns_,l,m)] *= low_pass_[l]*low_pass_[m];
-   }
-   }
-   SH_to_spat(shtns_, Ylm_, Sph_);
-
-   for (size_t i=0; i<nSph_; i++) {
-      v[i] = Sph_[i];
-   }
-}
-/*==========================================================================*/
-void filter_ts(std::vector<double> &v)
 {
    ALLOCATE_TMP;
    for (size_t i=0; i<nSph_; i++) {
@@ -332,19 +224,6 @@ std::vector<double> compute_ylm(const int l_ang, const int m_ang)
    return out;
 }
 /*==========================================================================*/
-std::vector<double> compute_ylm_ts(const int l_ang, const int m_ang)
-{
-   std::vector<cplx>   in(nYlm_, 0.0);
-   std::vector<double> out(nSph_,0.0);
-
-   in[LM(shtns_,l_ang,m_ang)] = 1;
-
-   to_Sph_ts(in, out);
-
-   return out;
-}
-/*==========================================================================*/
 } /* Sphere */
-
 #undef ALLOCATE_TMP
 #undef FREE_TMP

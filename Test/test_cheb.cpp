@@ -28,20 +28,8 @@ TEST(cheb_test, to_and_from) {
       po1[i] = tan(Cheb::pt(i));
    }
 
-   /* 
-    * Threadsafe transforms
-    */
    Cheb::to_ch(po1, ch);
    Cheb::to_po(ch, po2);
-
-   for (size_t i=0; i<nr; i++) {
-      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
-   }
-   /* 
-    * Thread safe transforms 
-    */
-   Cheb::to_ch_ts(po1, ch);
-   Cheb::to_po_ts(ch, po2);
 
    for (size_t i=0; i<nr; i++) {
       EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
@@ -67,11 +55,6 @@ TEST(cheb_test, derivatives) {
       dv1[i] = Cheb::pt(i)*cos(Cheb::pt(i)) + sin(Cheb::pt(i));
    }
    Cheb::der(v, dv2);
-
-   for (size_t i=0; i<nr; i++) {
-      EXPECT_TRUE(abs(dv1[i] - dv2[i]) < eps);
-   }
-   Cheb::der_ts(v, dv2);
 
    for (size_t i=0; i<nr; i++) {
       EXPECT_TRUE(abs(dv1[i] - dv2[i]) < eps);

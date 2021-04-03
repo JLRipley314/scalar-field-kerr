@@ -5,8 +5,12 @@ over the interval [lower, upper].
 import os, ctypes
 import numpy as np
 
-_p_cheb = os.getcwd()
-_l_cheb = ctypes.CDLL(_p_cheb+'/lib_cheb.so')
+try:
+   _p_cheb = os.getcwd()
+   _l_cheb = ctypes.CDLL(_p_cheb+'/lib_cheb.so')
+except OSError:
+   _p_cheb = os.getcwd()
+   _l_cheb = ctypes.CDLL(_p_cheb+'/Cheb/lib_cheb.so')
 
 _cheb_initialized = False
 #=============================================================================
