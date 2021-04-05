@@ -37,7 +37,7 @@ void init()
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
       const size_t indx     = Arr3d::indx(  ix,ip,it);
-      const size_t indx_Sph = Sphere::indx_Sph(ip,it);
+//      const size_t indx_Sph = Sphere::indx_Sph(ip,it);
 
       double r = pow(cl,2)/Cheb::pt(ix);
 

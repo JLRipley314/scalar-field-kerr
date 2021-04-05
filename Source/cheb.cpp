@@ -5,61 +5,61 @@
 namespace Cheb {
 /*==========================================================================*/
 namespace {
-      size_t n_;
+      size_t _n;
 
-      double lower_;
-      double upper_;
-      double jacobian_; 
+      double _lower;
+      double _upper;
+      double _jacobian; 
       /* 
        * Chebyshev points over interval [lower,upper] 
        */
-      std::vector<double> pts_;
-      std::vector<double> low_pass_;
+      std::vector<double> _pts;
+      std::vector<double> _low_pass;
       /* 
        * for fftw Fourier transform 
        */
-      fftw_plan plan_dct_;
+      fftw_plan _plan_dct;
 }
 /*==========================================================================*/
 /* setup fftw and vectors */
 /*==========================================================================*/
 void init(const int n, const double lower, const double upper) 
 {
-   n_ = n;
-   lower_ = lower;
-   upper_ = upper;
-   jacobian_ = (upper_-lower_) / 2.0;
+   _n = n;
+   _lower = lower;
+   _upper = upper;
+   _jacobian = (_upper-_lower) / 2.0;
 
-   pts_.resize(n_,0.0);
-   low_pass_.resize(n_,0.0);
+   _pts.resize(_n,0.0);
+   _low_pass.resize(_n,0.0);
    /* 
     * Chebyshev points on interval [lower, upper]
     */
-   for (size_t i=0; i<n_; i++) {
-      pts_[i] = jacobian_*cos(M_PI*double(i)/(n_-1)) + ((upper_+lower_)/2.0);
+   for (size_t i=0; i<_n; i++) {
+      _pts[i] = _jacobian*cos(M_PI*double(i)/(_n-1)) + ((_upper+_lower)/2.0);
    }
    /* 
     * for low pass filter in Chebyshev space 
     */
-   for (size_t i=0; i<n_; i++) {
-      low_pass_[i] = exp(-40.0*pow(double(i)/n_,10));
+   for (size_t i=0; i<_n; i++) {
+      _low_pass[i] = exp(-40.0*pow(double(i)/_n,10));
    }   
    /* 
     * initialize fftw discrete cosine transform plan 
     */
-   std::vector<double> in_( n_,0);
-   std::vector<double> out_(n_,0);
+   std::vector<double> i_n( _n,0);
+   std::vector<double> out_(_n,0);
 
-   plan_dct_ = fftw_plan_r2r_1d(n_,in_.data(),out_.data(),FFTW_REDFT00,FFTW_PATIENT);
+   _plan_dct = fftw_plan_r2r_1d(_n,i_n.data(),out_.data(),FFTW_REDFT00,FFTW_PATIENT);
 
-   assert(plan_dct_!=nullptr);
+   assert(_plan_dct!=nullptr);
 }
 /*==========================================================================*/
 void cleanup()
 {
-   assert(plan_dct_!=nullptr);
+   assert(_plan_dct!=nullptr);
 
-   fftw_destroy_plan(plan_dct_);
+   fftw_destroy_plan(_plan_dct);
    fftw_cleanup();
 }
 /*==========================================================================*/
@@ -70,16 +70,16 @@ void to_ch(std::vector<double> &po, std::vector<double> &ch)
    /*
     * compute Fourier transform
     */
-   assert(po.size()==n_);
-   assert(ch.size()==n_);
-   fftw_execute_r2r(plan_dct_, po.data(), ch.data());
+   assert(po.size()==_n);
+   assert(ch.size()==_n);
+   fftw_execute_r2r(_plan_dct, po.data(), ch.data());
    /*
     * normalize Chebyshev coefficients
     */
-   ch[0]    /= (2.0*(n_-1));
-   ch[n_-1] /= (2.0*(n_-1));
-   for (size_t i=1; i<n_-1; i++) {
-      ch[i] /= (n_-1);
+   ch[0]    /= (2.0*(_n-1));
+   ch[_n-1] /= (2.0*(_n-1));
+   for (size_t i=1; i<_n-1; i++) {
+      ch[i] /= (_n-1);
    }
 }
 /*==========================================================================*/
@@ -90,41 +90,41 @@ void to_po(std::vector<double> &ch, std::vector<double> &po)
    /*
     * compute Fourier transform
     */
-   assert(ch.size()==n_);
-   assert(po.size()==n_);
+   assert(ch.size()==_n);
+   assert(po.size()==_n);
    /*
     * normalize coefficients for Fourier transform 
     */
-   for (size_t i=1; i<n_-1; i++) {
+   for (size_t i=1; i<_n-1; i++) {
       ch[i] /= 2.0;
    }
-   fftw_execute_r2r(plan_dct_, ch.data(), po.data());
+   fftw_execute_r2r(_plan_dct, ch.data(), po.data());
 }
 /*==========================================================================*/
 /* Compute derivative over interval */
 /*==========================================================================*/
 void der(std::vector<double> &v, std::vector<double> &dv)
 {
-   std::vector<double> ch_tmp(n_,0);
-   assert(v.size( )==n_);
-   assert(dv.size()==n_);
+   std::vector<double> ch_tmp(_n,0);
+   assert(v.size( )==_n);
+   assert(dv.size()==_n);
 
    to_ch(v,ch_tmp);
    /*
     * to start Chebyshev derivative recurrence relation 
     */
-   ch_tmp[n_-1] = 0;
-   ch_tmp[n_-2] = 0;
+   ch_tmp[_n-1] = 0;
+   ch_tmp[_n-2] = 0;
    /* 
     * use dv as a temporary array
     */
-   for (size_t i=0; i<n_; i++) {
+   for (size_t i=0; i<_n; i++) {
       dv[i] = ch_tmp[i];
    }
    /* 
     * apply Chebyshev derivative recurrence relation 
     */
-   for (size_t i=n_-2; i>=1; i--) { 
+   for (size_t i=_n-2; i>=1; i--) { 
       ch_tmp[i-1] = 2.0*i*dv[i] + ch_tmp[i+1];
    } 
    ch_tmp[0] /= 2.0;
@@ -132,8 +132,8 @@ void der(std::vector<double> &v, std::vector<double> &dv)
     * Normalize derivative to inverval 
     */
    to_po(ch_tmp,dv);
-   for (size_t i=0; i<n_; i++) {
-      dv[i] /= jacobian_;
+   for (size_t i=0; i<_n; i++) {
+      dv[i] /= _jacobian;
    }
 }
 /*==========================================================================*/
@@ -141,19 +141,19 @@ void der(std::vector<double> &v, std::vector<double> &dv)
 /*==========================================================================*/
 void filter(std::vector<double> &v)
 {
-   std::vector<double> ch_tmp(n_,0);
-   assert(v.size()==n_);
+   std::vector<double> ch_tmp(_n,0);
+   assert(v.size()==_n);
 
    to_ch(v,ch_tmp);
-   for (size_t i=0; i<n_; i++) { 
-      ch_tmp[i] *= low_pass_[i];
+   for (size_t i=0; i<_n; i++) { 
+      ch_tmp[i] *= _low_pass[i];
    } 
    to_po(ch_tmp,v);
 }
 /*==========================================================================*/
-size_t n() { return n_; }
-double lower() { return lower_; }
-double upper() { return upper_; }
-double pt(const size_t i) { return pts_[i]; }
+size_t n() { return _n; }
+double lower() { return _lower; }
+double upper() { return _upper; }
+double pt(const size_t i) { return _pts[i]; }
 /*==========================================================================*/
 } /* Cheb */

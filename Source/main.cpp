@@ -7,6 +7,7 @@
 #include "cheb.hpp"
 #include "sphere.hpp"
 #include "arr.hpp"
+#include "grid.hpp"
 #include "field.hpp"
 #include "initial_data.hpp"
 #include "scalar_eom.hpp"
@@ -29,13 +30,16 @@ int main(int argc, char **argv)
    std::cout<<"Initializing Cheb"<<std::endl;
    Cheb::init(  Params::nx(), Params::rmin(), Params::rmax());
 
+   std::cout<<"Initializing Grid"<<std::endl;
+   Grid::init();
+
    std::cout<<"Initializing Equations of motion"<<std::endl;
    Eom::init();
 
    std::cout<<"Initializing Fields"<<std::endl;
-   Field f("f", Params::nx_nphi_nlat(), 0.0);
-   Field p("p", Params::nx_nphi_nlat(), 0.0);
-   Field q("q", Params::nx_nphi_nlat(), 0.0);
+   Field f("f", Params::nx_nphi_nlat(), 0.0, Grid::g3d);
+   Field p("p", Params::nx_nphi_nlat(), 0.0, Grid::g3d);
+   Field q("q", Params::nx_nphi_nlat(), 0.0, Grid::g3d);
 
    std::cout<<"Setting initial data"<<std::endl;
    ID::ingoing_pulse(f.n, p.n, q.n);

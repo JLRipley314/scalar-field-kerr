@@ -13,7 +13,8 @@ class Field
       Field(
             const std::string name,
             const size_t size,
-            const double init_val
+            const double init_val,
+            const std::vector<std::vector<double>> &in_grid
          );
 
       ~Field();
@@ -31,6 +32,8 @@ class Field
       std::vector<double> k3;
       std::vector<double> k4;
       std::vector<double> k5;
+
+      std::vector<std::vector<double>> grid;
 };
 
 #endif /* _FIELD_HPP_ */

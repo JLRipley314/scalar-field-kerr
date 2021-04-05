@@ -21,7 +21,7 @@ sim.bin_name= "default.run"
 sim.recompile= False
 
 sim.run_type= "basic_run"
-sim.debug= True
+sim.debug= False
 
 sim.black_hole_mass= float(0.5)
 sim.black_hole_spin= round(0.0*sim.black_hole_mass,16)

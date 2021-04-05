@@ -122,7 +122,7 @@ class Sim:
          +' | tee '+self.output_file#+' 2>&1 &'
       )
       if (self.debug):
-         run_str= 'valgrind -v --track-origins=yes --leak-check=full '+run_str
+         run_str= 'valgrind -v --track-origins=yes --leak-check=full --gen-suppressions=yes '+run_str
       if (self.computer=='home'):
          os.environ['OMP_NUM_THREADS']= str(self.num_threads)
          subprocess.call(run_str,shell=True) 

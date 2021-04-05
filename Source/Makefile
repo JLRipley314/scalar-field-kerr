@@ -12,9 +12,9 @@ CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra \
 #=============================================================================
 OBJ = params.o \
       io.o \
+      arr.o \
       cheb.o \
       sphere.o \
-      arr.o \
       field.o \
       initial_data.o \
       scalar_eom.o \
@@ -22,9 +22,10 @@ OBJ = params.o \
 
 DEPS = params.hpp \
        io.hpp \
+       arr.hpp \
        cheb.hpp \
        sphere.hpp \
-       arr.hpp \
+       grid.hpp \
        field.hpp \
        initial_data.hpp \
        scalar_eom.hpp

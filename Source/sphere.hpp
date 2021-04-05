@@ -14,7 +14,6 @@ namespace Sphere {
 /*===========================================================================*/
    void init(const size_t nl, const size_t nphi, const size_t nlat);
    void cleanup();
-
    /*
     * NOTE the indexing! we are using "SHT_NATIVE_LAYOUT", so in
     * fact theta varies the fastest; i.e. we index as (phi, theta) 
