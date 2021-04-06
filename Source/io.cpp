@@ -28,7 +28,7 @@ void write(
       const int n= vals.size();
       for (int i=0; i<n; ++i) {
          out<<std::setprecision(16)<<vals[i]<<std::endl;
-      }		
+      }
    }
    else {
       std::cout

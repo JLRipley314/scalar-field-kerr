@@ -37,9 +37,9 @@ class Sim:
       ,0.5)
 
       self.horizon= self.black_hole_mass+sqrt_term
-      self.r_min = self.horizon
+      self.R_min = 0
 
-      self.r_max= float(
+      self.R_max= float(
          pow(self.compactification_length,2)
          /self.horizon
       )

@@ -31,8 +31,8 @@ namespace Params
 
    double cl();
 
-   double rmax();
-   double rmin();
+   double Rmax();
+   double Rmin();
 
    double bh_mass();
    double bh_spin();

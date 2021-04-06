@@ -23,13 +23,13 @@ int main(int argc, char **argv)
    Params::init(param_file);
 
    std::cout<<"Initializing Arr3d"<<std::endl;
-   Arr3d::init( Params::nx(), Params::nphi(), Params::nlat());
+   Arr3d::init(Params::nx(), Params::nphi(), Params::nlat());
 
    std::cout<<"Initializing Sphere"<<std::endl;
    Sphere::init(Params::nl(), Params::nphi(), Params::nlat());
 
    std::cout<<"Initializing Cheb"<<std::endl;
-   Cheb::init(  Params::nx(), Params::rmin(), Params::rmax());
+   Cheb::init(  Params::nx(), Params::Rmin(), Params::Rmax());
 
    std::cout<<"Initializing Grid"<<std::endl;
    Grid::init();
@@ -45,9 +45,9 @@ int main(int argc, char **argv)
    std::cout<<"Setting initial data"<<std::endl;
    ID::ingoing_pulse(f.n, p.n, q.n);
 
-   Csv::write(output_dir+"/"+f.name, 1, f.n);
-//   Csv::write(output_dir+"/"+p.name, 0, p.n);
-//   Csv::write(output_dir+"/"+q.name, 0, q.n);
+   Csv::write(output_dir+"/"+f.name, 0, f.n);
+   Csv::write(output_dir+"/"+p.name, 0, p.n);
+   Csv::write(output_dir+"/"+q.name, 0, q.n);
 
    std::cout<<"Beginning evolution"<<std::endl;
    for (size_t itm=0; itm<Params::nt(); itm++) {
@@ -60,6 +60,8 @@ int main(int argc, char **argv)
    }
 
    std::cout<<"Cleaning up"<<std::endl;
+   Eom::   cleanup();
+   Grid::  cleanup();
    Cheb::  cleanup();
    Sphere::cleanup();
    Arr3d:: cleanup();

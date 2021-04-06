@@ -9,3 +9,7 @@ clean_bin:
 
 clean_out:
 	$(MAKE) clean --directory=Output/
+
+clean:
+	$(MAKE) clean_bin
+	$(MAKE) clean_out

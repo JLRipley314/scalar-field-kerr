@@ -41,7 +41,7 @@ TEST(sphere_test, to_and_from) {
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       EXPECT_LT(
-            abs(po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)]),
+            fabs(po1[Sphere::indx_Sph(ip,it)]-po2[Sphere::indx_Sph(ip,it)]),
             1e-14
          );
    }
@@ -84,7 +84,7 @@ TEST(sphere_test, partial_phi) {
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       EXPECT_LT(
-            abs(dv1[Sphere::indx_Sph(ip,it)]-dv2[Sphere::indx_Sph(ip,it)]),
+            fabs(dv1[Sphere::indx_Sph(ip,it)]-dv2[Sphere::indx_Sph(ip,it)]),
             5e-14
          );
    }
@@ -129,7 +129,7 @@ TEST(sphere_test, laplace_beltrami) {
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       EXPECT_LT(
-            abs(ddv1[Sphere::indx_Sph(ip,it)]-ddv2[Sphere::indx_Sph(ip,it)]),
+            fabs(ddv1[Sphere::indx_Sph(ip,it)]-ddv2[Sphere::indx_Sph(ip,it)]),
             5e-12
          );
    }
@@ -174,17 +174,17 @@ TEST(sphere_test, filter_is_TVD) {
    for (size_t ip=1; ip<Sphere::nphi()-1; ip++) {
    for (size_t it=1; it<Sphere::nlat()-1; it++) {
       tv1 += 
-         abs(po1[Sphere::indx_Sph(ip  ,it)]
+         fabs(po1[Sphere::indx_Sph(ip  ,it)]
          -   po1[Sphere::indx_Sph(ip+1,it)])
          +  
-         abs(po1[Sphere::indx_Sph(ip,it  )]
+         fabs(po1[Sphere::indx_Sph(ip,it  )]
           -  po1[Sphere::indx_Sph(ip,it+1)]);
 
       tv2 += 
-         abs(po2[Sphere::indx_Sph(ip  ,it)]
+         fabs(po2[Sphere::indx_Sph(ip  ,it)]
          -   po2[Sphere::indx_Sph(ip+1,it)])
          +  
-         abs(po2[Sphere::indx_Sph(ip,it  )]
+         fabs(po2[Sphere::indx_Sph(ip,it  )]
           -  po2[Sphere::indx_Sph(ip,it+1)]);
    }
    }

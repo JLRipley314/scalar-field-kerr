@@ -23,8 +23,8 @@ namespace Params
 
       double cl_;
 
-      double rmin_;
-      double rmax_;
+      double Rmin_;
+      double Rmax_;
 
       double bh_mass_;
       double bh_spin_;
@@ -79,8 +79,8 @@ namespace Params
 
    double cl() {return cl_;};
 
-   double rmax() {return rmax_;};
-   double rmin() {return rmin_;};
+   double Rmax() {return Rmax_;};
+   double Rmin() {return Rmin_;};
 
    double bh_mass() {return bh_mass_;};
    double bh_spin() {return bh_spin_;};
@@ -115,8 +115,8 @@ namespace Params
 
       cl_ =   std::stod(read(param_file,"compactification_length"));
 
-      rmax_ =   std::stod(read(param_file,"r_max"));
-      rmin_ =   std::stod(read(param_file,"r_min"));
+      Rmax_ =   std::stod(read(param_file,"R_max"));
+      Rmin_ =   std::stod(read(param_file,"R_min"));
 
       bh_mass_ = std::stod(read(param_file,"black_hole_mass"));
       bh_spin_ = std::stod(read(param_file,"black_hole_spin"));

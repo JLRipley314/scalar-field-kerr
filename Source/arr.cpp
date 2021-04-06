@@ -12,6 +12,8 @@ namespace Arr3d
    namespace 
    {
       size_t _nx;
+      size_t _ny;
+      size_t _nz;
    }
 /*=========================================================================*/
 void init(const size_t nx, const size_t ny, const size_t nz)
@@ -24,6 +26,11 @@ void init(const size_t nx, const size_t ny, const size_t nz)
 void cleanup()
 {
 };
+/*=========================================================================*/
+size_t indx(const size_t i, const size_t j, const size_t k) 
+{
+   return _ny*_nz*i + _nz*j + k;
+}
 /*=========================================================================*/
 std::vector<double> arr3d(const double val)
 {

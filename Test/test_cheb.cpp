@@ -32,7 +32,7 @@ TEST(cheb_test, to_and_from) {
    Cheb::to_po(ch, po2);
 
    for (size_t i=0; i<nr; i++) {
-      EXPECT_TRUE(abs(po1[i] - po2[i]) < eps);
+      EXPECT_TRUE(fabs(po1[i] - po2[i]) < eps);
    }
    Cheb::cleanup();
 }
@@ -57,7 +57,7 @@ TEST(cheb_test, derivatives) {
    Cheb::der(v, dv2);
 
    for (size_t i=0; i<nr; i++) {
-      EXPECT_TRUE(abs(dv1[i] - dv2[i]) < eps);
+      EXPECT_TRUE(fabs(dv1[i] - dv2[i]) < eps);
    }
    Cheb::cleanup();
 }
@@ -85,8 +85,8 @@ TEST(cheb_test, filter_is_TVD) {
    double tv1 = 0;
    double tv2 = 0;
    for (size_t i=1; i<nr-1; i++) {
-      tv1 += abs(po1[i+1] - po1[i]);
-      tv2 += abs(po2[i+1] - po2[i]);
+      tv1 += fabs(po1[i+1] - po1[i]);
+      tv2 += fabs(po2[i+1] - po2[i]);
    }
    EXPECT_TRUE(tv2 < tv1);
    Cheb::cleanup();
