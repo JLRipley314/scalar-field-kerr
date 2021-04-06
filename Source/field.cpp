@@ -4,8 +4,7 @@
 Field::Field(
          std::string name,
          const size_t size,
-         const double init_val,
-         const std::vector<std::vector<double>> &in_grid
+         const double init_val
       )
 :  name{name},
    n(size,init_val),
@@ -20,7 +19,6 @@ Field::Field(
    k4(size,init_val),
    k5(size,init_val)
 {
-   grid = in_grid;
 }
 /*==========================================================================*/
 Field::~Field()

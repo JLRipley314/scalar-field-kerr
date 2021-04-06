@@ -11,6 +11,7 @@
 #include "field.hpp"
 #include "initial_data.hpp"
 #include "scalar_eom.hpp"
+#include "io.hpp"
 
 int main(int argc, char **argv)
 {
@@ -37,12 +38,16 @@ int main(int argc, char **argv)
    Eom::init();
 
    std::cout<<"Initializing Fields"<<std::endl;
-   Field f("f", Params::nx_nphi_nlat(), 0.0, Grid::g3d);
-   Field p("p", Params::nx_nphi_nlat(), 0.0, Grid::g3d);
-   Field q("q", Params::nx_nphi_nlat(), 0.0, Grid::g3d);
+   Field f("f", Params::nx_nphi_nlat(), 0.0);
+   Field p("p", Params::nx_nphi_nlat(), 0.0);
+   Field q("q", Params::nx_nphi_nlat(), 0.0);
 
    std::cout<<"Setting initial data"<<std::endl;
    ID::ingoing_pulse(f.n, p.n, q.n);
+
+   Csv::write(output_dir+"/"+f.name, 1, f.n);
+//   Csv::write(output_dir+"/"+p.name, 0, p.n);
+//   Csv::write(output_dir+"/"+q.name, 0, q.n);
 
    std::cout<<"Beginning evolution"<<std::endl;
    for (size_t itm=0; itm<Params::nt(); itm++) {

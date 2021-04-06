@@ -15,6 +15,7 @@ OBJ = params.o \
       arr.o \
       cheb.o \
       sphere.o \
+      grid.o \
       field.o \
       initial_data.o \
       scalar_eom.o \
