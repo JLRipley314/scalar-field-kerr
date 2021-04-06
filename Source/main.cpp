@@ -35,9 +35,10 @@ int main(int argc, char **argv)
    Grid::init();
    /* For writing grid points to file 
     */
-   std::vector<std::vector<double>> g3d(Params::nx_nphi_nlat(),std::vector<double>(3,0));
+   std::vector<std::vector<double>> grid_cart(Params::nx_nphi_nlat(),std::vector<double>(3,0));
+   std::vector<std::string> labels_cart = {"x", "y", "z", "value"};
    for (size_t i=0; i<Params::nx_nphi_nlat(); i++) {
-      g3d[i] = Grid::pt(i);
+      grid_cart[i] = Grid::pt_cart(i);
    }
 
    std::cout<<"Initializing Equations of motion"<<std::endl;
@@ -52,9 +53,9 @@ int main(int argc, char **argv)
    ID::ingoing_pulse(f.n, p.n, q.n);
 
    size_t save_indx = 0;
-   Csv::write_unstructured(output_dir+"/"+f.name, save_indx, g3d, f.n);
-   Csv::write_unstructured(output_dir+"/"+p.name, save_indx, g3d, p.n);
-   Csv::write_unstructured(output_dir+"/"+q.name, save_indx, g3d, q.n);
+   Csv::write_unstructured(output_dir+"/"+f.name, save_indx, labels_cart, grid_cart, f.n);
+   Csv::write_unstructured(output_dir+"/"+p.name, save_indx, labels_cart, grid_cart, p.n);
+   Csv::write_unstructured(output_dir+"/"+q.name, save_indx, labels_cart, grid_cart, q.n);
 
    std::cout<<"Beginning evolution"<<std::endl;
    for (size_t itm=0; itm<Params::nt(); itm++) {
@@ -65,9 +66,9 @@ int main(int argc, char **argv)
       if (itm%Params::t_step_save()==0) {
          save_indx += 1;
          std::cout<<itm*Params::dt()/Params::bh_mass()<<std::endl;
-         Csv::write_unstructured(output_dir+"/"+f.name, save_indx, g3d, f.np1);
-         Csv::write_unstructured(output_dir+"/"+p.name, save_indx, g3d, p.np1);
-         Csv::write_unstructured(output_dir+"/"+q.name, save_indx, g3d, q.np1);
+         Csv::write_unstructured(output_dir+"/"+f.name, save_indx, labels_cart, grid_cart, f.np1);
+         Csv::write_unstructured(output_dir+"/"+p.name, save_indx, labels_cart, grid_cart, p.np1);
+         Csv::write_unstructured(output_dir+"/"+q.name, save_indx, labels_cart, grid_cart, q.np1);
       }
       f.shift();
       p.shift();

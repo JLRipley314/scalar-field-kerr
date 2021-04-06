@@ -41,6 +41,7 @@ void write(
 void write_unstructured(
       const std::string name, 
       const int itm, 
+      const std::vector<std::string> &labels,
       const std::vector<std::vector<double>> &grid,
       const std::vector<double> &vals)
 {
@@ -51,6 +52,10 @@ void write_unstructured(
    if (out.is_open()) {
       const int indxs = grid[0].size();
       const int n= vals.size();
+      for (size_t i=0; i<labels.size()-1; i++) { /* labels for each grid point */ 
+         out<<labels[i]<<",";
+      }		
+      out<<labels[labels.size()-1]<<std::endl;
       for (int i=0; i<n; ++i) {
          for (int j=0; j<indxs; ++j) { /* grid point location */
             out<<std::setprecision(16)<<grid[i][j]<<",";

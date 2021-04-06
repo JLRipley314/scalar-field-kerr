@@ -18,6 +18,7 @@ namespace Csv
    void write_unstructured(
          const std::string name, 
          const int itm, 
+         const std::vector<std::string> &labels,
          const std::vector<std::vector<double>> &grid,
          const std::vector<double> &vals
       );

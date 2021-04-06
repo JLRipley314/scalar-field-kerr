@@ -7,7 +7,8 @@ namespace {
    size_t _nphi;
    size_t _nlat; 
 
-   std::vector<std::vector<double>> _g3d;
+   std::vector<std::vector<double>> _spherical_coords;
+   std::vector<std::vector<double>> _cartesian_coords;
 }
 /*===========================================================================*/
 void init()
@@ -18,7 +19,8 @@ void init()
    _nphi = Params::nphi(); 
    _nlat = Params::nlat(); 
 
-   _g3d.resize(size, std::vector<double>(3,0));
+   _spherical_coords.resize(size, std::vector<double>(3,0));
+   _cartesian_coords.resize(size, std::vector<double>(3,0));
 
    for (size_t ix=0; ix<_nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
    for (size_t ip=0; ip<_nphi; ip++) {
@@ -26,7 +28,12 @@ void init()
       double R     = Cheb::pt(ix);
       double phi   = Sphere::phi(  ip);
       double theta = Sphere::theta(it);  
-      _g3d[Params::nphi()*Params::nlat()*ix + Sphere::indx_Sph(ip, it)] = {R, phi, theta};
+      _spherical_coords[Params::nphi()*Params::nlat()*ix + Sphere::indx_Sph(ip, it)] = {R, phi, theta};
+      _cartesian_coords[Params::nphi()*Params::nlat()*ix + Sphere::indx_Sph(ip, it)] = {
+         R*cos(phi)*sin(theta), 
+         R*sin(phi)*sin(theta),
+         R*cos(theta)
+      };
    }
    }
    }
@@ -36,14 +43,24 @@ void cleanup()
 {
 }
 /*===========================================================================*/
-std::vector<double> pt(const size_t ix, const size_t i_ph, const size_t i_th) 
+std::vector<double> pt_polar(const size_t ix, const size_t i_ph, const size_t i_th) 
 {
-   return _g3d[_nphi*_nlat*ix + _nlat*i_ph + i_th];
+   return _spherical_coords[_nphi*_nlat*ix + _nlat*i_ph + i_th];
 }
 /*===========================================================================*/
-std::vector<double> pt(const size_t i) 
+std::vector<double> pt_polar(const size_t i) 
 {
-   return _g3d[i];
+   return _spherical_coords[i];
+}
+/*===========================================================================*/
+std::vector<double> pt_cart(const size_t ix, const size_t i_ph, const size_t i_th) 
+{
+   return _cartesian_coords[_nphi*_nlat*ix + _nlat*i_ph + i_th];
+}
+/*===========================================================================*/
+std::vector<double> pt_cart(const size_t i) 
+{
+   return _cartesian_coords[i];
 }
 /*===========================================================================*/
 } /* Grid */
