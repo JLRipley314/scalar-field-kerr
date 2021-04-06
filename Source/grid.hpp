@@ -19,5 +19,6 @@ namespace Grid
     * returns {R, phi, theta}
     */
    std::vector<double> pt(const size_t ix, const size_t i_ph, const size_t i_th); 
+   std::vector<double> pt(const size_t i); 
 }
 #endif /* _GRID_HPP */

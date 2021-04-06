@@ -18,6 +18,8 @@ class Field
 
       ~Field();
 
+      void shift();
+
       const std::string name;
 
       std::vector<double> n;
@@ -31,6 +33,9 @@ class Field
       std::vector<double> k3;
       std::vector<double> k4;
       std::vector<double> k5;
+
+   private:
+      const size_t size;
 };
 
 #endif /* _FIELD_HPP_ */

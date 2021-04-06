@@ -41,4 +41,9 @@ std::vector<double> pt(const size_t ix, const size_t i_ph, const size_t i_th)
    return _g3d[_nphi*_nlat*ix + _nlat*i_ph + i_th];
 }
 /*===========================================================================*/
+std::vector<double> pt(const size_t i) 
+{
+   return _g3d[i];
+}
+/*===========================================================================*/
 } /* Grid */

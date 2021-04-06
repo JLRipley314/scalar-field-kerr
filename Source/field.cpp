@@ -17,7 +17,8 @@ Field::Field(
    k2(size,init_val),
    k3(size,init_val),
    k4(size,init_val),
-   k5(size,init_val)
+   k5(size,init_val),
+   size{size}
 {
 }
 /*==========================================================================*/
@@ -25,3 +26,12 @@ Field::~Field()
 {
 }
 /*==========================================================================*/
+void Field::shift()
+{
+   for (size_t i=0; i<size; i++) {
+      n[i] = np1[i];
+      k1[i] = k5[i];
+   }
+}
+
+

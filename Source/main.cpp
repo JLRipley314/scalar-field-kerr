@@ -33,6 +33,12 @@ int main(int argc, char **argv)
 
    std::cout<<"Initializing Grid"<<std::endl;
    Grid::init();
+   /* For writing grid points to file 
+    */
+   std::vector<std::vector<double>> g3d(Params::nx_nphi_nlat(),std::vector<double>(3,0));
+   for (size_t i=0; i<Params::nx_nphi_nlat(); i++) {
+      g3d[i] = Grid::pt(i);
+   }
 
    std::cout<<"Initializing Equations of motion"<<std::endl;
    Eom::init();
@@ -45,18 +51,27 @@ int main(int argc, char **argv)
    std::cout<<"Setting initial data"<<std::endl;
    ID::ingoing_pulse(f.n, p.n, q.n);
 
-   Csv::write(output_dir+"/"+f.name, 0, f.n);
-   Csv::write(output_dir+"/"+p.name, 0, p.n);
-   Csv::write(output_dir+"/"+q.name, 0, q.n);
+   size_t save_indx = 0;
+   Csv::write_unstructured(output_dir+"/"+f.name, save_indx, g3d, f.n);
+   Csv::write_unstructured(output_dir+"/"+p.name, save_indx, g3d, p.n);
+   Csv::write_unstructured(output_dir+"/"+q.name, save_indx, g3d, q.n);
 
    std::cout<<"Beginning evolution"<<std::endl;
    for (size_t itm=0; itm<Params::nt(); itm++) {
+
       Eom::time_step(f, p, q);
 
+      /* save to file */
       if (itm%Params::t_step_save()==0) {
+         save_indx += 1;
          std::cout<<itm*Params::dt()/Params::bh_mass()<<std::endl;
-         /* save to file */
+         Csv::write_unstructured(output_dir+"/"+f.name, save_indx, g3d, f.np1);
+         Csv::write_unstructured(output_dir+"/"+p.name, save_indx, g3d, p.np1);
+         Csv::write_unstructured(output_dir+"/"+q.name, save_indx, g3d, q.np1);
       }
+      f.shift();
+      p.shift();
+      q.shift();
    }
 
    std::cout<<"Cleaning up"<<std::endl;

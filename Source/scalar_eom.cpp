@@ -126,6 +126,28 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> dv)
    }
 }
 /*==========================================================================*/
+/* Low pass filter in spectral space */
+/*==========================================================================*/
+void filter(std::vector<double> &v)
+{
+   std::vector<double> inter_radial(Params::nx());
+   std::vector<double> inter_sphere(Params::nlat()*Params::nphi());
+
+   for (size_t ix=0; ix<Params::nx(); ix++) {
+      Arr3d::get_row23(ix, v, inter_sphere); 
+      Sphere::filter(inter_sphere);
+      Arr3d::set_row23(ix, inter_sphere, v); 
+   }
+
+   for (size_t ip=0; ip<Params::nphi(); ip++) {
+   for (size_t it=0; it<Params::nlat(); it++) {
+      Arr3d::get_row1(ip, it, v, inter_radial); 
+      Cheb::filter(inter_radial);
+      Arr3d::set_row1(ip, it, inter_radial, v); 
+   }
+   }
+}
+/*==========================================================================*/
 void set_k(
       const std::vector<double> &f,
       const std::vector<double> &p,
@@ -172,6 +194,10 @@ void time_step(Field &f, Field &p, Field &q)
 {
    const double dt = Params::dt();
    const size_t n = Params::nx_nphi_nlat();
+
+   filter(f.n);
+   filter(p.n);
+   filter(q.n);
 
    std::vector<double> dr_f(  n);
    std::vector<double> lap_f( n);
