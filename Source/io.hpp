@@ -10,16 +10,22 @@
 namespace Csv 
 /*=========================================================================*/
 {
+   void init();
+
    void write(
          const std::string name, 
          const size_t itm, 
          const std::vector<double> &vals 
       );	
-   void write_unstructured(
+   void write_sphere_2d(
          const std::string name, 
          const int itm, 
-         const std::vector<std::string> &labels,
-         const std::vector<std::vector<double>> &grid,
+         const size_t ix, 
+         const std::vector<double> &vals
+      );
+   void write_cart_3d(
+         const std::string name, 
+         const int itm, 
          const std::vector<double> &vals
       );
 /*=========================================================================*/

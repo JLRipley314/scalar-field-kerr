@@ -16,6 +16,11 @@ namespace Grid
    void init();
    void cleanup();
    /*
+    * returns spherical coordinate {phi, theta}
+    */
+   std::vector<double> pt_sphere(const size_t i_ph, const size_t i_th); 
+   std::vector<double> pt_sphere(const size_t i); 
+   /*
     * returns spherical polar coordinate {R, phi, theta}
     */
    std::vector<double> pt_polar(const size_t ix, const size_t i_ph, const size_t i_th); 
