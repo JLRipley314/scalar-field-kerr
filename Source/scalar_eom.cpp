@@ -1,10 +1,9 @@
+#include <cassert>
 #include <iostream>
 
 #include "scalar_eom.hpp"
-#include "grid.hpp"
-#include "cheb.hpp"
-#include "sphere.hpp"
 #include "params.hpp"
+#include "grid.hpp"
 /*==========================================================================*/
 namespace Eom {
 /*==========================================================================*/
@@ -43,36 +42,36 @@ void init()
    const double V3 = Params::V_3();
    const double V4 = Params::V_4();
 
-   for (size_t ix=0; ix<nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
+   for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
       const size_t indx = Grid::indx(ix,it,ip);
+      
+      const double inv_r = Cheb::pt(ix)/pow(cl,2);
 
-      double r = pow(cl,2)/Cheb::pt(ix);
-
-      double m = Params::bh_mass();
-      double a = Params::bh_spin()/m;
+      const double m = Params::bh_mass();
+      const double a = Params::bh_spin()/m;
 
       /* divide by r^2 to reduce infty/infy type errors 
        * in computing coefficients. */
-      double Sigma = 1.0 + pow(a/r,2)*pow(cos(Sphere::theta(it)),2); 
-      double Delta = 1.0 + pow(a/r,2) - (2.0*m/r); 
+      const double Sigma = 1.0 + pow(inv_r,2)*pow(a,2)*pow(cos(Sphere::theta(it)),2); 
+      const double Delta = 1.0 + pow(inv_r,2)*pow(a,2) - inv_r*(2.0*m); 
 
       p_f1[indx] = V2;
       p_f2[indx] = V3/2.0;
       p_f3[indx] = V4/6.0;
 
-      p_p[indx] = (2.0*m/Sigma) / pow(r,2);
-      p_q[indx] = 2.0*((1.0/r) - (m/pow(r,2)))/Sigma;
+      p_p[indx] = (2.0*m/Sigma) * pow(inv_r,2);
+      p_q[indx] = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
 
-      p_dr_p[indx] = 4.0*m*(1.0/r)/Sigma;
+      p_dr_p[indx] = 4.0*m*inv_r/Sigma;
       p_dr_q[indx] = (Delta/Sigma);
 
-      p_dphi_q[indx] = (2.0*a/Sigma) / pow(r,2);
+      p_dphi_q[indx] = (2.0*a/Sigma) * pow(inv_r,2);
 
-      p_lap_f[indx] = (1.0/Sigma) / pow(r,2);
+      p_lap_f[indx] = (1.0/Sigma) * pow(inv_r,2);
 
-      double pre = 1.0 + (2.0*m*(1.0/r)/Sigma);
+      const double pre = 1.0 + (2.0*m*inv_r/Sigma);
 
       p_f1[indx] /= pre;
       p_f2[indx] /= pre;
@@ -92,71 +91,6 @@ void init()
    }
 }
 /*==========================================================================*/
-void set_partial_r(const std::vector<double> &v, std::vector<double> dv)
-{
-   std::vector<double> inter(   Params::nx());
-   std::vector<double> inter_dv(Params::nx());
-
-   for (size_t ip=0; ip<Params::nphi(); ip++) {
-   for (size_t it=0; it<Params::nlat(); it++) {
-      Grid::get_row_R(it, ip, v, inter); 
-
-      Cheb::der(inter, inter_dv);
-
-      Grid::set_row_R(it, ip, inter_dv, dv); 
-   }
-   }
-}
-/*==========================================================================*/
-void set_spherical_lap(const std::vector<double> &v, std::vector<double> ddv)
-{
-   std::vector<double> inter(    Params::nlat()*Params::nphi());
-   std::vector<double> inter_ddv(Params::nlat()*Params::nphi());
-
-   for (size_t ix=0; ix<Params::nx(); ix++) {
-      Grid::get_row_th_ph(ix, v, inter); 
-
-      Sphere::laplace_beltrami(inter, inter_ddv);
-
-      Grid::set_row_th_ph(ix, inter_ddv, ddv); 
-   }
-}
-/*==========================================================================*/
-void set_partial_phi(const std::vector<double> &v, std::vector<double> dv)
-{
-   std::vector<double> inter(   Params::nlat()*Params::nphi());
-   std::vector<double> inter_dv(Params::nlat()*Params::nphi());
-
-   for (size_t ix=0; ix<Params::nx(); ix++) {
-      Grid::get_row_th_ph(ix, v, inter); 
-
-      Sphere::partial_phi(inter, inter_dv);
-
-      Grid::set_row_th_ph(ix, inter_dv, dv); 
-   }
-}
-/*==========================================================================*/
-/* Low pass filter in spectral space */
-/*==========================================================================*/
-void filter(std::vector<double> &v)
-{
-   std::vector<double> inter_radial(Params::nx());
-   std::vector<double> inter_sphere(Params::nlat()*Params::nphi());
-
-   for (size_t ix=0; ix<Params::nx(); ix++) {
-      Grid::get_row_th_ph(ix, v, inter_sphere); 
-      Sphere::filter(inter_sphere);
-      Grid::set_row_th_ph(ix, inter_sphere, v); 
-   }
-   for (size_t ip=0; ip<Params::nphi(); ip++) {
-   for (size_t it=0; it<Params::nlat(); it++) {
-      Grid::get_row_R(it, ip, v, inter_radial); 
-      Cheb::filter(inter_radial);
-      Grid::set_row_R(it, ip, inter_radial, v); 
-   }
-   }
-}
-/*==========================================================================*/
 void set_k(
       const std::vector<double> &f,
       const std::vector<double> &p,
@@ -171,13 +105,13 @@ void set_k(
       std::vector<double> &q_k
       )
 {
-   set_partial_r(f, dr_f);
-   set_partial_r(p, dr_p);
-   set_partial_r(q, dr_q);
+   Grid::set_partial_r(f, dr_f);
+   Grid::set_partial_r(p, dr_p);
+   Grid::set_partial_r(q, dr_q);
 
-   set_partial_phi(f, dphi_q);
+   Grid::set_partial_phi(f, dphi_q);
 
-   set_spherical_lap(f, lap_f);
+   Grid::set_spherical_lap(f, lap_f);
 
    for (size_t i=0; i<Params::nx_nlat_nphi(); i++) {
       f_k[i] = p[i];
@@ -207,9 +141,9 @@ void time_step(Field &f, Field &p, Field &q)
    const double dt = Params::dt();
    const size_t n = Params::nx_nlat_nphi();
 
-   filter(f.n);
-   filter(p.n);
-   filter(q.n);
+   Grid::filter(f.n);
+   Grid::filter(p.n);
+   Grid::filter(q.n);
 
    std::vector<double> dr_f(  n);
    std::vector<double> lap_f( n);

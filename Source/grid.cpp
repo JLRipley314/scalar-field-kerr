@@ -32,6 +32,8 @@ namespace {
    std::vector<std::vector<double>> _x_y_z;
    std::vector<std::vector<double>> _th_ph;
    std::vector<std::vector<double>> _R_th;
+
+   std::vector<double> _R_over_cl_sqrd;
 }
 /*===========================================================================*/
 double compactification(const double cl, const double R)
@@ -89,6 +91,9 @@ void init()
          theta
       };
    }
+   }
+   for (size_t ix=0; ix<_nx; ix++) {
+      _R_over_cl_sqrd[ix] = pow(Cheb::pt(ix)/Params::cl(),2);
    }
 }
 /*=========================================================================*/
@@ -277,6 +282,105 @@ void set_row_th_ph(const size_t ix,
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
       out[INDX_R_TH_PH(ix,it,ip)] = in[INDX_TH_PH(it,ip)];
+   }
+   }
+}
+/*==========================================================================*/
+void set_partial_r(const std::vector<double> &v, std::vector<double> dv)
+{
+   assert(v.size() ==_nx*_nlat*_nphi);
+   assert(dv.size()==_nx*_nlat*_nphi);
+
+   std::vector<double> inter(   _nx);
+   std::vector<double> inter_dv(_nx);
+
+   for (size_t ip=0; ip<_nphi; ip++) {
+   for (size_t it=0; it<_nlat; it++) {
+      get_row_R(it, ip, v, inter); 
+
+      Cheb::der(inter, inter_dv);
+
+      for (size_t ix=0; ix<_nx; ix++) {
+         inter_dv[ix] *= - _R_over_cl_sqrd[ix];
+      }
+
+      set_row_R(it, ip, inter_dv, dv); 
+   }
+   }
+}
+/*==========================================================================*/
+void set_spherical_lap(const std::vector<double> &v, std::vector<double> ddv)
+{
+   assert(v.size()  ==_nx*_nlat*_nphi);
+   assert(ddv.size()==_nx*_nlat*_nphi);
+
+   std::vector<double> inter(    _nlat*_nphi);
+   std::vector<double> inter_ddv(_nlat*_nphi);
+
+   for (size_t ix=0; ix<_nx; ix++) {
+      get_row_th_ph(ix, v, inter); 
+
+      Sphere::laplace_beltrami(inter, inter_ddv);
+
+      set_row_th_ph(ix, inter_ddv, ddv); 
+   }
+}
+/*==========================================================================*/
+void set_partial_phi(const std::vector<double> &v, std::vector<double> dv)
+{
+   assert(v.size() ==_nx*_nlat*_nphi);
+   assert(dv.size()==_nx*_nlat*_nphi);
+
+   std::vector<double> inter(   _nlat*_nphi);
+   std::vector<double> inter_dv(_nlat*_nphi);
+
+   for (size_t ix=0; ix<_nx; ix++) {
+      get_row_th_ph(ix, v, inter); 
+
+      Sphere::partial_phi(inter, inter_dv);
+
+      set_row_th_ph(ix, inter_dv, dv); 
+   }
+}
+/*==========================================================================*/
+void set_indep_res(
+      const std::vector<double> &f, 
+      const std::vector<double> &q, 
+      std::vector<double> res)
+{
+   assert(f.size()  ==_nx*_nlat*_nphi);
+   assert(q.size()  ==_nx*_nlat*_nphi);
+   assert(res.size()==_nx*_nlat*_nphi);
+
+   std::vector<double> df(_nx*_nlat*_nphi,0);
+
+   set_partial_r(f, df);
+
+   for (size_t ix=0; ix<_nx*_nlat*_nphi; ix++) {
+      res[ix]=df[ix]-q[ix];
+   }
+
+}
+/*==========================================================================*/
+/* Low pass filter in spectral space */
+/*==========================================================================*/
+void filter(std::vector<double> &v)
+{
+   assert(v.size()==_nx*_nlat*_nphi);
+
+   std::vector<double> inter_radial(_nx);
+   std::vector<double> inter_sphere(_nlat*_nphi);
+
+   for (size_t ix=0; ix<_nx; ix++) {
+      get_row_th_ph(ix, v, inter_sphere); 
+      Sphere::filter(inter_sphere);
+      set_row_th_ph(ix, inter_sphere, v); 
+   }
+   for (size_t ip=0; ip<_nphi; ip++) {
+   for (size_t it=0; it<_nlat; it++) {
+      get_row_R(it, ip, v, inter_radial); 
+      Cheb::filter(inter_radial);
+      set_row_R(it, ip, inter_radial, v); 
    }
    }
 }

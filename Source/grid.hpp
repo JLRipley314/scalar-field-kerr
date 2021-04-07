@@ -1,9 +1,9 @@
 #ifndef _GRID_HPP_
 #define _GRID_HPP_
 /*
- * Header file with 
- * utility functions for accessing array elements over
- * the sphere and the full three dimensional space
+ * Utility functions for accessing array elements over
+ * the sphere and the full three dimensional space,
+ * and taking derivatives over the grid.
  */
 #include <vector>
 
@@ -90,5 +90,25 @@ namespace Grid
          const std::vector<double> &in,
          std::vector<double> &out
       );
+/*==========================================================================*/
+/* Functions acting on full 3d grid functions */
+/*==========================================================================*/
+void set_partial_phi(const std::vector<double> &v, std::vector<double> dv);
+/*==========================================================================*/
+void set_spherical_lap(const std::vector<double> &v, std::vector<double> ddv);
+/*==========================================================================*/
+void set_partial_r(const std::vector<double> &v, std::vector<double> dv);
+/*==========================================================================*/
+/* \partial_R f - q */
+/*==========================================================================*/
+void set_indep_res(
+      const std::vector<double> &f, 
+      const std::vector<double> &q, 
+      std::vector<double> res);
+/*==========================================================================*/
+/* Low pass filter in spectral space */
+/*==========================================================================*/
+void filter(std::vector<double> &v);
+/*==========================================================================*/
 }
 #endif /* _GRID_HPP */

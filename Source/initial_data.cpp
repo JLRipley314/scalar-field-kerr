@@ -50,7 +50,7 @@ void ingoing_pulse(
        */ 
       p[Grid::indx(ix,it,ip)] = 0.0;
       /*
-       * radial derivative of f
+       * q = \partial_r f
        */
       q[Grid::indx(ix,it,ip)] = (
          (2.0*(((r-rl)/width)   )*pow(((ru-r)/width),2))
@@ -58,8 +58,6 @@ void ingoing_pulse(
       +  (1.0*(1.0              )*pow(((ru-r)/width),2))
       -  (2.0*pow((r-rl)/width,2)*(1.0                ))
       )*bump/width;
-
-      q[Grid::indx(ix,it,ip)] *= -pow(r/cl,2);
       /*
        * give angular structure Y_{lm} 
        */

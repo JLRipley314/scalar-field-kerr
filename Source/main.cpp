@@ -50,7 +50,7 @@ int main(int argc, char **argv)
    Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.n);
 
    std::cout<<"Beginning evolution"<<std::endl;
-   for (size_t itm=0; itm<Params::nt(); itm++) {
+   for (size_t itm=1; itm<Params::nt(); itm++) {
 
       Eom::time_step(f, p, q);
 
