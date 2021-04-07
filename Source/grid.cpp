@@ -1,6 +1,12 @@
 #include <cassert>
 #include <iostream>
 
+/*
+ * NOTE: we use a COMPACTIFIED version of the radial coordinate
+ * different from what we we use to evovle; i.e. NOT R,
+ * but instead rr = r/(1+r/L) = 1/(1 + R/L)
+ */
+
 #include "grid.hpp"
 
 #define INDX_R_TH(ix,it) ((_nlat)*(ix) + (it))
@@ -39,7 +45,7 @@ void init()
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      double R     = Cheb::pt(ix);
+      double R     = pow(Params::cl(),2)/(Cheb::pt(ix) + Params::cl());  
       double theta = Sphere::theta(it);  
       double phi   = Sphere::phi(  ip);
       _R_th_ph[INDX_R_TH_PH(ix,it,ip)] = {

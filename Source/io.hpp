@@ -17,13 +17,13 @@ namespace Csv
          const size_t itm, 
          const std::vector<double> &vals 
       );	
-   void write_sphere_2d(
+   void write_th_ph(
          const std::string name, 
          const int itm, 
          const size_t ix, 
          const std::vector<double> &vals
       );
-   void write_cart_3d(
+   void write_x_y_z(
          const std::string name, 
          const int itm, 
          const std::vector<double> &vals

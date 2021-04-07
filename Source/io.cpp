@@ -12,29 +12,29 @@ namespace Csv
 /*===========================================================================*/
 namespace 
 {
-   std::vector<std::vector<double>> _grid_slice_2d;
-   std::vector<std::vector<double>> _grid_sphere_2d;
-   std::vector<std::vector<double>> _grid_cart_3d;
+   std::vector<std::vector<double>> _grid_R_th;
+   std::vector<std::vector<double>> _grid_th_ph;
+   std::vector<std::vector<double>> _grid_x_y_z;
 
-   std::vector<std::string> _labels_slice_2d  = {"r",   "theta", "value"};
-   std::vector<std::string> _labels_sphere_2d = {"theta", "phi", "value"};
-   std::vector<std::string> _labels_cart_3d   = {"x", "y", "z",  "value"};
+   std::vector<std::string> _labels_R_th  = {"r",   "theta", "value"};
+   std::vector<std::string> _labels_th_ph = {"theta", "phi", "value"};
+   std::vector<std::string> _labels_x_y_z = {"x", "y", "z",  "value"};
 }   
 /*===========================================================================*/
 void init()
 {
-   _grid_slice_2d.resize( Params::nx()  *Params::nlat(),std::vector<double>(2,0));
-   _grid_sphere_2d.resize(Params::nphi()*Params::nlat(),std::vector<double>(2,0));
-   _grid_cart_3d.resize(  Params::nx_nlat_nphi(),       std::vector<double>(3,0)); 
+   _grid_R_th.resize( Params::nx()  *Params::nlat(),std::vector<double>(2,0));
+   _grid_th_ph.resize(Params::nphi()*Params::nlat(),std::vector<double>(2,0));
+   _grid_x_y_z.resize(Params::nx_nlat_nphi(),       std::vector<double>(3,0)); 
 
    for (size_t i=0; i<Params::nx()*Params::nlat(); i++) {
-      _grid_slice_2d[i] = Grid::R_th(i);
+      _grid_R_th[i] = Grid::R_th(i);
    }
    for (size_t i=0; i<Params::nphi()*Params::nlat(); i++) {
-      _grid_sphere_2d[i] = Grid::th_ph(i);
+      _grid_th_ph[i] = Grid::th_ph(i);
    }
    for (size_t i=0; i<Params::nx_nlat_nphi(); i++) {
-      _grid_cart_3d[i] = Grid::x_y_z(i);
+      _grid_x_y_z[i] = Grid::x_y_z(i);
    }
 }
 /*===========================================================================*/
@@ -62,7 +62,7 @@ void write(
    out.close();
 }
 /*===========================================================================*/
-void write_sphere_2d(
+void write_th_ph(
       const std::string name, 
       const int itm,
       const size_t ix,
@@ -72,23 +72,23 @@ void write_sphere_2d(
    std::ofstream out;
    out.open(file_name,std::ios::app);
 
-   std::vector<double> sphere_vals(Params::nphi()*Params::nlat(),0);
-   Grid::get_row_th_ph(ix, vals, sphere_vals);
+   std::vector<double> th_ph_vals(Params::nphi()*Params::nlat(),0);
+   Grid::get_row_th_ph(ix, vals, th_ph_vals);
 
    if (out.is_open()) {
 
-      const size_t indxs = _labels_sphere_2d.size();
+      const size_t indxs = _labels_th_ph.size();
       for (size_t i=0; i<indxs-1; i++) { 
-         out<<_labels_sphere_2d[i]<<",";
+         out<<_labels_th_ph[i]<<",";
       }		
-      out<<_labels_sphere_2d[indxs-1]<<std::endl;
+      out<<_labels_th_ph[indxs-1]<<std::endl;
 
-      const size_t n= sphere_vals.size();
+      const size_t n= th_ph_vals.size();
       for (size_t i=0; i<n; i++) {
          for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
-            out<<std::setprecision(16)<<_grid_sphere_2d[i][j]<<",";
+            out<<std::setprecision(16)<<_grid_th_ph[i][j]<<",";
          }		
-         out<<std::setprecision(16)<<sphere_vals[i]<<std::endl; /* grid point value */
+         out<<std::setprecision(16)<<th_ph_vals[i]<<std::endl; /* grid point value */
       }		
    }
    else {
@@ -99,7 +99,7 @@ void write_sphere_2d(
    out.close();
 }
 /*===========================================================================*/
-void write_cart_3d(
+void write_x_y_z(
       const std::string name, 
       const int itm, 
       const std::vector<double> &vals)
@@ -110,19 +110,21 @@ void write_cart_3d(
 
    if (out.is_open()) {
 
-      const size_t indxs = _labels_cart_3d.size();
+      const size_t indxs = _labels_x_y_z.size();
       for (size_t i=0; i<indxs-1; i++) { 
-         out<<_labels_cart_3d[i]<<",";
+         out<<_labels_x_y_z[i]<<",";
       }		
-      out<<_labels_cart_3d[indxs-1]<<std::endl;
+      out<<_labels_x_y_z[indxs-1]<<std::endl;
 
       const size_t n= vals.size();
       for (size_t i=0; i<n; ++i) {
-         for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
-            out<<std::setprecision(16)<<_grid_cart_3d[i][j]<<",";
-         }		
-         out<<std::setprecision(16)<<vals[i]<<std::endl; /* grid point value */
-      }		
+         if (fabs(vals[i]>1e-14)) {
+            for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
+               out<<std::setprecision(16)<<_grid_x_y_z[i][j]<<",";
+            }
+            out<<std::setprecision(16)<<vals[i]<<std::endl; /* grid point value */
+         }
+      }
    }
    else {
       std::cout

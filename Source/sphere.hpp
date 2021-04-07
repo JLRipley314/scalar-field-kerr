@@ -4,6 +4,24 @@
 #ifndef _SPHERE_HPP_
 #define _SPHERE_HPP_
 
+#include <stdbool.h>
+/*
+ * SHTNS_CONTIGUOUS_LONGITUDES true:
+ * means theta is the ``fastest'' index,
+ * i.e. the indexing is 
+ * _nlat*ip + it.
+ * Setting it to false means we index as
+ * _nphi*it + ip
+ *
+ * For the library shtns, usually the fastest transforms use
+ * contiguous longitudinal indexing.
+ *
+ * If you use the function indx, you ALWAYS access 
+ * the angular coordinates as
+ * indx(it,ip),
+ * which matches the usual notation (theta,phi) in spherical
+ * polar coordinates. 
+ */
 #define SHTNS_CONTIGUOUS_LONGITUDES true
 
 #include <vector>
