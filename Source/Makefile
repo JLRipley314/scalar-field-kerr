@@ -11,22 +11,20 @@ CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra \
 	 -lshtns -lfftw3 -lm
 #=============================================================================
 OBJ = params.o \
-      io.o \
-      arr.o \
       cheb.o \
       sphere.o \
       grid.o \
+      io.o \
       field.o \
       initial_data.o \
       scalar_eom.o \
       main.o
 
 DEPS = params.hpp \
-       io.hpp \
-       arr.hpp \
        cheb.hpp \
        sphere.hpp \
        grid.hpp \
+       io.hpp \
        field.hpp \
        initial_data.hpp \
        scalar_eom.hpp

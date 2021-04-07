@@ -1,13 +1,10 @@
 #include <iostream>
 
 #include "initial_data.hpp"
-#include "arr.hpp"
+#include "grid.hpp"
 #include "params.hpp"
 #include "cheb.hpp"
 #include "sphere.hpp"
-
-using Arr3d::indx;
-using Sphere::indx_Sph;
 /*==========================================================================*/
 namespace ID 
 {
@@ -47,31 +44,31 @@ void ingoing_pulse(
       if ((r<ru) && (r>rl)) {
          bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
       }
-      f[indx(ix,ip,it)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
+      f[Grid::indx(ix,ip,it)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
       /*
        * time symmetric for now
        */ 
-      p[indx(ix,ip,it)] = 0.0;
+      p[Grid::indx(ix,ip,it)] = 0.0;
       /*
        * radial derivative of f
        */
-      q[indx(ix,ip,it)] = (
+      q[Grid::indx(ix,ip,it)] = (
          (2.0*(((r-rl)/width)   )*pow(((ru-r)/width),2))
       -  (2.0*pow((r-rl)/width,2)*((ru-r)/width       ))
       +  (1.0*(1.0              )*pow(((ru-r)/width),2))
       -  (2.0*pow((r-rl)/width,2)*(1.0                ))
       )*bump/width;
 
-      q[indx(ix,ip,it)] *= -pow(r/cl,2);
+      q[Grid::indx(ix,ip,it)] *= -pow(r/cl,2);
       /*
        * give angular structure Y_{lm} 
        */
-      f[indx(ix,ip,it)] *= ylm[indx_Sph(ip,it)];
-      p[indx(ix,ip,it)] *= ylm[indx_Sph(ip,it)];
-      q[indx(ix,ip,it)] *= ylm[indx_Sph(ip,it)];
+      f[Grid::indx(ix,ip,it)] *= ylm[Sphere::indx(ip,it)];
+      p[Grid::indx(ix,ip,it)] *= ylm[Sphere::indx(ip,it)];
+      q[Grid::indx(ix,ip,it)] *= ylm[Sphere::indx(ip,it)];
 
-      if (fabs(f[indx(ix,ip,it)]) > max_val) {
-         max_val = fabs(f[indx(ix,ip,it)]);
+      if (fabs(f[Grid::indx(ix,ip,it)]) > max_val) {
+         max_val = fabs(f[Grid::indx(ix,ip,it)]);
       }
    }
    }
@@ -83,9 +80,9 @@ void ingoing_pulse(
    for (size_t ix=0; ix<nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
-      f[indx(ix,ip,it)] *= amp / max_val;
-      p[indx(ix,ip,it)] *= amp / max_val;
-      q[indx(ix,ip,it)] *= amp / max_val; 
+      f[Grid::indx(ix,ip,it)] *= amp / max_val;
+      p[Grid::indx(ix,ip,it)] *= amp / max_val;
+      q[Grid::indx(ix,ip,it)] *= amp / max_val; 
    }
    }
    }

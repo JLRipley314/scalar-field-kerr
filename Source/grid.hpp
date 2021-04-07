@@ -14,21 +14,81 @@
 namespace Grid 
 {
    void init();
-   void cleanup();
-   /*
-    * returns spherical coordinate {phi, theta}
-    */
-   std::vector<double> pt_sphere(const size_t i_ph, const size_t i_th); 
-   std::vector<double> pt_sphere(const size_t i); 
+
+   size_t indx(const size_t i_x, const size_t i_th, const size_t i_ph); 
    /*
     * returns spherical polar coordinate {R, phi, theta}
     */
-   std::vector<double> pt_polar(const size_t ix, const size_t i_ph, const size_t i_th); 
-   std::vector<double> pt_polar(const size_t i); 
+   std::vector<double> R_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph); 
+   std::vector<double> R_th_ph(const size_t i); 
    /*
     * returns cartesian coordinate {x, y, z}
     */
-   std::vector<double> pt_cart(const size_t ix, const size_t i_ph, const size_t i_th); 
-   std::vector<double> pt_cart(const size_t i); 
+   std::vector<double> x_y_z(const size_t i_x, const size_t i_th, const size_t i_ph); 
+   std::vector<double> x_y_z(const size_t i); 
+   /*
+    * returns spherical coordinate {phi, theta}
+    */
+   std::vector<double> th_ph(const size_t i_th, const size_t i_ph); 
+   std::vector<double> th_ph(const size_t i); 
+   /*
+    * returns spherical coordinate {R, theta}
+    */
+   std::vector<double> R_th(const size_t i_x, const size_t i_th); 
+   std::vector<double> R_th(const size_t i); 
+   /*
+    * Get row vals
+    */
+   void get_row_R(const size_t j, const size_t k, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      ); 
+   void get_row_th(const size_t i, const size_t k, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      ); 
+   void get_row_ph(const size_t i, const size_t j, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      ); 
+   void get_row_R_th(const size_t k, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      );
+   void get_row_R_ph(const size_t j, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      );
+   void get_row_th_ph(const size_t i, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      );
+   /*
+    * Get row vals
+    */
+   void set_row_R(const size_t j, const size_t k, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      ); 
+   void set_row_th(const size_t i, const size_t k, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      ); 
+   void set_row_ph(const size_t i, const size_t j, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      ); 
+   void set_row_R_th(const size_t k, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      );
+   void set_row_R_ph(const size_t j, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      );
+   void set_row_th_ph(const size_t i, 
+         const std::vector<double> &in,
+         std::vector<double> &out
+      );
 }
 #endif /* _GRID_HPP */

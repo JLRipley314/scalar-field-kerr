@@ -1,5 +1,5 @@
 #include "scalar_eom.hpp"
-#include "arr.hpp"
+#include "grid.hpp"
 #include "cheb.hpp"
 #include "sphere.hpp"
 #include "params.hpp"
@@ -18,7 +18,7 @@ namespace {
 /*==========================================================================*/
 void init()
 {
-   const size_t ntotal = Params::nx_nphi_nlat();
+   const size_t ntotal = Params::nx_nlat_nphi();
    p_f.resize(ntotal,0);
    p_p.resize(ntotal,0);
    p_q.resize(ntotal,0);
@@ -36,8 +36,7 @@ void init()
    for (size_t ix=0; ix<nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
-      const size_t indx     = Arr3d::indx(  ix,ip,it);
-//      const size_t indx_Sph = Sphere::indx_Sph(ip,it);
+      const size_t indx = Grid::indx(ix,it,ip);
 
       double r = pow(cl,2)/Cheb::pt(ix);
 
@@ -77,11 +76,6 @@ void init()
    }
 }
 /*==========================================================================*/
-void cleanup()
-{
-return;
-}
-/*==========================================================================*/
 void set_partial_r(const std::vector<double> &v, std::vector<double> dv)
 {
    std::vector<double> inter(   Params::nx());
@@ -89,11 +83,11 @@ void set_partial_r(const std::vector<double> &v, std::vector<double> dv)
 
    for (size_t ip=0; ip<Params::nphi(); ip++) {
    for (size_t it=0; it<Params::nlat(); it++) {
-      Arr3d::get_row1(ip, it, v, inter); 
+      Grid::get_row_R(it, ip, v, inter); 
 
       Cheb::der(inter, inter_dv);
 
-      Arr3d::set_row1(ip, it, inter_dv, dv); 
+      Grid::set_row_R(it, ip, inter_dv, dv); 
    }
    }
 }
@@ -104,11 +98,11 @@ void set_spherical_lap(const std::vector<double> &v, std::vector<double> ddv)
    std::vector<double> inter_ddv(Params::nlat()*Params::nphi());
 
    for (size_t ix=0; ix<Params::nx(); ix++) {
-      Arr3d::get_row23(ix, v, inter); 
+      Grid::get_row_th_ph(ix, v, inter); 
 
       Sphere::laplace_beltrami(inter, inter_ddv);
 
-      Arr3d::set_row23(ix, inter_ddv, ddv); 
+      Grid::set_row_th_ph(ix, inter_ddv, ddv); 
    }
 }
 /*==========================================================================*/
@@ -118,11 +112,11 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> dv)
    std::vector<double> inter_dv(Params::nlat()*Params::nphi());
 
    for (size_t ix=0; ix<Params::nx(); ix++) {
-      Arr3d::get_row23(ix, v, inter); 
+      Grid::get_row_th_ph(ix, v, inter); 
 
       Sphere::partial_phi(inter, inter_dv);
 
-      Arr3d::set_row23(ix, inter_dv, dv); 
+      Grid::set_row_th_ph(ix, inter_dv, dv); 
    }
 }
 /*==========================================================================*/
@@ -134,16 +128,16 @@ void filter(std::vector<double> &v)
    std::vector<double> inter_sphere(Params::nlat()*Params::nphi());
 
    for (size_t ix=0; ix<Params::nx(); ix++) {
-      Arr3d::get_row23(ix, v, inter_sphere); 
+      Grid::get_row_th_ph(ix, v, inter_sphere); 
       Sphere::filter(inter_sphere);
-      Arr3d::set_row23(ix, inter_sphere, v); 
+      Grid::set_row_th_ph(ix, inter_sphere, v); 
    }
 
    for (size_t ip=0; ip<Params::nphi(); ip++) {
    for (size_t it=0; it<Params::nlat(); it++) {
-      Arr3d::get_row1(ip, it, v, inter_radial); 
+      Grid::get_row_R(it, ip, v, inter_radial); 
       Cheb::filter(inter_radial);
-      Arr3d::set_row1(ip, it, inter_radial, v); 
+      Grid::set_row_R(it, ip, inter_radial, v); 
    }
    }
 }
@@ -170,7 +164,7 @@ void set_k(
 
    set_spherical_lap(f, lap_f);
 
-   for (size_t i=0; i<Params::nx_nphi_nlat(); i++) {
+   for (size_t i=0; i<Params::nx_nlat_nphi(); i++) {
       f_k[i] = p[i];
       p_k[i] = 
          p_f[i]*f[i] 
@@ -193,7 +187,7 @@ void set_k(
 void time_step(Field &f, Field &p, Field &q)
 {
    const double dt = Params::dt();
-   const size_t n = Params::nx_nphi_nlat();
+   const size_t n = Params::nx_nlat_nphi();
 
    filter(f.n);
    filter(p.n);

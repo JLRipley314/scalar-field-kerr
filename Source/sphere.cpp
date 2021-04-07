@@ -55,7 +55,7 @@ double phi(const size_t i_ph)
    return i_ph*2.0*M_PI/((_shtns->nphi)*(_shtns->mres));
 }
 /*==========================================================================*/
-void init(const size_t nl, const size_t nphi, const size_t nlat)
+void init(const size_t nl, const size_t nlat, const size_t nphi)
 {
    _lmax = nl;
    _mmax = _lmax;
@@ -65,11 +65,19 @@ void init(const size_t nl, const size_t nphi, const size_t nlat)
    shtns_verbose(0);     /* displays informations during initialization. */
    shtns_use_threads(1); /* enable multi-threaded transforms (if supported). */
    
+#if SHTNS_CONTIGUOUS_LONGITUDES
    _shtns = shtns_init( 
          shtns_type(int(sht_gauss) | int(SHT_NATIVE_LAYOUT)), 
          _lmax, _mmax, _mres, 
          _nlat, _nphi
       );
+#else
+   _shtns = shtns_init( 
+         shtns_type(int(sht_gauss) | int(SHT_PHI_CONTIGUOUS)), 
+         _lmax, _mmax, _mres, 
+         _nlat, _nphi
+      );
+#endif
    /* 
     * Set Laplacian in spherical harmonic space: \Delta Y_{lm} = -l(l+1) Y_{lm}
     */
@@ -93,9 +101,13 @@ void cleanup()
    shtns_destroy(_shtns);
 }
 /*==========================================================================*/
-size_t indx_Sph(const size_t i_ph, const size_t i_th)
+size_t indx(const size_t i_th, const size_t i_ph)
 {
+#if SHTNS_CONTIGUOUS_LONGITUDES
    return _nlat*i_ph + i_th;
+#else 
+   return _nphi*i_th + i_ph;
+#endif
 }
 /*==========================================================================*/
 void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)

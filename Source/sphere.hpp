@@ -4,6 +4,8 @@
 #ifndef _SPHERE_HPP_
 #define _SPHERE_HPP_
 
+#define SHTNS_CONTIGUOUS_LONGITUDES true
+
 #include <vector>
 #include <complex>
 #include <cmath>
@@ -12,13 +14,10 @@
 /*===========================================================================*/
 namespace Sphere {
 /*===========================================================================*/
-   void init(const size_t nl, const size_t nphi, const size_t nlat);
+   void init(const size_t nl, const size_t nlat, const size_t nphi);
    void cleanup();
-   /*
-    * NOTE the indexing! we are using "SHT_NATIVE_LAYOUT", so in
-    * fact theta varies the fastest; i.e. we index as (phi, theta) 
-    */
-   size_t indx_Sph(const size_t i_ph, const size_t i_th);
+
+   size_t indx(const size_t i_th, const size_t i_ph);
 
    size_t nlat();
    size_t nphi();

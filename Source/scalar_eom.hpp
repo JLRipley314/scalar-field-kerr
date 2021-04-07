@@ -11,7 +11,6 @@
 namespace Eom {
 /*==========================================================================*/
 void init();
-void cleanup();
 
 void time_step(Field &f, Field &p, Field &q);
 

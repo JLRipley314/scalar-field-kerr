@@ -6,7 +6,6 @@
 #include "params.hpp"
 #include "cheb.hpp"
 #include "sphere.hpp"
-#include "arr.hpp"
 #include "grid.hpp"
 #include "field.hpp"
 #include "initial_data.hpp"
@@ -22,11 +21,8 @@ int main(int argc, char **argv)
    std::cout<<"Initializing Parameters"<<std::endl;
    Params::init(param_file);
 
-   std::cout<<"Initializing Arr3d"<<std::endl;
-   Arr3d::init(Params::nx(), Params::nphi(), Params::nlat());
-
    std::cout<<"Initializing Sphere"<<std::endl;
-   Sphere::init(Params::nl(), Params::nphi(), Params::nlat());
+   Sphere::init(Params::nl(), Params::nlat(), Params::nphi());
 
    std::cout<<"Initializing Cheb"<<std::endl;
    Cheb::init(  Params::nx(), Params::Rmin(), Params::Rmax());
@@ -41,9 +37,9 @@ int main(int argc, char **argv)
    Csv::init();
 
    std::cout<<"Initializing Fields"<<std::endl;
-   Field f("f", Params::nx_nphi_nlat(), 0.0);
-   Field p("p", Params::nx_nphi_nlat(), 0.0);
-   Field q("q", Params::nx_nphi_nlat(), 0.0);
+   Field f("f", Params::nx_nlat_nphi(), 0.0);
+   Field p("p", Params::nx_nlat_nphi(), 0.0);
+   Field q("q", Params::nx_nlat_nphi(), 0.0);
 
    std::cout<<"Setting initial data"<<std::endl;
    ID::ingoing_pulse(f.n, p.n, q.n);
@@ -72,11 +68,8 @@ int main(int argc, char **argv)
    }
 
    std::cout<<"Cleaning up"<<std::endl;
-   Eom::   cleanup();
-   Grid::  cleanup();
    Cheb::  cleanup();
    Sphere::cleanup();
-   Arr3d:: cleanup();
  
    return EXIT_SUCCESS;
 }
