@@ -50,7 +50,7 @@ sim.V_4 = 0
 ## rl(ru)_0:               lower(upper) bounds of initial data as a multiple
 ##                         of the black hole horizon
 #-----------------------------------------------------------------------------
-sim.l_ang=  0 
+sim.l_ang=  1 
 sim.m_ang=  0 
 sim.amp= 0.01 
 sim.rl_0= 4.2 

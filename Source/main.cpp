@@ -56,8 +56,9 @@ int main(int argc, char **argv)
 
       /* save to file */
       if (itm%Params::t_step_save()==0) {
-         save_indx += 1;
          std::cout<<itm*Params::dt()/Params::bh_mass()<<std::endl;
+
+         save_indx += 1;
          Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.np1);
          Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.np1);
          Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.np1);

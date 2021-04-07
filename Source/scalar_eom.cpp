@@ -9,7 +9,9 @@
 namespace Eom {
 /*==========================================================================*/
 namespace {
-   std::vector<double> p_f;
+   std::vector<double> p_f1;
+   std::vector<double> p_f2;
+   std::vector<double> p_f3;
    std::vector<double> p_p;
    std::vector<double> p_q;
    std::vector<double> p_dr_p;
@@ -21,7 +23,9 @@ namespace {
 void init()
 {
    const size_t ntotal = Params::nx_nlat_nphi();
-   p_f.resize(ntotal,0);
+   p_f1.resize(ntotal,0);
+   p_f2.resize(ntotal,0);
+   p_f3.resize(ntotal,0);
    p_p.resize(ntotal,0);
    p_q.resize(ntotal,0);
    p_dr_p.resize(ntotal,0);
@@ -34,6 +38,10 @@ void init()
    const size_t nphi = Params::nphi();
 
    const double cl  = Params::cl();
+
+   const double V2 = Params::V_2();
+   const double V3 = Params::V_3();
+   const double V4 = Params::V_4();
 
    for (size_t ix=0; ix<nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
    for (size_t ip=0; ip<nphi; ip++) {
@@ -50,12 +58,15 @@ void init()
       double Sigma = 1.0 + pow(a/r,2)*pow(cos(Sphere::theta(it)),2); 
       double Delta = 1.0 + pow(a/r,2) - (2.0*m/r); 
 
-      p_f[indx] = 0.0;
+      p_f1[indx] = V2;
+      p_f2[indx] = V3/2.0;
+      p_f3[indx] = V4/6.0;
+
       p_p[indx] = (2.0*m/Sigma) / pow(r,2);
       p_q[indx] = 2.0*((1.0/r) - (m/pow(r,2)))/Sigma;
 
-      p_dr_p[indx] = 2.0*m*(1.0/r)/Sigma;
-      p_dr_q[indx] = (Delta/Sigma) / pow(r,2);
+      p_dr_p[indx] = 4.0*m*(1.0/r)/Sigma;
+      p_dr_q[indx] = (Delta/Sigma);
 
       p_dphi_q[indx] = (2.0*a/Sigma) / pow(r,2);
 
@@ -63,7 +74,10 @@ void init()
 
       double pre = 1.0 + (2.0*m*(1.0/r)/Sigma);
 
-      p_f[indx] /= pre;
+      p_f1[indx] /= pre;
+      p_f2[indx] /= pre;
+      p_f3[indx] /= pre;
+
       p_p[indx] /= pre;
       p_q[indx] /= pre;
 
@@ -168,7 +182,10 @@ void set_k(
    for (size_t i=0; i<Params::nx_nlat_nphi(); i++) {
       f_k[i] = p[i];
       p_k[i] = 
-         p_f[i]*f[i] 
+      +  p_f1[i]*f[i] 
+      +  p_f2[i]*pow(f[i],2) 
+      +  p_f3[i]*pow(f[i],3) 
+
       +  p_p[i]*p[i] 
       +  p_q[i]*q[i]
 

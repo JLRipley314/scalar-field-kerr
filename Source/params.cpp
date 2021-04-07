@@ -29,7 +29,6 @@ namespace Params
       double bh_mass_;
       double bh_spin_;
 
-      double V_1_;
       double V_2_;
       double V_3_;
       double V_4_;
@@ -85,7 +84,6 @@ namespace Params
    double bh_mass() {return bh_mass_;};
    double bh_spin() {return bh_spin_;};
 
-   double V_1() {return V_1_;};
    double V_2() {return V_2_;};
    double V_3() {return V_3_;};
    double V_4() {return V_4_;};
@@ -122,7 +120,6 @@ namespace Params
       bh_spin_ = std::stod(read(param_file,"black_hole_spin"));
       /*---------------------------------------------------------------------*/
       /* for the potentials */
-      V_1_ = std::stod(read(param_file,"V_1"));
       V_2_ = std::stod(read(param_file,"V_2"));
       V_3_ = std::stod(read(param_file,"V_3"));
       V_4_ = std::stod(read(param_file,"V_4"));

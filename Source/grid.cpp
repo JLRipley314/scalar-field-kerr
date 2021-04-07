@@ -34,6 +34,11 @@ namespace {
    std::vector<std::vector<double>> _R_th;
 }
 /*===========================================================================*/
+double compactification(const double cl, const double R)
+{
+   return cl/(1.0 + (R/cl));
+}
+/*===========================================================================*/
 void init()
 {
    _nx   = Params::nx();
@@ -45,7 +50,7 @@ void init()
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      double R     = pow(Params::cl(),2)/(Cheb::pt(ix) + Params::cl());  
+      double R     = compactification(Params::cl(),Cheb::pt(ix));
       double theta = Sphere::theta(it);  
       double phi   = Sphere::phi(  ip);
       _R_th_ph[INDX_R_TH_PH(ix,it,ip)] = {
@@ -77,7 +82,7 @@ void init()
 
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      double R     = Cheb::pt(ix);
+      double R     = compactification(Params::cl(),Cheb::pt(ix));
       double theta = Sphere::theta(it);  
       _R_th[INDX_R_TH(ix,it)] = {
          R, 

@@ -39,7 +39,6 @@ namespace Params
    /* 
     * for the potentials 
     */
-   double V_1();
    double V_2();
    double V_3();
    double V_4();
