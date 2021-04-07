@@ -9,6 +9,50 @@
 #include "../Source/sphere.hpp"
 
 /*==========================================================================*/
+/* Testing that the we can make spherical harmonics with all
+ * the correct signs and normalizations.
+ * Namely: we use the Condon-Shortly phase convention,
+ * and normalize the spherical harmonics so they are orthonormal on
+ * the unit sphere. 
+ */
+TEST(sphere_test, make_Ylm) {
+   const size_t nl   = pow(2,5);
+   const size_t nlat = nl + 2;
+   const size_t nphi = 3*nl;
+   Sphere::init(nl, nlat, nphi);
+
+   std::vector<double> y00 = Sphere::compute_ylm(0, 0);
+   std::vector<double> y10 = Sphere::compute_ylm(1, 0);
+   std::vector<double> y11 = Sphere::compute_ylm(1, 1);
+
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      const double theta = Sphere::theta(it);
+      const double phi   = Sphere::phi(ip);
+      EXPECT_LT(fabs(
+            pow(1.0/(4.0*M_PI),0.5)
+         -  y00[Sphere::indx(it,ip)]
+         ),
+            1e-15
+         );
+      EXPECT_LT(fabs(
+            pow(3.0/(4.0*M_PI),0.5)*cos(theta) 
+         - y10[Sphere::indx(it,ip)]
+         ),
+            1e-15
+         );
+      EXPECT_LT(fabs(
+         -  pow(3.0/(2.0*M_PI),0.5)*sin(theta)*cos(phi) 
+         -  y11[Sphere::indx(it,ip)]
+         ), 
+            1e-15
+         );
+   }
+   }
+
+   Sphere::cleanup();
+}
+/*==========================================================================*/
 /* Testing we can go to/from spherical harmonic space, 
  * without changing the value of the array (to within truncation error). 
  */

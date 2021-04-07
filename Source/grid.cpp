@@ -92,6 +92,8 @@ void init()
       };
    }
    }
+   _R_over_cl_sqrd.resize(_nx,0);
+
    for (size_t ix=0; ix<_nx; ix++) {
       _R_over_cl_sqrd[ix] = pow(Cheb::pt(ix)/Params::cl(),2);
    }

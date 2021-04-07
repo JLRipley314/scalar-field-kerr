@@ -74,7 +74,7 @@ void ingoing_pulse(
    /* 
     * rescale so initial amplitude is amp
     */
-   for (size_t ix=0; ix<nx-1; ix++) { /* do not include ix=nx-1 as r=infty there */
+   for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
       f[Grid::indx(ix,it,ip)] *= amp / max_val;

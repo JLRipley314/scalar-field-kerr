@@ -27,8 +27,8 @@ sim.black_hole_mass= float(0.5)
 sim.black_hole_spin= round(0.0*sim.black_hole_mass,16)
 sim.compactification_length= float(1)
 
-sim.evolve_time= float(1.0) ## units of black hole mass
-sim.num_saved_times= int(50)
+sim.evolve_time= float(0.25) ## units of black hole mass
+sim.num_saved_times= int(5)
 
 sim.nx= 48  ## number of radial pts 
 sim.nl= 12  ## number of angular values
@@ -43,14 +43,19 @@ sim.V_3 = 0
 sim.V_4 = 0
 #-----------------------------------------------------------------------------
 ## Initial data:
-##
-## l_ang:                  initial data is a particular swal function
-## initial_data_direction: which way pulse is approximately "heading"
-## amp:                    initial amplitude of real/imaginary parts of psi4
-## rl(ru)_0:               lower(upper) bounds of initial data as a multiple
-##                         of the black hole horizon
+## l_ang:                  
+##    Initial data is a particular swal function
+## m_ang:                  
+##    Must have m_ang >= 0  
+## initial_data_direction: 
+##    Which way pulse is approximately "heading"
+## amp:
+##    Initial amplitude of real/imaginary parts of psi4
+## rl(ru)_0:               
+##    Lower(upper) bounds of initial data as a multiple
+##    of the black hole horizon
 #-----------------------------------------------------------------------------
-sim.l_ang=  1 
+sim.l_ang=  0 
 sim.m_ang=  0 
 sim.amp= 0.01 
 sim.rl_0= 4.2 
