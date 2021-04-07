@@ -25,7 +25,7 @@ int main(int argc, char **argv)
    Sphere::init(Params::nl(), Params::nlat(), Params::nphi());
 
    std::cout<<"Initializing Cheb"<<std::endl;
-   Cheb::init(  Params::nx(), Params::Rmin(), Params::Rmax());
+   Cheb::init(Params::nx(), Params::Rmin(), Params::Rmax());
 
    std::cout<<"Initializing Grid"<<std::endl;
    Grid::init();

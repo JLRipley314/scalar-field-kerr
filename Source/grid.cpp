@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 
 #include "grid.hpp"
 
@@ -7,10 +8,10 @@
 
 #if SHTNS_CONTIGUOUS_LONGITUDES
 #define INDX_R_TH_PH(ix,it,ip) ((_nphi)*(_nlat)*(ix) + (_nlat)*(ip) + (it))
-#define INDX_TH_PH(it,ip) ((_nphi)*(it) + (ip))
+#define INDX_TH_PH(it,ip) ((_nlat)*(ip) + (it))
 #else 
 #define INDX_R_TH_PH(ix,it,ip) ((_nlat)*(_nphi)*(ix) + (_nphi)*(it) + (ip))
-#define INDX_TH_PH(it,ip) ((_nlat)*(ip) + (it))
+#define INDX_TH_PH(it,ip) ((_nphi)*(it) + (ip))
 #endif
 
 /*===========================================================================*/
@@ -70,10 +71,9 @@ void init()
 
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      const size_t ip = 0;
       double R     = Cheb::pt(ix);
       double theta = Sphere::theta(it);  
-      _R_th[INDX_R_TH_PH(ix,it,ip)] = {
+      _R_th[INDX_R_TH(ix,it)] = {
          R, 
          theta
       };
@@ -205,7 +205,7 @@ void set_row_R(const size_t it, const size_t ip,
    assert(in.size() ==_nx);
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ix=0; ix<_nx; ix++) {
-      out[INDX_R_TH_PH(ix,ip,it)] = in[ix];
+      out[INDX_R_TH_PH(ix,it,ip)] = in[ix];
    }
 } 
 /*=========================================================================*/

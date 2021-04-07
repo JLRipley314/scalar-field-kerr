@@ -225,7 +225,7 @@ void filter(std::vector<double> &v)
 /*==========================================================================*/
 std::vector<double> compute_ylm(const int l_ang, const int m_ang)
 {
-   std::vector<cplx>   in(_nYlm, 0.0);
+   std::vector<cplx>   in( _nYlm,0.0);
    std::vector<double> out(_nSph,0.0);
 
    in[LM(_shtns,l_ang,m_ang)] = 1;

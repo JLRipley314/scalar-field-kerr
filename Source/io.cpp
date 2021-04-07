@@ -28,7 +28,7 @@ void init()
    _grid_cart_3d.resize(  Params::nx_nlat_nphi(),       std::vector<double>(3,0)); 
 
    for (size_t i=0; i<Params::nx()*Params::nlat(); i++) {
-      _grid_slice_2d[i] = Grid::th_ph(i);
+      _grid_slice_2d[i] = Grid::R_th(i);
    }
    for (size_t i=0; i<Params::nphi()*Params::nlat(); i++) {
       _grid_sphere_2d[i] = Grid::th_ph(i);

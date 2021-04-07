@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "scalar_eom.hpp"
 #include "grid.hpp"
 #include "cheb.hpp"
@@ -132,7 +134,6 @@ void filter(std::vector<double> &v)
       Sphere::filter(inter_sphere);
       Grid::set_row_th_ph(ix, inter_sphere, v); 
    }
-
    for (size_t ip=0; ip<Params::nphi(); ip++) {
    for (size_t it=0; it<Params::nlat(); it++) {
       Grid::get_row_R(it, ip, v, inter_radial); 
