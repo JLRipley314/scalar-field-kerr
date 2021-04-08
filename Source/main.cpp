@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 #include "params.hpp"
@@ -46,22 +47,25 @@ int main(int argc, char **argv)
 
    size_t save_indx = 0;
    Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.n);
-   Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.n);
-   Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.n);
+//   Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.n);
+//   Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.n);
 
    std::cout<<"Beginning evolution"<<std::endl;
+   const double res = Grid::norm_indep_res(f.n, q.n);
+   std::cout<<0<<"\t"<<res<<std::endl;
    for (size_t itm=1; itm<Params::nt(); itm++) {
 
       Eom::time_step(f, p, q);
 
       /* save to file */
       if (itm%Params::t_step_save()==0) {
-         std::cout<<itm*Params::dt()/Params::bh_mass()<<std::endl;
+         const double res = Grid::norm_indep_res(f.np1, q.np1);
+         std::cout<<itm*Params::dt()/Params::bh_mass()<<"\t"<<res<<std::endl;
 
          save_indx += 1;
          Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.np1);
-         Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.np1);
-         Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.np1);
+//         Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.np1);
+//         Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.np1);
       }
       f.shift();
       p.shift();

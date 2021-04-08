@@ -97,14 +97,13 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> dv);
 /*==========================================================================*/
 void set_spherical_lap(const std::vector<double> &v, std::vector<double> ddv);
 /*==========================================================================*/
-void set_partial_r(const std::vector<double> &v, std::vector<double> dv);
+void set_partial_R(const std::vector<double> &v, std::vector<double> dv);
 /*==========================================================================*/
 /* \partial_R f - q */
 /*==========================================================================*/
-void set_indep_res(
+double norm_indep_res(
       const std::vector<double> &f, 
-      const std::vector<double> &q, 
-      std::vector<double> res);
+      const std::vector<double> &q); 
 /*==========================================================================*/
 /* Low pass filter in spectral space */
 /*==========================================================================*/

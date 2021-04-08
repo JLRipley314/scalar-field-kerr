@@ -288,7 +288,7 @@ void set_row_th_ph(const size_t ix,
    }
 }
 /*==========================================================================*/
-void set_partial_r(const std::vector<double> &v, std::vector<double> dv)
+void set_partial_R(const std::vector<double> &v, std::vector<double> dv)
 {
    assert(v.size() ==_nx*_nlat*_nphi);
    assert(dv.size()==_nx*_nlat*_nphi);
@@ -345,23 +345,25 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> dv)
    }
 }
 /*==========================================================================*/
-void set_indep_res(
+double norm_indep_res(
       const std::vector<double> &f, 
-      const std::vector<double> &q, 
-      std::vector<double> res)
+      const std::vector<double> &q) 
 {
    assert(f.size()  ==_nx*_nlat*_nphi);
    assert(q.size()  ==_nx*_nlat*_nphi);
-   assert(res.size()==_nx*_nlat*_nphi);
 
    std::vector<double> df(_nx*_nlat*_nphi,0);
 
-   set_partial_r(f, df);
+   set_partial_R(f, df);
+
+   double res = 0;
 
    for (size_t ix=0; ix<_nx*_nlat*_nphi; ix++) {
-      res[ix]=df[ix]-q[ix];
+      res += fabs(df[ix]-q[ix]);
    }
+   res /= _nx*_nlat*_nphi;
 
+   return res;
 }
 /*==========================================================================*/
 /* Low pass filter in spectral space */

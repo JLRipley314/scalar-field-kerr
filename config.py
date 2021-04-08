@@ -30,10 +30,10 @@ sim.compactification_length= float(1)
 sim.evolve_time= float(0.25) ## units of black hole mass
 sim.num_saved_times= int(5)
 
-sim.nx= 48  ## number of radial pts 
-sim.nl= 12  ## number of angular values
-sim.nlat = 32 ## number of theta collocation points 
-sim.nphi = 32 ## number of phi collocation points; must be a multiple of 4 
+sim.nx= 64  ## number of radial pts 
+sim.nl= 16  ## number of angular values
+sim.nlat = 40 ## number of theta collocation points 
+sim.nphi = 40 ## number of phi collocation points; must be a multiple of 4 
 #-----------------------------------------------------------------------------
 ## scalar field potential
 #-----------------------------------------------------------------------------
