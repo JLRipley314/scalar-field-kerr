@@ -11,59 +11,57 @@
 #include "../Source/grid.hpp"
 
 /*==========================================================================*/
-/* Testing application of cheb and sphere to 3d works 
+/* computes derivatives using Grid functions and analytically,
+ * and takes one norm of difference of values. 
  */
-TEST(grid_test, test_dr) {
-   const size_t nl   = pow(2,5);
-   const size_t nlat = nl + 2;
-   const size_t nphi = 3*nl;
-
-   const size_t nx   = pow(2,5);
-   const double Rmin = 1;
-   const double Rmax = 10;
-   const double cl   = Rmax;
-
+std::vector<double> get_norm_diff(
+      const size_t nl,
+      const size_t nx,
+      const size_t nlat,
+      const size_t nphi,
+      const double Rmin,
+      const double Rmax)
+{
    const size_t n = nx*nlat*nphi;
+
+   const double cl = Rmax;
 
    Sphere::init(nl, nlat, nphi);
    Cheb::init(nx, Rmin, Rmax);
    Grid::init(cl, nx, nlat, nphi);
 
-   std::vector<double> v(  n,0);
-
+   std::vector<double> v(n,0);
    std::vector<double> dr_v1(n,0);
-   std::vector<double> dr_v2(n,0);
-
    std::vector<double> dphi_v1(n,0);
-   std::vector<double> dphi_v2(n,0);
-
    std::vector<double> lap_v1(n,0);
-   std::vector<double> lap_v2(n,0);
+   std::vector<double> dr_v2(n,0);
+   std::vector<double> dphi_v2(n,0); 
+   std::vector<double> lap_v2(n,0); 
 
-   for (size_t i=0; i<nx*nlat*nphi; i++) {
+   for (size_t i=0; i<n; i++) {
       const std::vector<double> loc_r = Grid::r_th_ph(i);
-      const double r = loc_r[0];
+      const double r     = loc_r[0];
       const double theta = loc_r[1];
       const double phi   = loc_r[2];
 
-      v[i] = (1.0/r)*(
+      v[i] = (1.0/pow(r,2))*(
             1.0 
-         +  pow(sin(theta),2)*pow(cos(phi),2)
+         +  pow(sin(theta),2)/(1.0 + pow(cos(phi),2))
          );
-      dr_v1[i] = (-1.0/pow(r,2))*(
+      dr_v1[i] = (-2.0/pow(r,3))*(
             1.0 
-         +  pow(sin(theta),2)*pow(cos(phi),2)
+         +  pow(sin(theta),2)/(1.0 + pow(cos(phi),2))
          );
-      dphi_v1[i] = (1.0/r)*(
-         -  2.0*pow(sin(theta),2)*cos(phi)*sin(phi)
+      dphi_v1[i] = (1.0/pow(r,2))*(
+            pow(sin(theta),2)*sin(2*phi)/pow(1.0+pow(cos(phi),2),2)
          );
-      lap_v1[i] = (1.0/r)*(
-         0.5*(
-               1.0
-            +  3.0*cos(2.0*theta)
-            -  6.0*cos(2.0*phi)*pow(sin(theta),2)
-            ) 
-         );
+      lap_v1[i] = (1.0/pow(r,2))*(
+            31.0
+         +  57.0*cos(2*theta)
+         +  72.0*pow(cos(theta),2)*cos(2*phi)
+         -  6.0*cos(4*phi)*pow(sin(theta),2)
+         )/pow(3.0 + cos(2*phi),3)
+         ;
    }
    Grid::set_partial_r(    v,   dr_v2);
    Grid::set_partial_phi(  v, dphi_v2);
@@ -72,16 +70,44 @@ TEST(grid_test, test_dr) {
    double norm_dr   = 0;
    double norm_dphi = 0;
    double norm_lap  = 0;
-   for (size_t i=0; i<nx*nlat*nphi; i++) {
+   for (size_t i=0; i<n; i++) {
       norm_dr   += fabs(dr_v1[i]   - dr_v2[i]);
       norm_dphi += fabs(dphi_v1[i] - dphi_v2[i]);
       norm_lap  += fabs(lap_v1[i]  - lap_v2[i]);
    }
-   norm_dr   /= nx*nlat*nphi;
-   norm_dphi /= nx*nlat*nphi;
-   norm_lap  /= nx*nlat*nphi;
+   norm_dr   /= n;
+   norm_dphi /= n;
+   norm_lap  /= n;
 
-   std::cout<<"norm_dr:   "<<norm_dr<<std::endl;
-   std::cout<<"norm_dphi: "<<norm_dphi<<std::endl;
-   std::cout<<"norm_lap:  "<<norm_lap<<std::endl;
+   std::vector<double> norms(3,0);
+
+   norms[0] = norm_dr;
+   norms[1] = norm_dphi;
+   norms[2] = norm_lap;
+
+   return norms;
+}
+/*==========================================================================*/
+/* Testing application of cheb and sphere to 3d works 
+ */
+TEST(grid_test, test_dr_dphi_lap) {
+
+   const size_t Rmin = 1;
+   const size_t Rmax = 10;
+
+   const size_t nx1   = 32;
+   const size_t nl1   = 16;
+   const size_t nlat1 = 2*nl1 + 2;
+   const size_t nphi1 = nlat1;
+   std::vector<double> norms1 = get_norm_diff(nl1, nx1, nlat1, nphi1, Rmin, Rmax);
+
+   const size_t nx2   = 48;
+   const size_t nl2   = 24;
+   const size_t nlat2 = 2*nl2 + 2;
+   const size_t nphi2 = nlat2;
+   std::vector<double> norms2 = get_norm_diff(nl2, nx2, nlat2, nphi2, Rmin, Rmax);
+
+   EXPECT_LT(norms2[0], norms1[0]);
+   EXPECT_LT(norms2[1], norms1[1]);
+   EXPECT_LT(norms2[2], norms1[2]);
 }
