@@ -13,9 +13,18 @@
 
 namespace Grid 
 {
-   void init();
+   void init(
+         const double Rmax,
+         const size_t nx,
+         const size_t nlat,
+         const size_t nphi);
 
    size_t indx(const size_t i_x, const size_t i_th, const size_t i_ph); 
+   /*
+    * returns spherical polar coordinate {r, phi, theta}
+    */
+   std::vector<double> r_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph); 
+   std::vector<double> r_th_ph(const size_t i); 
    /*
     * returns spherical polar coordinate {R, phi, theta}
     */
@@ -93,13 +102,13 @@ namespace Grid
 /*==========================================================================*/
 /* Functions acting on full 3d grid functions */
 /*==========================================================================*/
-void set_partial_phi(const std::vector<double> &v, std::vector<double> dv);
+void set_partial_phi(const std::vector<double> &v, std::vector<double> &dv);
 /*==========================================================================*/
-void set_spherical_lap(const std::vector<double> &v, std::vector<double> ddv);
+void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv);
 /*==========================================================================*/
-void set_partial_R(const std::vector<double> &v, std::vector<double> dv);
+void set_partial_r(const std::vector<double> &v, std::vector<double> &dv);
 /*==========================================================================*/
-/* \partial_R f - q */
+/* \partial_r f - q */
 /*==========================================================================*/
 double norm_indep_res(
       const std::vector<double> &f, 

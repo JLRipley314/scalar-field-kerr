@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <iomanip>
 
 /*
  * NOTE: we use a COMPACTIFIED version of the radial coordinate
@@ -28,43 +29,46 @@ namespace {
    size_t _nphi;
    size_t _nlat; 
 
+   std::vector<std::vector<double>> _r_th_ph;
    std::vector<std::vector<double>> _R_th_ph;
    std::vector<std::vector<double>> _x_y_z;
    std::vector<std::vector<double>> _th_ph;
    std::vector<std::vector<double>> _R_th;
 
-   std::vector<double> _R_over_cl_sqrd;
+   std::vector<double> _partial_R_to_partial_r;
 }
 /*===========================================================================*/
-double compactification(const double cl, const double R)
+void init(
+      const double cl,
+      const size_t nx,
+      const size_t nlat,
+      const size_t nphi)
 {
-   return cl/(1.0 + (R/cl));
-}
-/*===========================================================================*/
-void init()
-{
-   _nx   = Params::nx();
-   _nlat = Params::nlat(); 
-   _nphi = Params::nphi(); 
+   _nx   = nx;
+   _nlat = nlat; 
+   _nphi = nphi; 
 
+   _r_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _R_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _x_y_z.resize(  _nx*_nphi*_nlat, std::vector<double>(3,0));
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      double R     = compactification(Params::cl(),Cheb::pt(ix));
+      double R     = Cheb::pt(ix);
       double theta = Sphere::theta(it);  
       double phi   = Sphere::phi(  ip);
-      _R_th_ph[INDX_R_TH_PH(ix,it,ip)] = {
-         R, 
-         theta,
-         phi 
-      };
-      _x_y_z[INDX_R_TH_PH(ix,it,ip)] = {
-         R*cos(phi)*sin(theta), 
-         R*sin(phi)*sin(theta),
-         R*cos(theta)
-      };
+
+      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][0] = (R<cl ? R/(1.0 - (R/cl)) : 1e10); 
+      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][1] = theta; 
+      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][2] = phi; 
+
+      _R_th_ph[INDX_R_TH_PH(ix,it,ip)][0] = R;
+      _R_th_ph[INDX_R_TH_PH(ix,it,ip)][1] = theta;
+      _R_th_ph[INDX_R_TH_PH(ix,it,ip)][2] = phi;
+
+      _x_y_z[INDX_R_TH_PH(ix,it,ip)][0] = R*cos(phi)*sin(theta); 
+      _x_y_z[INDX_R_TH_PH(ix,it,ip)][1] = R*sin(phi)*sin(theta);
+      _x_y_z[INDX_R_TH_PH(ix,it,ip)][2] = R*cos(theta);
    }
    }
    }
@@ -74,34 +78,40 @@ void init()
    for (size_t ip=0; ip<_nphi; ip++) {
       double theta = Sphere::theta(it);  
       double phi   = Sphere::phi(  ip);
-      _th_ph[INDX_TH_PH(it, ip)] = {
-         theta,
-         phi
-      };
+      _th_ph[INDX_TH_PH(it, ip)][0] = theta;
+      _th_ph[INDX_TH_PH(it, ip)][1] = phi;
    }
    }
    _R_th.resize(_nx*_nlat, std::vector<double>(2,0));
 
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      double R     = compactification(Params::cl(),Cheb::pt(ix));
+      double R     = Cheb::pt(ix);
       double theta = Sphere::theta(it);  
-      _R_th[INDX_R_TH(ix,it)] = {
-         R, 
-         theta
-      };
+      _R_th[INDX_R_TH(ix,it)][0] = R;
+      _R_th[INDX_R_TH(ix,it)][0] = theta;
    }
    }
-   _R_over_cl_sqrd.resize(_nx,0);
-
+   _partial_R_to_partial_r.resize(_nx,0);
+   
    for (size_t ix=0; ix<_nx; ix++) {
-      _R_over_cl_sqrd[ix] = pow(Cheb::pt(ix)/Params::cl(),2);
+      _partial_R_to_partial_r[ix] = pow(1.0 - (Cheb::pt(ix)/cl),2);
    }
 }
 /*=========================================================================*/
 size_t indx(const size_t i_x, const size_t i_th, const size_t i_ph) 
 {
    return INDX_R_TH_PH(i_x, i_th, i_ph);
+}
+/*===========================================================================*/
+std::vector<double> r_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) 
+{
+   return _r_th_ph[INDX_R_TH_PH(i_x, i_th, i_ph)];
+}
+/*===========================================================================*/
+std::vector<double> r_th_ph(const size_t i) 
+{
+   return _r_th_ph[i];
 }
 /*===========================================================================*/
 std::vector<double> R_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) 
@@ -288,47 +298,7 @@ void set_row_th_ph(const size_t ix,
    }
 }
 /*==========================================================================*/
-void set_partial_R(const std::vector<double> &v, std::vector<double> dv)
-{
-   assert(v.size() ==_nx*_nlat*_nphi);
-   assert(dv.size()==_nx*_nlat*_nphi);
-
-   std::vector<double> inter(   _nx);
-   std::vector<double> inter_dv(_nx);
-
-   for (size_t ip=0; ip<_nphi; ip++) {
-   for (size_t it=0; it<_nlat; it++) {
-      get_row_R(it, ip, v, inter); 
-
-      Cheb::der(inter, inter_dv);
-
-      for (size_t ix=0; ix<_nx; ix++) {
-         inter_dv[ix] *= - _R_over_cl_sqrd[ix];
-      }
-
-      set_row_R(it, ip, inter_dv, dv); 
-   }
-   }
-}
-/*==========================================================================*/
-void set_spherical_lap(const std::vector<double> &v, std::vector<double> ddv)
-{
-   assert(v.size()  ==_nx*_nlat*_nphi);
-   assert(ddv.size()==_nx*_nlat*_nphi);
-
-   std::vector<double> inter(    _nlat*_nphi);
-   std::vector<double> inter_ddv(_nlat*_nphi);
-
-   for (size_t ix=0; ix<_nx; ix++) {
-      get_row_th_ph(ix, v, inter); 
-
-      Sphere::laplace_beltrami(inter, inter_ddv);
-
-      set_row_th_ph(ix, inter_ddv, ddv); 
-   }
-}
-/*==========================================================================*/
-void set_partial_phi(const std::vector<double> &v, std::vector<double> dv)
+void set_partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 {
    assert(v.size() ==_nx*_nlat*_nphi);
    assert(dv.size()==_nx*_nlat*_nphi);
@@ -345,16 +315,56 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> dv)
    }
 }
 /*==========================================================================*/
+void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv)
+{
+   assert(v.size()  ==_nx*_nlat*_nphi);
+   assert(ddv.size()==_nx*_nlat*_nphi);
+
+   std::vector<double> inter(    _nlat*_nphi);
+   std::vector<double> inter_ddv(_nlat*_nphi);
+
+   for (size_t ix=0; ix<_nx; ix++) {
+      get_row_th_ph(ix, v, inter); 
+
+      Sphere::laplace_beltrami(inter, inter_ddv);
+
+      set_row_th_ph(ix, inter_ddv, ddv); 
+   }
+}
+/*==========================================================================*/
+void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
+{
+   assert(v.size() ==_nx*_nlat*_nphi);
+   assert(dv.size()==_nx*_nlat*_nphi);
+
+   std::vector<double> inter(   _nx);
+   std::vector<double> inter_dv(_nx);
+
+   for (size_t ip=0; ip<_nphi; ip++) {
+   for (size_t it=0; it<_nlat; it++) {
+      get_row_R(it, ip, v, inter); 
+
+      Cheb::der(inter, inter_dv);
+
+      for (size_t ix=0; ix<_nx; ix++) {
+         inter_dv[ix] *= _partial_R_to_partial_r[ix];
+      }
+
+      set_row_R(it, ip, inter_dv, dv); 
+   }
+   }
+}
+/*==========================================================================*/
 double norm_indep_res(
       const std::vector<double> &f, 
       const std::vector<double> &q) 
 {
-   assert(f.size()  ==_nx*_nlat*_nphi);
-   assert(q.size()  ==_nx*_nlat*_nphi);
+   assert(f.size()==_nx*_nlat*_nphi);
+   assert(q.size()==_nx*_nlat*_nphi);
 
    std::vector<double> df(_nx*_nlat*_nphi,0);
 
-   set_partial_R(f, df);
+   set_partial_r(f, df);
 
    double res = 0;
 

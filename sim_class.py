@@ -25,25 +25,24 @@ class Sim:
          self.output_dir=self.out_stem+self.output_stem
       os.makedirs(self.output_dir)
 #=============================================================================
+## stereographic projection
+   def compactification(self, r:float)->float:
+      return r/(1.0 + (r/self.compactification_length))
+#=============================================================================
    def set_derived_params(self)->None:
       self.max_l = int(self.nl - 1)
 #-----------------------------------------------------------------------------
-## put the R_max at the location of the outer horizon.
-## if near extremal limit then put R_max a m, which is in between
-## the outer and inner horizons
-      sqrt_term = pow(
+## R_min: location of black hole horizon
+## R_max: location of spatial infinity
+      sqrt_term= pow(
          pow(self.black_hole_mass,2)
       -  pow(self.black_hole_spin,2)
       ,0.5)
 
       self.horizon= self.black_hole_mass+sqrt_term
-      self.R_min = 0
 
-      self.R_max= float(
-         pow(self.compactification_length,2)
-         /self.horizon
-      )
-
+      self.R_min= self.compactification(self.horizon)
+      self.R_max= self.compactification_length
 
       self.rl= self.horizon*self.rl_0
       self.ru= self.horizon*self.ru_0

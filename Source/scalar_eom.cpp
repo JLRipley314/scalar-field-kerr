@@ -105,9 +105,9 @@ void set_k(
       std::vector<double> &q_k
       )
 {
-   Grid::set_partial_R(f, dr_f);
-   Grid::set_partial_R(p, dr_p);
-   Grid::set_partial_R(q, dr_q);
+   Grid::set_partial_r(f, dr_f);
+   Grid::set_partial_r(p, dr_p);
+   Grid::set_partial_r(q, dr_q);
 
    Grid::set_partial_phi(f, dphi_q);
 

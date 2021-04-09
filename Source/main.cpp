@@ -29,7 +29,7 @@ int main(int argc, char **argv)
    Cheb::init(Params::nx(), Params::Rmin(), Params::Rmax());
 
    std::cout<<"Initializing Grid"<<std::endl;
-   Grid::init();
+   Grid::init(Params::cl(), Params::nx(), Params::nlat(), Params::nphi());
 
    std::cout<<"Initializing Equations of motion"<<std::endl;
    Eom::init();
@@ -50,9 +50,14 @@ int main(int argc, char **argv)
 //   Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.n);
 //   Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.n);
 
-   std::cout<<"Beginning evolution"<<std::endl;
    const double res = Grid::norm_indep_res(f.n, q.n);
-   std::cout<<0<<"\t"<<res<<std::endl;
+   std::cout
+      <<std::setw(10)<<0
+      <<"\t"
+      <<std::setw(10)<<res
+      <<std::endl;
+
+   std::cout<<"Beginning evolution"<<std::endl;
    for (size_t itm=1; itm<Params::nt(); itm++) {
 
       Eom::time_step(f, p, q);
@@ -60,7 +65,11 @@ int main(int argc, char **argv)
       /* save to file */
       if (itm%Params::t_step_save()==0) {
          const double res = Grid::norm_indep_res(f.np1, q.np1);
-         std::cout<<itm*Params::dt()/Params::bh_mass()<<"\t"<<res<<std::endl;
+         std::cout
+            <<std::setw(10)<<itm*Params::dt()/Params::bh_mass()
+            <<"\t"
+            <<std::setw(10)<<res
+            <<std::endl;
 
          save_indx += 1;
          Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.np1);

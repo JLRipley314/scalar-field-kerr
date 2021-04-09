@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cassert>
+#include <iostream>
 #include "cheb.hpp"
 /*==========================================================================*/
 namespace Cheb {
@@ -36,7 +37,7 @@ void init(const int n, const double lower, const double upper)
     * Chebyshev points on interval [lower, upper]
     */
    for (size_t i=0; i<_n; i++) {
-      _pts[i] = _jacobian*cos(M_PI*double(i)/(_n-1)) + ((_upper+_lower)/2.0);
+      _pts[i] = _jacobian*cos(M_PI*double(i)/(_n-1.0)) + ((_upper+_lower)/2.0);
    }
    /* 
     * for low pass filter in Chebyshev space 
