@@ -3,32 +3,31 @@
 A C++(14) and python code that solves the equations of 
 motion for a real scalar field around a Kerr black hole.
 
-Look under **Releases** for the latest stable version of this code.
-
 Runtime parameters are configured in the `config.py` file.
 
 ## Libraries
 
-* FFTW (Fast Fourier Transforms): 
-	http://fftw.org
+* [FFTW](http://fftw.org) 
+	Fast Fourier transforms	
 
-* SHTns (Fast spherical harmonic transforms):
-	https://nschaeff.bitbucket.io/shtns/
+* [SHTns](https://nschaeff.bitbucket.io/shtns/)
+	Fast spherical harmonic transforms
+	
 
-* OpenMP (optional): 
-	https://www.openmp.org/
+* [OpenMP](https://www.openmp.org/)
+	
 
-* googletest (only used to run unit tests under `Test/`): 
-	https://github.com/google/googletest
-
+* [googletest](https://github.com/google/googletest)
+	only used to run unit tests under `Test/`
+	
 I have successfully compiled the code with 
-the GNU C++ compiler g++.
+the GNU C++ compiler (g++).
 
 ## Visualization
 
-I use pyqtgraph-graph derived software
-(see [here](https://github.com/JLRipley314/sci-vis))
-to visualize the data, which are saved as csv files. 
+I use [paraview](https://www.paraview.org/) to visualize the data.
+Contact me for more details about how to, e.g.
+visualize the 3d data 
 
 ## Citation
 
