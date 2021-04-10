@@ -12,36 +12,38 @@ namespace Params
    /*========================================================================*/
    namespace 
    {
-      size_t nt_;
-      size_t nx_;
-      size_t nl_;
-      size_t nlat_;
-      size_t nphi_;
-      size_t t_step_save_;
+      size_t _nt;
+      size_t _nx;
+      size_t _nl;
+      size_t _nlat;
+      size_t _nphi;
+      size_t _t_step_save;
 
-      double dt_;
+      double _dt;
 
-      double cl_;
+      double _cl;
 
-      double Rmin_;
-      double Rmax_;
+      double _Rmin;
+      double _Rmax;
 
-      double bh_mass_;
-      double bh_spin_;
+      double _bh_mass;
+      double _bh_spin;
 
-      double V_2_;
-      double V_3_;
-      double V_4_;
+      double _constraint_damping;
 
-      std::string id_;
-      std::string initial_data_direction_;
+      double _V2;
+      double _V3;
+      double _V4;
 
-      double amp_;
-      double rl_;
-      double ru_;
+      std::string _id;
+      std::string _initial_data_direction;
 
-      int l_ang_;
-      int m_ang_;
+      double _amp;
+      double _rl;
+      double _ru;
+
+      int _l_ang;
+      int _m_ang;
 
       std::string read(
             const std::string param_file, 
@@ -63,78 +65,82 @@ namespace Params
       }
    }
    /*========================================================================*/
-   size_t nt() {return nt_;};
-   size_t nx() {return nx_;};
-   size_t nl() {return nl_;};
+   size_t nt() {return _nt;};
+   size_t nx() {return _nx;};
+   size_t nl() {return _nl;};
 
-   size_t nx_nlat_nphi() { return nx_*nlat_*nphi_; }
-   size_t nxn() {return nl_;};
+   size_t nx_nlat_nphi() { return _nx*_nlat*_nphi; }
+   size_t nxn() {return _nl;};
 
-   size_t nlat() {return nlat_;};
-   size_t nphi() {return nphi_;};
-   size_t t_step_save() {return t_step_save_;};
+   size_t nlat() {return _nlat;};
+   size_t nphi() {return _nphi;};
+   size_t t_step_save() {return _t_step_save;};
 
-   double dt() {return dt_;};
+   double dt() {return _dt;};
 
-   double cl() {return cl_;};
+   double cl() {return _cl;};
 
-   double Rmax() {return Rmax_;};
-   double Rmin() {return Rmin_;};
+   double Rmax() {return _Rmax;};
+   double Rmin() {return _Rmin;};
 
-   double bh_mass() {return bh_mass_;};
-   double bh_spin() {return bh_spin_;};
+   double bh_mass() {return _bh_mass;};
+   double bh_spin() {return _bh_spin;};
 
-   double V_2() {return V_2_;};
-   double V_3() {return V_3_;};
-   double V_4() {return V_4_;};
+   double constraint_damping() {return _constraint_damping;};
 
-   std::string id() {return id_;};
+   double V_2() {return _V2;};
+   double V_3() {return _V3;};
+   double V_4() {return _V4;};
 
-   std::string initial_data_direction() {return initial_data_direction_;};
+   std::string id() {return _id;};
 
-   double amp() {return amp_;};
-   double rl() {return rl_;};
-   double ru() {return ru_;};
+   std::string initial_data_direction() {return _initial_data_direction;};
 
-   int l_ang() {return l_ang_;};
-   int m_ang() {return m_ang_;};
+   double amp() {return _amp;};
+   double rl() {return _rl;};
+   double ru() {return _ru;};
+
+   int l_ang() {return _l_ang;};
+   int m_ang() {return _m_ang;};
    /*========================================================================*/
    void init(const std::string param_file)
    {
-      nt_   = std::stoi(read(param_file,"nt"));
-      nx_   = std::stoi(read(param_file,"nx"));
-      nl_   = std::stoi(read(param_file,"nl"));
-      nlat_ = std::stoi(read(param_file,"nlat"));
-      nphi_ = std::stoi(read(param_file,"nphi"));
+      _nt   = std::stoi(read(param_file,"nt"));
+      _nx   = std::stoi(read(param_file,"nx"));
+      _nl   = std::stoi(read(param_file,"nl"));
+      _nlat = std::stoi(read(param_file,"nlat"));
+      _nphi = std::stoi(read(param_file,"nphi"));
 
-      t_step_save_ = std::stoi(read(param_file,"t_step_save"));
+      _t_step_save = std::stoi(read(param_file,"t_step_save"));
 
-      dt_ = std::stod(read(param_file,"dt"));
+      _dt = std::stod(read(param_file,"dt"));
 
-      cl_ =   std::stod(read(param_file,"compactification_length"));
+      _cl =   std::stod(read(param_file,"compactification_length"));
 
-      Rmax_ =   std::stod(read(param_file,"R_max"));
-      Rmin_ =   std::stod(read(param_file,"R_min"));
+      _Rmax =   std::stod(read(param_file,"R_max"));
+      _Rmin =   std::stod(read(param_file,"R_min"));
 
-      bh_mass_ = std::stod(read(param_file,"black_hole_mass"));
-      bh_spin_ = std::stod(read(param_file,"black_hole_spin"));
+      _bh_mass = std::stod(read(param_file,"black_hole_mass"));
+      _bh_spin = std::stod(read(param_file,"black_hole_spin"));
+
+      _constraint_damping = std::stod(read(param_file,"constraint_damping"));
       /*---------------------------------------------------------------------*/
       /* for the potentials */
-      V_2_ = std::stod(read(param_file,"V_2"));
-      V_3_ = std::stod(read(param_file,"V_3"));
-      V_4_ = std::stod(read(param_file,"V_4"));
+      _V2 = std::stod(read(param_file,"V_2"));
+      _V3 = std::stod(read(param_file,"V_3"));
+      _V4 = std::stod(read(param_file,"V_4"));
       /*---------------------------------------------------------------------*/
       /* for the initial data */
-      id_ = read(param_file,"initial_data_type");
+      _id = read(param_file,"initial_data_type");
 
-      initial_data_direction_ = read(param_file,"initial_data_direction");
+      _initial_data_direction = read(param_file,"initial_data_direction");
 
-      amp_ = std::stod(read(param_file,"amp"));
-      rl_ = std::stod(read(param_file,"rl"));
-      ru_ = std::stod(read(param_file,"ru"));
+      _amp = std::stod(read(param_file,"amp"));
+      _rl = std::stod(read(param_file,"rl"));
+      _ru = std::stod(read(param_file,"ru"));
 
-      l_ang_ = std::stoi(read(param_file,"l_ang"));
-      m_ang_ = std::stoi(read(param_file,"m_ang"));
+      _l_ang = std::stoi(read(param_file,"l_ang"));
+      _m_ang = std::stoi(read(param_file,"m_ang"));
    }
    /*========================================================================*/
 }

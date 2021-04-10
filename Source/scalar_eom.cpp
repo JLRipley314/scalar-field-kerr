@@ -8,29 +8,34 @@
 namespace Eom {
 /*==========================================================================*/
 namespace {
-   std::vector<double> p_f1;
-   std::vector<double> p_f2;
-   std::vector<double> p_f3;
-   std::vector<double> p_p;
-   std::vector<double> p_q;
-   std::vector<double> p_dr_p;
-   std::vector<double> p_dr_q;
-   std::vector<double> p_dphi_q;
-   std::vector<double> p_lap_f;
+   size_t _n;
+   double _constraint_damping;
+
+   std::vector<double> _p_f1;
+   std::vector<double> _p_f2;
+   std::vector<double> _p_f3;
+   std::vector<double> _p_p;
+   std::vector<double> _p_q;
+   std::vector<double> _p_dr_p;
+   std::vector<double> _p_dr_q;
+   std::vector<double> _p_dphi_q;
+   std::vector<double> _p_lap_f;
 }
 /*==========================================================================*/
 void init()
 {
-   const size_t ntotal = Params::nx_nlat_nphi();
-   p_f1.resize(ntotal,0);
-   p_f2.resize(ntotal,0);
-   p_f3.resize(ntotal,0);
-   p_p.resize(ntotal,0);
-   p_q.resize(ntotal,0);
-   p_dr_p.resize(ntotal,0);
-   p_dr_q.resize(ntotal,0);
-   p_dphi_q.resize(ntotal,0);
-   p_lap_f.resize(ntotal,0);
+   _n = Params::nx_nlat_nphi();
+   _constraint_damping = Params::constraint_damping();
+
+   _p_f1.resize(_n,0);
+   _p_f2.resize(_n,0);
+   _p_f3.resize(_n,0);
+   _p_p.resize(_n,0);
+   _p_q.resize(_n,0);
+   _p_dr_p.resize(_n,0);
+   _p_dr_q.resize(_n,0);
+   _p_dphi_q.resize(_n,0);
+   _p_lap_f.resize(_n,0);
 
    const size_t nx   = Params::nx();
    const size_t nlat = Params::nlat();
@@ -41,6 +46,7 @@ void init()
    const double V2 = Params::V_2();
    const double V3 = Params::V_3();
    const double V4 = Params::V_4();
+
 
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
@@ -57,35 +63,35 @@ void init()
       const double Sigma = 1.0 + pow(inv_r,2)*pow(a,2)*pow(cos(Sphere::theta(it)),2); 
       const double Delta = 1.0 + pow(inv_r,2)*pow(a,2) - inv_r*(2.0*m); 
 
-      p_f1[indx] = V2;
-      p_f2[indx] = V3/2.0;
-      p_f3[indx] = V4/6.0;
+      _p_f1[indx] = V2;
+      _p_f2[indx] = V3/2.0;
+      _p_f3[indx] = V4/6.0;
 
-      p_p[indx] = (2.0*m/Sigma) * pow(inv_r,2);
-      p_q[indx] = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
+      _p_p[indx] = (2.0*m/Sigma) * pow(inv_r,2);
+      _p_q[indx] = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
 
-      p_dr_p[indx] = 4.0*m*inv_r/Sigma;
-      p_dr_q[indx] = (Delta/Sigma);
+      _p_dr_p[indx] = 4.0*m*inv_r/Sigma;
+      _p_dr_q[indx] = (Delta/Sigma);
 
-      p_dphi_q[indx] = (2.0*a/Sigma) * pow(inv_r,2);
+      _p_dphi_q[indx] = (2.0*a/Sigma) * pow(inv_r,2);
 
-      p_lap_f[indx] = (1.0/Sigma) * pow(inv_r,2);
+      _p_lap_f[indx] = (1.0/Sigma) * pow(inv_r,2);
 
       const double pre = 1.0 + (2.0*m*inv_r/Sigma);
 
-      p_f1[indx] /= pre;
-      p_f2[indx] /= pre;
-      p_f3[indx] /= pre;
+      _p_f1[indx] /= pre;
+      _p_f2[indx] /= pre;
+      _p_f3[indx] /= pre;
 
-      p_p[indx] /= pre;
-      p_q[indx] /= pre;
+      _p_p[indx] /= pre;
+      _p_q[indx] /= pre;
 
-      p_dr_p[indx] /= pre;
-      p_dr_q[indx] /= pre;
+      _p_dr_p[indx] /= pre;
+      _p_dr_q[indx] /= pre;
 
-      p_dphi_q[indx] /= pre;
+      _p_dphi_q[indx] /= pre;
 
-      p_lap_f[indx] /= pre;
+      _p_lap_f[indx] /= pre;
    }
    }
    }
@@ -113,24 +119,29 @@ void set_k(
 
    Grid::set_spherical_lap(f, lap_f);
 
-   for (size_t i=0; i<Params::nx_nlat_nphi(); i++) {
-      f_k[i] = p[i];
-      p_k[i] = 
-      +  p_f1[i]*f[i] 
-      +  p_f2[i]*pow(f[i],2) 
-      +  p_f3[i]*pow(f[i],3) 
-
-      +  p_p[i]*p[i] 
-      +  p_q[i]*q[i]
-
-      +  p_dr_p[i]*dr_p[i] 
-      +  p_dr_q[i]*dr_q[i]
-
-      +  p_dphi_q[i]*dphi_q[i]
-
-      +  p_lap_f[i]*lap_f[i]
+   for (size_t i=0; i<_n; i++) {
+      f_k[i] = 
+         p[i]
       ;
-      q_k[i] = dr_p[i];
+      p_k[i] = 
+      +  _p_f1[i]*f[i] 
+      +  _p_f2[i]*pow(f[i],2) 
+      +  _p_f3[i]*pow(f[i],3) 
+
+      +  _p_p[i]*p[i] 
+      +  _p_q[i]*q[i]
+
+      +  _p_dr_p[i]*dr_p[i] 
+      +  _p_dr_q[i]*dr_q[i]
+
+      +  _p_dphi_q[i]*dphi_q[i]
+
+      +  _p_lap_f[i]*lap_f[i]
+      ;
+      q_k[i] = 
+         dr_p[i] 
+      +  _constraint_damping*(q[i] - dr_f[i])
+      ;
    }
 }
 /*==========================================================================*/
@@ -141,9 +152,9 @@ void time_step(Field &f, Field &p, Field &q)
    const double dt = Params::dt();
    const size_t n = Params::nx_nlat_nphi();
 
-   Grid::filter(f.n);
-   Grid::filter(p.n);
-   Grid::filter(q.n);
+//   Grid::filter(f.n);
+//   Grid::filter(p.n);
+//   Grid::filter(q.n);
 
    std::vector<double> dr_f(  n);
    std::vector<double> lap_f( n);

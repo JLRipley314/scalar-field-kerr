@@ -20,6 +20,7 @@ namespace Grid
 {
 namespace {
    size_t _nx;
+   size_t _nlat; 
    size_t _nphi;
 
    std::vector<std::vector<double>> _r_th_ph;

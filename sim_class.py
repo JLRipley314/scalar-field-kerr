@@ -47,11 +47,6 @@ class Sim:
       self.rl= self.horizon*self.rl_0
       self.ru= self.horizon*self.ru_0
 #-----------------------------------------------------------------------------
-      absa = abs(self.black_hole_spin/self.black_hole_mass)
-      self.constraint_damping = abs(
-         (1.0/self.black_hole_mass)*pow(abs(1.0-absa+1.0e-6),-0.5)
-      )
-#-----------------------------------------------------------------------------
 ## consider characteristic speeds: it looks like max is ~2/3 so can multiply
 ## the factor 6/N^2 by up to (3/2) (need to experiment)
 #-----------------------------------------------------------------------------
