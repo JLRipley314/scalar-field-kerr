@@ -25,9 +25,9 @@ the GNU C++ compiler (g++).
 
 ## Visualization
 
-I use [paraview](https://www.paraview.org/) to visualize the data.
+I've mostly used [paraview](https://www.paraview.org/) to visualize the data.
 Contact me for more details about how to, e.g.
-visualize the 3d data 
+read in and visualize the 3d data 
 
 ## Citation
 

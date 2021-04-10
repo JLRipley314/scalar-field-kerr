@@ -27,22 +27,21 @@ sim.black_hole_mass= float(0.5)
 sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
 sim.compactification_length= float(50)
 
-sim.evolve_time= float(1.0) ## units of black hole mass
-sim.num_saved_times= int(10)
+sim.evolve_time= float(5.0) ## units of black hole mass
+sim.num_saved_times= int(50)
 
 sim.nx= 64  ## number of radial pts 
 sim.nl= 16  ## number of angular values
-sim.nlat = 40 ## number of theta collocation points 
-sim.nphi = 40 ## number of phi collocation points; must be a multiple of 4 
+sim.nlat = 36 ## number of theta collocation points 
+sim.nphi = 36 ## number of phi collocation points; must be a multiple of 4 
 
-sim.constraint_damping = 0 ## damping of (q - \partial_r f)==0
+sim.constraint_damping = -100 ## damping of (q - \partial_r f)==0
 #-----------------------------------------------------------------------------
 ## scalar field potential
 #-----------------------------------------------------------------------------
-sim.V_1 = 0
-sim.V_2 = 0
-sim.V_3 = 0
-sim.V_4 = 0
+sim.V2 = 0.5
+sim.V3 = 0
+sim.V4 = 0.5
 #-----------------------------------------------------------------------------
 ## Initial data:
 ## l_ang:                  

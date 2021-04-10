@@ -43,7 +43,7 @@ void init(const int n, const double lower, const double upper)
     * for low pass filter in Chebyshev space 
     */
    for (size_t i=0; i<_n; i++) {
-      _low_pass[i] = exp(-40.0*pow(double(i)/_n,10));
+      _low_pass[i] = exp(-40.0*pow(double(i)/_n,12));
    }   
    /* 
     * initialize fftw discrete cosine transform plan 

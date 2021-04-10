@@ -43,9 +43,9 @@ void init()
 
    const double cl  = Params::cl();
 
-   const double V2 = Params::V_2();
-   const double V3 = Params::V_3();
-   const double V4 = Params::V_4();
+   const double V2 = Params::V2();
+   const double V3 = Params::V3();
+   const double V4 = Params::V4();
 
 
    for (size_t ix=0; ix<nx;   ix++) {
@@ -58,14 +58,17 @@ void init()
       const double m = Params::bh_mass();
       const double a = Params::bh_spin()/m;
 
-      /* divide by r^2 to reduce infty/infy type errors 
+      /* Divide by r^2 to reduce infty/infy type errors 
        * in computing coefficients. */
       const double Sigma = 1.0 + pow(inv_r,2)*pow(a,2)*pow(cos(Sphere::theta(it)),2); 
       const double Delta = 1.0 + pow(inv_r,2)*pow(a,2) - inv_r*(2.0*m); 
 
-      _p_f1[indx] = V2;
-      _p_f2[indx] = V3/2.0;
-      _p_f3[indx] = V4/6.0;
+      /* Notice the negative sign! 
+       * \Box\phi = V' 
+       * in -+++ signature */ 
+      _p_f1[indx] = - V2;
+      _p_f2[indx] = - V3/2.0;
+      _p_f3[indx] = - V4/6.0;
 
       _p_p[indx] = (2.0*m/Sigma) * pow(inv_r,2);
       _p_q[indx] = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;

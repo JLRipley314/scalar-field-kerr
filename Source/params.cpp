@@ -88,9 +88,9 @@ namespace Params
 
    double constraint_damping() {return _constraint_damping;};
 
-   double V_2() {return _V2;};
-   double V_3() {return _V3;};
-   double V_4() {return _V4;};
+   double V2() {return _V2;};
+   double V3() {return _V3;};
+   double V4() {return _V4;};
 
    std::string id() {return _id;};
 
@@ -126,9 +126,9 @@ namespace Params
       _constraint_damping = std::stod(read(param_file,"constraint_damping"));
       /*---------------------------------------------------------------------*/
       /* for the potentials */
-      _V2 = std::stod(read(param_file,"V_2"));
-      _V3 = std::stod(read(param_file,"V_3"));
-      _V4 = std::stod(read(param_file,"V_4"));
+      _V2 = std::stod(read(param_file,"V2"));
+      _V3 = std::stod(read(param_file,"V3"));
+      _V4 = std::stod(read(param_file,"V4"));
       /*---------------------------------------------------------------------*/
       /* for the initial data */
       _id = read(param_file,"initial_data_type");

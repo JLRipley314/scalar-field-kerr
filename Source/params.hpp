@@ -41,9 +41,9 @@ namespace Params
    /* 
     * for the potentials 
     */
-   double V_2();
-   double V_3();
-   double V_4();
+   double V2();
+   double V3();
+   double V4();
    /* 
     * for the initial data 
     */

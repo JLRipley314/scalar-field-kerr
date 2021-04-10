@@ -47,8 +47,6 @@ int main(int argc, char **argv)
 
    size_t save_indx = 0;
    Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.n);
-//   Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.n);
-//   Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.n);
 
    const double res = Grid::norm_indep_res(f.n, q.n);
    std::cout
@@ -71,10 +69,9 @@ int main(int argc, char **argv)
             <<std::setw(10)<<res
             <<std::endl;
 
+         if (std::isnan(res)) return EXIT_SUCCESS;
          save_indx += 1;
          Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.np1);
-//         Csv::write_x_y_z(output_dir+"/"+p.name, save_indx, p.np1);
-//         Csv::write_x_y_z(output_dir+"/"+q.name, save_indx, q.np1);
       }
       f.shift();
       p.shift();
