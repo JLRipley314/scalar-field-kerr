@@ -24,11 +24,11 @@ sim.run_type= "basic_run"
 sim.debug= False
 
 sim.black_hole_mass= float(0.5)
-sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
+sim.black_hole_spin= round(0.9999*sim.black_hole_mass,16)
 sim.compactification_length= float(50)
 
-sim.evolve_time= float(5.0) ## units of black hole mass
-sim.num_saved_times= int(50)
+sim.evolve_time= float(10.0) ## units of black hole mass
+sim.num_saved_times= int(100)
 
 sim.nx= 64  ## number of radial pts 
 sim.nl= 16  ## number of angular values

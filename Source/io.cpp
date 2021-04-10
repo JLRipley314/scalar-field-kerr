@@ -118,7 +118,7 @@ void write_x_y_z(
 
       const size_t n= vals.size();
       for (size_t i=0; i<n; ++i) {
-         if (fabs(vals[i]>1e-4)) {
+         if (fabs(vals[i])>1e-3) {
             for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
                out<<std::setprecision(16)<<_grid_x_y_z[i][j]<<",";
             }
