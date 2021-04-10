@@ -16,7 +16,7 @@ namespace
    std::vector<std::vector<double>> _grid_th_ph;
    std::vector<std::vector<double>> _grid_x_y_z;
 
-   std::vector<std::string> _labels_R_th  = {"r",   "theta", "value"};
+   std::vector<std::string> _labels_R_th  = {"R",   "theta", "value"};
    std::vector<std::string> _labels_th_ph = {"theta", "phi", "value"};
    std::vector<std::string> _labels_x_y_z = {"x", "y", "z",  "value"};
 }   
@@ -118,7 +118,7 @@ void write_x_y_z(
 
       const size_t n= vals.size();
       for (size_t i=0; i<n; ++i) {
-         if (fabs(vals[i]>1e-14)) {
+         if (fabs(vals[i]>1e-4)) {
             for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
                out<<std::setprecision(16)<<_grid_x_y_z[i][j]<<",";
             }

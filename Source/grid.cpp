@@ -2,12 +2,6 @@
 #include <iostream>
 #include <iomanip>
 
-/*
- * NOTE: we use a COMPACTIFIED version of the radial coordinate
- * different from what we we use to evovle; i.e. NOT R,
- * but instead rr = r/(1+r/L) = 1/(1 + R/L)
- */
-
 #include "grid.hpp"
 
 #define INDX_R_TH(ix,it) ((_nlat)*(ix) + (it))
@@ -27,7 +21,6 @@ namespace Grid
 namespace {
    size_t _nx;
    size_t _nphi;
-   size_t _nlat; 
 
    std::vector<std::vector<double>> _r_th_ph;
    std::vector<std::vector<double>> _R_th_ph;
@@ -368,10 +361,10 @@ double norm_indep_res(
 
    double res = 0;
 
-   for (size_t ix=0; ix<_nx*_nlat*_nphi; ix++) {
-      res += fabs(df[ix]-q[ix]);
+   for (size_t i=0; i<_nx*_nlat*_nphi; i++) {
+      res += pow(df[i]-q[i],2);
    }
-   res /= _nx*_nlat*_nphi;
+   res = pow(res/(_nx*_nlat*_nphi),0.5);
 
    return res;
 }

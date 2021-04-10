@@ -26,6 +26,10 @@ std::vector<double> get_norm_diff(
 
    const double cl = Rmax;
 
+   const double rl    = 0.1*(Rmax-Rmin) + Rmin;
+   const double ru    = 0.2*(Rmax-Rmin) + Rmin;
+   const double width = ru-rl;
+
    Sphere::init(nl, nlat, nphi);
    Cheb::init(nx, Rmin, Rmax);
    Grid::init(cl, nx, nlat, nphi);
@@ -44,18 +48,34 @@ std::vector<double> get_norm_diff(
       const double theta = loc_r[1];
       const double phi   = loc_r[2];
 
-      v[i] = (1.0/pow(r,2))*(
+      double bump = 0.0;
+
+      if ((r<ru) && (r>rl)) {
+         bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
+      }
+
+      double rval = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump;
+
+      double der_rval = (
+         (2.0*((  (r-rl)/width) )*pow(((ru-r)/width),2))
+      -  (2.0*pow((r-rl)/width,2)*(    (ru-r)/width   ))
+      +  (1.0*(1.0              )*pow(((ru-r)/width),2))
+      -  (2.0*pow((r-rl)/width,2)*(1.0                ))
+      )*bump/width;
+
+
+      v[i] = rval*(
             1.0 
          +  pow(sin(theta),2)/(1.0 + pow(cos(phi),2))
          );
-      dr_v1[i] = (-2.0/pow(r,3))*(
+      dr_v1[i] = der_rval*(
             1.0 
          +  pow(sin(theta),2)/(1.0 + pow(cos(phi),2))
          );
-      dphi_v1[i] = (1.0/pow(r,2))*(
+      dphi_v1[i] = rval*(
             pow(sin(theta),2)*sin(2*phi)/pow(1.0+pow(cos(phi),2),2)
          );
-      lap_v1[i] = (1.0/pow(r,2))*(
+      lap_v1[i] = rval*(
             31.0
          +  57.0*cos(2*theta)
          +  72.0*pow(cos(theta),2)*cos(2*phi)
@@ -95,13 +115,13 @@ TEST(grid_test, test_dr_dphi_lap) {
    const size_t Rmin = 1;
    const size_t Rmax = 10;
 
-   const size_t nx1   = 32;
+   const size_t nx1   = 48;
    const size_t nl1   = 16;
    const size_t nlat1 = 2*nl1 + 2;
    const size_t nphi1 = nlat1;
    std::vector<double> norms1 = get_norm_diff(nl1, nx1, nlat1, nphi1, Rmin, Rmax);
 
-   const size_t nx2   = 48;
+   const size_t nx2   = 64;
    const size_t nl2   = 24;
    const size_t nlat2 = 2*nl2 + 2;
    const size_t nphi2 = nlat2;

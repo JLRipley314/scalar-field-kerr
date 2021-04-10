@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "cheb.hpp"
-#include "params.hpp"
 #include "sphere.hpp"
 
 namespace Grid 
