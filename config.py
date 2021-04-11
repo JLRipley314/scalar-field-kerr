@@ -27,13 +27,13 @@ sim.black_hole_mass= float(0.5)
 sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
 sim.compactification_length= float(50)
 
-sim.evolve_time= float(20.0) ## units of black hole mass
-sim.num_saved_times= int(100)
+sim.evolve_time= float(50.0) ## units of black hole mass
+sim.num_saved_times= int(200)
 
-sim.nx= 128  ## number of radial pts 
-sim.nl= 12   ## number of angular values
-sim.nlat = 32 ## number of theta collocation points 
-sim.nphi = 32 ## number of phi collocation points; must be a multiple of 4 
+sim.nx= 160  ## number of radial pts 
+sim.nl= 20   ## number of angular values
+sim.nlat = 44 ## number of theta collocation points 
+sim.nphi = 44 ## number of phi collocation points; must be a multiple of 4 
 
 sim.constraint_damping = -100 ## damping of (q - \partial_r f)==0
 #-----------------------------------------------------------------------------
@@ -66,21 +66,16 @@ sim.initial_data_direction= "ingoing"
 #-----------------------------------------------------------------------------
 ## details of computer setup 
 
-sim.computer= "home"#"della"#
-sim.out_stem= "/tigress/jripley/tf-out/"
+sim.computer= "della"#"home"#
+sim.out_stem= "/tigress/jripley/sf"
 
-sim.num_threads= 2
+sim.num_threads= 20
 
 ## for cluster/slurm script
 
-sim.walltime= "72:00:00" ## (hh:mm:ss)
+sim.walltime= "12:00:00" ## (hh:mm:ss)
 sim.memory=   "2048" ## MB 
 sim.email=    "lloydripley@gmail.com" ## for slurm notification
-#-----------------------------------------------------------------------------
-## multiple of when can begin second order evolution 
-
-sim.integrate_psi4_start_multiple= float(6.0)
-sim.scd_order_start_multiple= float(6.0)
 #=============================================================================
 ## different scripts for making convergence tests, etc.
 #=============================================================================

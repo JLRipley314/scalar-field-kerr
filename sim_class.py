@@ -22,7 +22,7 @@ class Sim:
       if (self.computer=="home"):
          self.output_dir= "Output/"+self.output_stem
       else:
-         self.output_dir=self.out_stem+self.output_stem
+         self.output_dir=self.out_stem+"/"+self.output_stem
       os.makedirs(self.output_dir)
 #=============================================================================
 ## stereographic projection
@@ -74,7 +74,7 @@ class Sim:
    def write_slurm_script(self, run_str:str):
       with open('{}/run.slurm'.format(self.home_dir), 'w') as f:
          f.write('#!/bin/sh\n')
-         f.write('#SBATCH -J fteuk\t\t# job name\n')
+         f.write('#SBATCH -J scalar\t\t# job name\n')
          f.write('#SBATCH -t {}\t\t# walltime (dd:hh:mm:ss)\n'.format(self.walltime))
          f.write('#SBATCH -p physics\t\t# partition/queue name\n')
          f.write('#SBATCH --mem={}MB\n'.format(self.memory))
