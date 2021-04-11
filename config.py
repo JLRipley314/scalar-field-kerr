@@ -50,7 +50,7 @@ sim.initial_data_direction= "ingoing"
 sim.computer= "della"#"home"#
 sim.out_stem= "/tigress/jripley/sf"
 
-sim.num_threads= 20 ## sets number of threads if using OpenMP 
+sim.num_threads= 4 ## sets number of threads if using OpenMP 
 #-----------------------------------------------------------------------------
 ## For writing slurm script
 

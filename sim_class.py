@@ -47,11 +47,8 @@ class Sim:
       self.rl= self.horizon*self.rl_0
       self.ru= self.horizon*self.ru_0
 #-----------------------------------------------------------------------------
-## consider characteristic speeds: it looks like max is ~2/3 so can multiply
-## the factor 6/N^2 by up to (3/2) (need to experiment)
-#-----------------------------------------------------------------------------
       self.dt= float(
-         9.*pow(max(self.nx,self.nl),-2)
+         6.*pow(max([self.nx,self.nlat,self.nphi]),-2)
       )
 #-----------------------------------------------------------------------------
       self.nt= int(
