@@ -49,10 +49,11 @@ int main(int argc, char **argv)
    Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-3, 1e9, Params::Rmin(), Params::Rmax(), f.n);
 
    const double res = Grid::norm_indep_res(f.n, q.n);
+   const double tv  = Grid::total_variation(f.n);
    std::cout
-      <<std::setw(10)<<0
-      <<"\t"
-      <<std::setw(10)<<res
+      <<std::setw(16)<<0
+      <<std::setw(16)<<res
+      <<std::setw(16)<<tv
       <<std::endl;
 
    std::cout<<"Beginning evolution"<<std::endl;
@@ -63,10 +64,11 @@ int main(int argc, char **argv)
       /* save to file */
       if (itm%Params::t_step_save()==0) {
          const double res = Grid::norm_indep_res(f.np1, q.np1);
+         const double tv  = Grid::total_variation(f.np1); 
          std::cout
-            <<std::setw(10)<<itm*Params::dt()/Params::bh_mass()
-            <<"\t"
-            <<std::setw(10)<<res
+            <<std::setw(16)<<itm*Params::dt()/Params::bh_mass()
+            <<std::setw(16)<<res
+            <<std::setw(16)<<tv
             <<std::endl;
 
          if (std::isnan(res)) return EXIT_SUCCESS;

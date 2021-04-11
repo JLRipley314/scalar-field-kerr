@@ -397,6 +397,35 @@ double norm_indep_res(
 
    return res;
 }
+/*==========================================================================*/
+double total_variation(const std::vector<double> &v) 
+{
+   assert(v.size()==_nx*_nlat*_nphi);
+
+   double tv = 0;
+   for (size_t ix=0; ix<_nx-1;   ix++) {
+   for (size_t it=0; it<_nlat-1; it++) {
+   for (size_t ip=0; ip<_nphi-1; ip++) {
+      tv += pow(
+               pow(
+                  v[indx(ix+1, it, ip)] 
+               -  v[indx(ix,   it, ip)]
+               ,2)
+            +  pow(
+                  v[indx(ix, it+1, ip)] 
+               -  v[indx(ix, it,   ip)]
+               ,2)
+            +  pow(
+                  v[indx(ix, it, ip+1)] 
+               -  v[indx(ix, it, ip)]
+               ,2)
+            ,
+            0.5); 
+   }
+   }
+   }
+   return tv;
+}
 /*===========================================================================*/
 } /* Grid */
 

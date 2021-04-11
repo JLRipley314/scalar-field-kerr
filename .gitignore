@@ -1,4 +1,5 @@
 *.swp
+*.slurm
 *.o
 *.run
 __pycache__

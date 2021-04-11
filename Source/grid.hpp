@@ -113,6 +113,8 @@ double norm_indep_res(
       const std::vector<double> &f, 
       const std::vector<double> &q); 
 /*==========================================================================*/
+double total_variation(const std::vector<double> &f); 
+/*==========================================================================*/
 /* Low pass filter in spectral space */
 /*==========================================================================*/
 void filter(std::vector<double> &v);
