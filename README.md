@@ -1,6 +1,6 @@
 # Scalar field dynamics around a Kerr black hole
 
-A C++(14) and python code that solves the equations of 
+A C++ (C++11 onwards) and Python code that solves the equations of 
 motion for a real scalar field around a Kerr black hole.
 
 Runtime parameters are configured in the `config.py` file.
@@ -11,11 +11,9 @@ Runtime parameters are configured in the `config.py` file.
 	Fast Fourier transforms	
 
 * [SHTns](https://nschaeff.bitbucket.io/shtns/)
-	Fast spherical harmonic transforms
-	
+	Fast spherical harmonic transforms	
 
-* [OpenMP](https://www.openmp.org/)
-	
+* [OpenMP](https://www.openmp.org/)	
 
 * [googletest](https://github.com/google/googletest)
 	only used to run unit tests under `Test/`
