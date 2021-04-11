@@ -285,6 +285,7 @@ void set_row_th_ph(const size_t ix,
 {
    assert(in.size() ==_nphi*_nlat);
    assert(out.size()==_nx*_nphi*_nlat);
+
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
       out[INDX_R_TH_PH(ix,it,ip)] = in[INDX_TH_PH(it,ip)];
@@ -297,10 +298,11 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> &dv)
    assert(v.size() ==_nx*_nlat*_nphi);
    assert(dv.size()==_nx*_nlat*_nphi);
 
-   std::vector<double> inter(   _nlat*_nphi);
-   std::vector<double> inter_dv(_nlat*_nphi);
-
+#pragma omp parallel for
    for (size_t ix=0; ix<_nx; ix++) {
+      std::vector<double> inter(   _nlat*_nphi);
+      std::vector<double> inter_dv(_nlat*_nphi);
+
       get_row_th_ph(ix, v, inter); 
 
       Sphere::partial_phi(inter, inter_dv);
@@ -314,10 +316,11 @@ void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv)
    assert(v.size()  ==_nx*_nlat*_nphi);
    assert(ddv.size()==_nx*_nlat*_nphi);
 
-   std::vector<double> inter(    _nlat*_nphi);
-   std::vector<double> inter_ddv(_nlat*_nphi);
-
+#pragma omp parallel for
    for (size_t ix=0; ix<_nx; ix++) {
+      std::vector<double> inter(    _nlat*_nphi);
+      std::vector<double> inter_ddv(_nlat*_nphi);
+
       get_row_th_ph(ix, v, inter); 
 
       Sphere::laplace_beltrami(inter, inter_ddv);
@@ -331,11 +334,12 @@ void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
    assert(v.size() ==_nx*_nlat*_nphi);
    assert(dv.size()==_nx*_nlat*_nphi);
 
-   std::vector<double> inter(   _nx);
-   std::vector<double> inter_dv(_nx);
-
-   for (size_t ip=0; ip<_nphi; ip++) {
+#pragma omp parallel for
    for (size_t it=0; it<_nlat; it++) {
+   for (size_t ip=0; ip<_nphi; ip++) {
+      std::vector<double> inter(   _nx);
+      std::vector<double> inter_dv(_nx);
+
       get_row_R(it, ip, v, inter); 
 
       Cheb::der(inter, inter_dv);
@@ -345,6 +349,30 @@ void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
       }
 
       set_row_R(it, ip, inter_dv, dv); 
+   }
+   }
+}
+/*==========================================================================*/
+/* Low pass filter in spectral space */
+/*==========================================================================*/
+void filter(std::vector<double> &v)
+{
+   assert(v.size()==_nx*_nlat*_nphi);
+
+#pragma omp parallel for
+   for (size_t ix=0; ix<_nx; ix++) {
+      std::vector<double> inter_sphere(_nlat*_nphi);
+      get_row_th_ph(ix, v, inter_sphere); 
+      Sphere::filter(inter_sphere);
+      set_row_th_ph(ix, inter_sphere, v); 
+   }
+#pragma omp parallel for
+   for (size_t it=0; it<_nlat; it++) {
+   for (size_t ip=0; ip<_nphi; ip++) {
+      std::vector<double> inter_radial(_nx);
+      get_row_R(it, ip, v, inter_radial); 
+      Cheb::filter(inter_radial);
+      set_row_R(it, ip, inter_radial, v); 
    }
    }
 }
@@ -368,29 +396,6 @@ double norm_indep_res(
    res = pow(res/(_nx*_nlat*_nphi),0.5);
 
    return res;
-}
-/*==========================================================================*/
-/* Low pass filter in spectral space */
-/*==========================================================================*/
-void filter(std::vector<double> &v)
-{
-   assert(v.size()==_nx*_nlat*_nphi);
-
-   std::vector<double> inter_radial(_nx);
-   std::vector<double> inter_sphere(_nlat*_nphi);
-
-   for (size_t ix=0; ix<_nx; ix++) {
-      get_row_th_ph(ix, v, inter_sphere); 
-      Sphere::filter(inter_sphere);
-      set_row_th_ph(ix, inter_sphere, v); 
-   }
-   for (size_t ip=0; ip<_nphi; ip++) {
-   for (size_t it=0; it<_nlat; it++) {
-      get_row_R(it, ip, v, inter_radial); 
-      Cheb::filter(inter_radial);
-      set_row_R(it, ip, inter_radial, v); 
-   }
-   }
 }
 /*===========================================================================*/
 } /* Grid */

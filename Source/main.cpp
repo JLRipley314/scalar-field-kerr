@@ -46,7 +46,7 @@ int main(int argc, char **argv)
    ID::ingoing_pulse(f.n, p.n, q.n);
 
    size_t save_indx = 0;
-   Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.n);
+   Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-3, 1e9, Params::Rmin(), Params::Rmax(), f.n);
 
    const double res = Grid::norm_indep_res(f.n, q.n);
    std::cout
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
          if (std::isnan(res)) return EXIT_SUCCESS;
          save_indx += 1;
-         Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, f.np1);
+         Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-3, 1e9, Params::Rmin(), Params::Rmax(), f.np1);
       }
       f.shift();
       p.shift();

@@ -215,8 +215,8 @@ TEST(sphere_test, filter_is_TVD) {
     */
    double tv1 = 0;
    double tv2 = 0;
-   for (size_t ip=1; ip<Sphere::nphi()-1; ip++) {
-   for (size_t it=1; it<Sphere::nlat()-1; it++) {
+   for (size_t ip=0; ip<Sphere::nphi()-1; ip++) {
+   for (size_t it=0; it<Sphere::nlat()-1; it++) {
       tv1 += 
          fabs(po1[Sphere::indx(it,ip)]
          -    po1[Sphere::indx(it,ip+1)])

@@ -25,7 +25,11 @@ namespace Csv
       );
    void write_x_y_z(
          const std::string name, 
-         const int itm, 
+         const int itm,
+         const double vmin,
+         const double vmax,
+         const double rmin,
+         const double rmax, 
          const std::vector<double> &vals
       );
 /*=========================================================================*/

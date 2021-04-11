@@ -90,7 +90,7 @@ void init(const size_t nl, const size_t nlat, const size_t nphi)
     */
    _low_pass.resize(_lmax,0);
    for (size_t i=0; i<_lmax; i++) {
-      _low_pass[i] = exp(-36*pow(double(i)/_lmax,12));
+      _low_pass[i] = exp(-40.0*pow(double(i)/_lmax,16));
    }
    _nSph = NSPAT_ALLOC(_shtns);
    _nYlm = _shtns->nlm;

@@ -84,7 +84,7 @@ TEST(cheb_test, filter_is_TVD) {
     */
    double tv1 = 0;
    double tv2 = 0;
-   for (size_t i=1; i<nr-1; i++) {
+   for (size_t i=0; i<nr-1; i++) {
       tv1 += fabs(po1[i+1] - po1[i]);
       tv2 += fabs(po2[i+1] - po2[i]);
    }

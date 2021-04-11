@@ -11,7 +11,7 @@ GT_INCLUDE = -I/usr/local/include
 SHTNS_INC = -I/usr/include -I/home/jripley/shtns/Library/include
 SHTNS_LIB = -L/lib/x86_64-linux-gnu -L/home/jripley/shtns/Library/lib
 
-CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra \
+CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
 	 -lshtns -lfftw3 -lm #-D_GLIBCXX_DEBUG
 #=============================================================================
 OBJ = main.o \

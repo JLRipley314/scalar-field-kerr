@@ -155,9 +155,9 @@ void time_step(Field &f, Field &p, Field &q)
    const double dt = Params::dt();
    const size_t n = Params::nx_nlat_nphi();
 
-//   Grid::filter(f.n);
-//   Grid::filter(p.n);
-//   Grid::filter(q.n);
+   Grid::filter(f.n);
+   Grid::filter(p.n);
+   Grid::filter(q.n);
 
    std::vector<double> dr_f(  n);
    std::vector<double> lap_f( n);

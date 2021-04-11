@@ -99,9 +99,22 @@ void write_th_ph(
    out.close();
 }
 /*===========================================================================*/
+inline double magnitude(const std::vector<double> &v)
+{
+   double mag = 0;
+   for (const double &val: v) {
+      mag += pow(val,2);
+   }
+   return pow(mag,0.5);
+}
+/*===========================================================================*/
 void write_x_y_z(
       const std::string name, 
-      const int itm, 
+      const int itm,
+      const double vmin,
+      const double vmax,
+      const double rmin,
+      const double rmax, 
       const std::vector<double> &vals)
 {
    std::string file_name= name+"_"+std::to_string(itm)+".csv";
@@ -118,7 +131,11 @@ void write_x_y_z(
 
       const size_t n= vals.size();
       for (size_t i=0; i<n; ++i) {
-         if (fabs(vals[i])>1e-3) {
+         if ((fabs(vals[i])>vmin)
+         &&  (fabs(vals[i])<vmax)
+         &&  (magnitude(_grid_x_y_z[i])>rmin)
+         &&  (magnitude(_grid_x_y_z[i])<rmax)
+         ) {
             for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
                out<<std::setprecision(16)<<_grid_x_y_z[i][j]<<",";
             }

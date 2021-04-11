@@ -15,8 +15,8 @@
  * and takes one norm of difference of values. 
  */
 std::vector<double> get_norm_diff(
-      const size_t nl,
       const size_t nx,
+      const size_t nl,
       const size_t nlat,
       const size_t nphi,
       const double Rmin,
@@ -108,6 +108,103 @@ std::vector<double> get_norm_diff(
    return norms;
 }
 /*==========================================================================*/
+/* Adds random noise to function, filters, and returns total variation
+ * of both 
+ */
+std::vector<double> get_total_variation(
+      const size_t nx,
+      const size_t nl,
+      const size_t nlat,
+      const size_t nphi,
+      const double Rmin,
+      const double Rmax)
+{
+   const size_t n = nx*nlat*nphi;
+
+   const double cl = Rmax;
+
+   const double rl    = 0.1*(Rmax-Rmin) + Rmin;
+   const double ru    = 0.5*(Rmax-Rmin) + Rmin;
+   const double width = ru-rl;
+
+   Sphere::init(nl, nlat, nphi);
+   Cheb::init(nx, Rmin, Rmax);
+   Grid::init(cl, nx, nlat, nphi);
+
+   std::vector<double> v(n,0);
+   std::vector<double> filter_v(n,0);
+
+   for (size_t i=0; i<n; i++) {
+      const std::vector<double> loc_r = Grid::r_th_ph(i);
+      const double r     = loc_r[0];
+      const double theta = loc_r[1];
+      const double phi   = loc_r[2];
+
+      double bump = 0.0;
+
+      if ((r<ru) && (r>rl)) {
+         bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
+      }
+
+      double rval = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump;
+
+      v[i] = rval*(
+            1.0 
+         +  pow(sin(theta),2)/(1.0 + pow(cos(phi),2))
+         );
+      v[i] *= (1.0 + (0.1*rand()/RAND_MAX));
+      filter_v[i] = v[i];
+   }
+   Grid::filter(filter_v);
+
+   double tv_v        = 0;
+   double tv_filter_v = 0;
+
+   for (size_t ix=0; ix<nx-1;   ix++) {
+   for (size_t it=0; it<nlat-1; it++) {
+   for (size_t ip=0; ip<nphi-1; ip++) {
+      tv_v += pow(
+               pow(
+                  v[Grid::indx(ix+1, it, ip)] 
+               -  v[Grid::indx(ix,   it, ip)]
+               ,2)
+            +  pow(
+                  v[Grid::indx(ix, it+1, ip)] 
+               -  v[Grid::indx(ix, it,   ip)]
+               ,2)
+            +  pow(
+                  v[Grid::indx(ix, it, ip+1)] 
+               -  v[Grid::indx(ix, it, ip)]
+               ,2)
+            ,
+            0.5); 
+
+      tv_filter_v += pow(
+               pow(
+                  filter_v[Grid::indx(ix+1, it, ip)] 
+               -  filter_v[Grid::indx(ix,   it, ip)]
+               ,2)
+            +  pow(
+                  filter_v[Grid::indx(ix, it+1, ip)] 
+               -  filter_v[Grid::indx(ix, it,   ip)]
+               ,2)
+            +  pow(
+                  filter_v[Grid::indx(ix, it, ip+1)] 
+               -  filter_v[Grid::indx(ix, it, ip)]
+               ,2)
+            ,
+            0.5); 
+   }
+   }
+   }
+   std::vector<double> tvs(2,0);
+
+   tvs[0] = tv_v;
+   tvs[1] = tv_filter_v;
+
+   return tvs;
+}
+/*==========================================================================*/
 /* Testing application of cheb and sphere to 3d works 
  */
 TEST(grid_test, test_dr_dphi_lap) {
@@ -119,15 +216,38 @@ TEST(grid_test, test_dr_dphi_lap) {
    const size_t nl1   = 16;
    const size_t nlat1 = 2*nl1 + 2;
    const size_t nphi1 = nlat1;
-   std::vector<double> norms1 = get_norm_diff(nl1, nx1, nlat1, nphi1, Rmin, Rmax);
+   std::vector<double> norms1 = get_norm_diff(nx1, nl1, nlat1, nphi1, Rmin, Rmax);
 
    const size_t nx2   = 64;
    const size_t nl2   = 24;
    const size_t nlat2 = 2*nl2 + 2;
    const size_t nphi2 = nlat2;
-   std::vector<double> norms2 = get_norm_diff(nl2, nx2, nlat2, nphi2, Rmin, Rmax);
+   std::vector<double> norms2 = get_norm_diff(nx2, nl2, nlat2, nphi2, Rmin, Rmax);
 
    EXPECT_LT(norms2[0], norms1[0]);
    EXPECT_LT(norms2[1], norms1[1]);
    EXPECT_LT(norms2[2], norms1[2]);
+}
+/*==========================================================================*/
+/* Testing grid filter is TVD 
+ */
+TEST(grid_test, test_tvd) {
+
+   const size_t Rmin = 1;
+   const size_t Rmax = 100;
+
+   const size_t nx1   = 96;
+   const size_t nl1   = 16;
+   const size_t nlat1 = 2*nl1 + 2;
+   const size_t nphi1 = nlat1;
+   std::vector<double> tv1 = get_total_variation(nx1, nl1, nlat1, nphi1, Rmin, Rmax);
+
+   const size_t nx2   = 128;
+   const size_t nl2   = 24;
+   const size_t nlat2 = 2*nl2 + 2;
+   const size_t nphi2 = nlat2;
+   std::vector<double> tv2 = get_total_variation(nx2, nl2, nlat2, nphi2, Rmin, Rmax);
+
+   EXPECT_LT(tv1[1], tv1[0]);
+   EXPECT_LT(tv2[1], tv2[0]);
 }
