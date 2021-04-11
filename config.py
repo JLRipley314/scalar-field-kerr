@@ -24,14 +24,14 @@ sim.run_type= "basic_run"
 sim.debug= False
 
 sim.black_hole_mass= float(0.5)
-sim.black_hole_spin= round(0.0*sim.black_hole_mass,16)
+sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
 sim.compactification_length= float(50)
 
 sim.evolve_time= float(20.0) ## units of black hole mass
 sim.num_saved_times= int(100)
 
-sim.nx= 64  ## number of radial pts 
-sim.nl= 12  ## number of angular values
+sim.nx= 128  ## number of radial pts 
+sim.nl= 12   ## number of angular values
 sim.nlat = 32 ## number of theta collocation points 
 sim.nphi = 32 ## number of phi collocation points; must be a multiple of 4 
 
@@ -60,7 +60,7 @@ sim.l_ang=  4
 sim.m_ang=  0 
 sim.amp= 0.01 
 sim.rl_0= 1.1 
-sim.ru_0= 10.0
+sim.ru_0= 20.0
 sim.initial_data_type= "compact_pulse"
 sim.initial_data_direction= "ingoing"
 #-----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ sim.initial_data_direction= "ingoing"
 sim.computer= "home"#"della"#
 sim.out_stem= "/tigress/jripley/tf-out/"
 
-sim.num_threads= 1
+sim.num_threads= 2
 
 ## for cluster/slurm script
 
