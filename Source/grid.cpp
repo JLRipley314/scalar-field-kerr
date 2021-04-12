@@ -52,7 +52,7 @@ void init(
       double theta = Sphere::theta(it);  
       double phi   = Sphere::phi(  ip);
 
-      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][0] = (R<cl ? R/(1.0 - (R/cl)) : 1e10); 
+      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][0] = (fabs(R-cl)<1e-16) ? (R/(1.0 - (R/cl))) : 1e12; 
       _r_th_ph[INDX_R_TH_PH(ix,it,ip)][1] = theta; 
       _r_th_ph[INDX_R_TH_PH(ix,it,ip)][2] = phi; 
 

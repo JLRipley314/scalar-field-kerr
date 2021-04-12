@@ -34,7 +34,6 @@ class Field
       std::vector<double> k4;
       std::vector<double> k5;
 
-   private:
       const size_t size;
 };
 

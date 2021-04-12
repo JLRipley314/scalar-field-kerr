@@ -117,8 +117,8 @@ namespace Params
 
       _cl =   std::stod(read(param_file,"compactification_length"));
 
-      _Rmax =   std::stod(read(param_file,"R_max"));
-      _Rmin =   std::stod(read(param_file,"R_min"));
+      _Rmax =   std::stod(read(param_file,"Rmax"));
+      _Rmin =   std::stod(read(param_file,"Rmin"));
 
       _bh_mass = std::stod(read(param_file,"black_hole_mass"));
       _bh_spin = std::stod(read(param_file,"black_hole_spin"));
