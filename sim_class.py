@@ -48,7 +48,7 @@ class Sim:
       self.ru= self.horizon*self.ru_0
 #-----------------------------------------------------------------------------
       self.dt= float(
-         1.*pow(max([self.nx,self.nlat,self.nphi]),-2)
+         3.*pow(max([self.nx,self.nlat,self.nphi]),-2)
       )
 #-----------------------------------------------------------------------------
       self.nt= int(
