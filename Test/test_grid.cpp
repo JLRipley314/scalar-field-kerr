@@ -43,10 +43,10 @@ std::vector<double> get_norm_diff(
    std::vector<double> lap_v2(n,0); 
 
    for (size_t i=0; i<n; i++) {
-      const std::vector<double> loc_r = Grid::r_th_ph(i);
-      const double r     = loc_r[0];
-      const double theta = loc_r[1];
-      const double phi   = loc_r[2];
+      const std::vector<double> r_th_ph = Grid::r_th_ph(i);
+      const double r     = r_th_ph[0];
+      const double theta = r_th_ph[1];
+      const double phi   = r_th_ph[2];
 
       double bump = 0.0;
 

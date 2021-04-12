@@ -60,7 +60,7 @@ void init()
       std::vector<double> R_th_ph = Grid::R_th_ph(ix, it, ip); 
       std::vector<double> r_th_ph = Grid::r_th_ph(ix, it, ip); 
 
-      const double inv_r = (fabs(R_th_ph[0]-cl)<1e-16) ? (1.0/r_th_ph[0]) : 0.0;
+      const double inv_r = (fabs(R_th_ph[0]-cl)>1e-16) ? (1.0/r_th_ph[0]) : 0.0;
       const double th = r_th_ph[1];
 
       /* Divide by r^2 to reduce infty/infy type errors 

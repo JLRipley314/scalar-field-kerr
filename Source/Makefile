@@ -7,8 +7,6 @@ SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
 	 -lshtns -lfftw3 -lm
-#CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra \
-#	 -lshtns -lfftw3 -lm #-D_GLIBCXX_DEBUG
 #=============================================================================
 OBJ = params.o \
       cheb.o \
