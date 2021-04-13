@@ -6,7 +6,7 @@ SHTNS_INC = -I$(HOME)/shtns/Library/include
 SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
-	 -lshtns -lfftw3 -lm -D_GLIBCXX_DEBUG
+	 -lshtns -lfftw3 -lm #-D_GLIBCXX_DEBUG
 #=============================================================================
 OBJ = params.o \
       cheb.o \
@@ -35,3 +35,8 @@ all: default.run
 
 %.o: %.cpp $(DEPS)
 	$(CC) $(CFLAGS) $(SHTNS_INC) $(SHTNS_LIB) -c -o $@ $<
+
+#=============================================================================
+.PHONY: clean
+clean:
+	$(RM) *.o

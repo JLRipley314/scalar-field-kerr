@@ -4,12 +4,16 @@ all:
 test:
 	$(MAKE) --directory=Test/
 
-clean_bin:
+clean_Bin:
 	$(MAKE) clean --directory=Bin/
 
-clean_out:
+clean_Output:
 	$(MAKE) clean --directory=Output/
 
+clean_Source:
+	$(MAKE) clean --directory=Source/
+
 clean:
-	$(MAKE) clean_bin
-	$(MAKE) clean_out
+	$(MAKE) clean_Bin
+	$(MAKE) clean_Output
+	$(MAKE) clean_Source
