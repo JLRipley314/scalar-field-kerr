@@ -63,11 +63,19 @@ void init()
       const double inv_r = (fabs(R_th_ph[0]-cl)>1e-16) ? (1.0/r_th_ph[0]) : 0.0;
       const double th = r_th_ph[1];
 
-      /* Divide by r^2 to reduce infty/infy type errors 
+      /* Sigma and Delta:
+       * Divide by r^2 to reduce infty/infy type errors 
        * in computing coefficients. */
-
       const double Sigma = 1.0 + pow(inv_r,2)*pow(a,2)*pow(cos(th),2); 
-      const double Delta = 1.0 + pow(inv_r,2)*pow(a,2) - inv_r*(2.0*m); 
+
+      const double rp = 
+         (fabs(m-a)<1e-16) ? (m)   : (
+         (fabs(a)  <1e-16) ? (2*m) : (m + pow((m-a)*(m+a),0.5))
+         );
+      const double rm = 
+         (fabs(m-a)<1e-16) ? (m)   : (pow(a,2)/rp)
+         ;
+      const double Delta = (1.0 - rp*inv_r)*(1.0 - rm*inv_r); 
 
       /* Notice the negative sign! 
        * \Box\phi = V' 
