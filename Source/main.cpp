@@ -40,15 +40,14 @@ int main(int argc, char **argv)
    std::cout<<"Initializing Fields"<<std::endl;
    Field f("f", Params::nx_nlat_nphi(), 0.0);
    Field p("p", Params::nx_nlat_nphi(), 0.0);
-   Field q("q", Params::nx_nlat_nphi(), 0.0);
 
    std::cout<<"Setting initial data"<<std::endl;
-   ID::ingoing_pulse(f.n, p.n, q.n);
+   ID::ingoing_pulse(f.n, p.n);
 
    size_t save_indx = 0;
    Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-3, 1e9, Params::Rmin(), Params::Rmax(), f.n);
 
-   const double res = Grid::norm_indep_res(f.n, q.n);
+   const double res = Grid::norm_indep_res(Params::dt(), f.n, f.np1, p.n);
    const double tv  = Grid::total_variation(f.n);
    std::cout
       <<std::setw(16)<<0
@@ -59,11 +58,11 @@ int main(int argc, char **argv)
    std::cout<<"Beginning evolution"<<std::endl;
    for (size_t itm=1; itm<Params::nt(); itm++) {
 
-      Eom::time_step(f, p, q);
+      Eom::time_step(f, p);
 
       /* save to file */
       if (itm%Params::t_step_save()==0) {
-         const double res = Grid::norm_indep_res(f.np1, q.np1);
+         const double res = Grid::norm_indep_res(Params::dt(), f.n, f.np1, p.np1);
          const double tv  = Grid::total_variation(f.np1); 
          std::cout
             <<std::setw(16)<<itm*Params::dt()/Params::bh_mass()
@@ -77,7 +76,6 @@ int main(int argc, char **argv)
       }
       f.shift();
       p.shift();
-      q.shift();
    }
 
    std::cout<<"Cleaning up"<<std::endl;

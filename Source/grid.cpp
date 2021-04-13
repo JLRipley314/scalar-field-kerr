@@ -378,20 +378,19 @@ void filter(std::vector<double> &v)
 }
 /*==========================================================================*/
 double norm_indep_res(
-      const std::vector<double> &f, 
-      const std::vector<double> &q) 
+      const double dt, 
+      const std::vector<double> &f_n, 
+      const std::vector<double> &f_np1, 
+      const std::vector<double> &p) 
 {
-   assert(f.size()==_nx*_nlat*_nphi);
-   assert(q.size()==_nx*_nlat*_nphi);
-
-   std::vector<double> df(_nx*_nlat*_nphi,0);
-
-   set_partial_r(f, df);
+   assert(f_n.size()  ==_nx*_nlat*_nphi);
+   assert(f_np1.size()==_nx*_nlat*_nphi);
+   assert(p.size()    ==_nx*_nlat*_nphi);
 
    double res = 0;
 
    for (size_t i=0; i<_nx*_nlat*_nphi; i++) {
-      res += pow(df[i]-q[i],2);
+      res += pow(p[i] - ((f_np1[i]-f_n[i])/dt),2);
    }
    res = pow(res/(_nx*_nlat*_nphi),0.5);
 

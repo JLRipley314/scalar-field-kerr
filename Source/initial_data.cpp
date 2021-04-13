@@ -13,8 +13,7 @@ namespace ID
 /*==========================================================================*/
 void ingoing_pulse(
       std::vector<double> &f,
-      std::vector<double> &p,
-      std::vector<double> &q)
+      std::vector<double> &p)
 {
    const size_t nx   = Params::nx();
    const size_t nphi = Params::nphi();
@@ -50,20 +49,10 @@ void ingoing_pulse(
        */ 
       p[Grid::indx(ix,it,ip)] = 0.0;
       /*
-       * q = \partial_r f
-       */
-      q[Grid::indx(ix,it,ip)] = (
-         (2.0*(((r-rl)/width)   )*pow(((ru-r)/width),2))
-      -  (2.0*pow((r-rl)/width,2)*((ru-r)/width       ))
-      +  (1.0*(1.0              )*pow(((ru-r)/width),2))
-      -  (2.0*pow((r-rl)/width,2)*(1.0                ))
-      )*bump/width;
-      /*
        * give angular structure Y_{lm} 
        */
       f[Grid::indx(ix,it,ip)] *= ylm[Sphere::indx(it,ip)];
       p[Grid::indx(ix,it,ip)] *= ylm[Sphere::indx(it,ip)];
-      q[Grid::indx(ix,it,ip)] *= ylm[Sphere::indx(it,ip)];
 
       if (fabs(f[Grid::indx(ix,it,ip)]) > max_val) {
          max_val = fabs(f[Grid::indx(ix,it,ip)]);
@@ -79,7 +68,6 @@ void ingoing_pulse(
    for (size_t it=0; it<nlat; it++) {
       f[Grid::indx(ix,it,ip)] *= amp / max_val;
       p[Grid::indx(ix,it,ip)] *= amp / max_val;
-      q[Grid::indx(ix,it,ip)] *= amp / max_val; 
    }
    }
    }

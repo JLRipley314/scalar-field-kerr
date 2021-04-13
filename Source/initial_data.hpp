@@ -12,8 +12,7 @@ namespace ID
 /*==========================================================================*/
 void ingoing_pulse(
       std::vector<double> &f,
-      std::vector<double> &p,
-      std::vector<double> &q
+      std::vector<double> &p
    );
 /*==========================================================================*/
 } /* ID */

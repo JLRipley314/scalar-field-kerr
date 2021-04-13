@@ -107,11 +107,13 @@ void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv);
 /*==========================================================================*/
 void set_partial_r(const std::vector<double> &v, std::vector<double> &dv);
 /*==========================================================================*/
-/* \partial_r f - q */
+/* \partial_t f - p */
 /*==========================================================================*/
 double norm_indep_res(
-      const std::vector<double> &f, 
-      const std::vector<double> &q); 
+      const double dt, 
+      const std::vector<double> &f_n, 
+      const std::vector<double> &f_np1, 
+      const std::vector<double> &p); 
 /*==========================================================================*/
 double total_variation(const std::vector<double> &f); 
 /*==========================================================================*/

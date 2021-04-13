@@ -36,8 +36,6 @@ namespace Params
 
    double bh_mass();
    double bh_spin();
-
-   double constraint_damping();
    /* 
     * for the potentials 
     */

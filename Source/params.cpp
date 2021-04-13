@@ -29,8 +29,6 @@ namespace Params
       double _bh_mass;
       double _bh_spin;
 
-      double _constraint_damping;
-
       double _V2;
       double _V3;
       double _V4;
@@ -86,8 +84,6 @@ namespace Params
    double bh_mass() {return _bh_mass;};
    double bh_spin() {return _bh_spin;};
 
-   double constraint_damping() {return _constraint_damping;};
-
    double V2() {return _V2;};
    double V3() {return _V3;};
    double V4() {return _V4;};
@@ -122,8 +118,6 @@ namespace Params
 
       _bh_mass = std::stod(read(param_file,"black_hole_mass"));
       _bh_spin = std::stod(read(param_file,"black_hole_spin"));
-
-      _constraint_damping = std::stod(read(param_file,"constraint_damping"));
       /*---------------------------------------------------------------------*/
       /* for the potentials */
       _V2 = std::stod(read(param_file,"V2"));
