@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <iomanip>
 
 #include "scalar_eom.hpp"
 #include "params.hpp"
@@ -56,7 +57,7 @@ void init()
    const double cl  = Params::cl();
 
    const double m = Params::bh_mass();
-   const double a = Params::bh_spin()/m;
+   const double a = Params::bh_spin();
 
    const double V2 = Params::V2();
    const double V3 = Params::V3();
@@ -70,7 +71,7 @@ void init()
       std::vector<double> R_th_ph = Grid::R_th_ph(ix, it, ip); 
       std::vector<double> r_th_ph = Grid::r_th_ph(ix, it, ip); 
 
-      const double inv_r = (fabs(R_th_ph[0]-cl)>1e-16) ? (1.0/r_th_ph[0]) : 0.0;
+      const double inv_r = (fabs(R_th_ph[0]-cl)<1e-16) ? 0 : (1.0/r_th_ph[0]);
       const double th = r_th_ph[1];
 
       /* Sigma and Delta:
@@ -79,14 +80,13 @@ void init()
       const double Sigma = 1.0 + pow(inv_r,2)*pow(a,2)*pow(cos(th),2); 
 
       const double rp = 
-         (fabs(m-a)<1e-16) ? (m)   : (
-         (fabs(a)  <1e-16) ? (2*m) : (m + pow((m-a)*(m+a),0.5))
+         (fabs(m-fabs(a))<1e-16) ? (m)   : (
+         (fabs(a)        <1e-16) ? (2*m) : (m + pow((m-a)*(m+a),0.5))
          );
       const double rm = 
          (fabs(m-a)<1e-16) ? (m)   : (pow(a,2)/rp)
          ;
-//      const double Delta = (1.0 - rp*inv_r)*(1.0 - rm*inv_r); 
-      const double Delta = 1.0 - (2*m)*inv_r + pow(a*inv_r,2); 
+      const double Delta = (1.0 - rp*inv_r)*(1.0 - rm*inv_r); 
 
       /* Notice the negative sign! 
        * \Box\phi = V' 
@@ -138,7 +138,7 @@ void set_k(
    Grid::set_partial_r(    p,    _dr_p);
    Grid::set_partial_r(_dr_f, _dr_dr_f);
 
-   Grid::set_partial_phi(f, _dphi_dr_f);
+   Grid::set_partial_phi(_dr_f, _dphi_dr_f);
 
    Grid::set_spherical_lap(f, _lap_f);
 

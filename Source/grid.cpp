@@ -423,7 +423,7 @@ double total_variation(const std::vector<double> &v)
    }
    }
    }
-   return tv;
+   return tv/(_nx*_nlat*_nphi);
 }
 /*===========================================================================*/
 } /* Grid */

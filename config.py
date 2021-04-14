@@ -18,11 +18,11 @@ sim.black_hole_mass= float(0.5)
 sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
 sim.compactification_length= float(50)
 
-sim.evolve_time= float(10.0) ## units of black hole mass
-sim.num_saved_times= int(50)
+sim.evolve_time= float(1.0) ## units of black hole mass
+sim.num_saved_times= int(10)
 
 sim.nx= 48  ## Number of radial pts 
-sim.nl= 12   ## Number of angular values
+sim.nl= 14   ## Number of angular values
 sim.nlat = 32 ## Number of theta collocation points 
 sim.nphi = 32 ## Number of phi collocation points; must be a multiple of 4 
 #-----------------------------------------------------------------------------
@@ -45,10 +45,10 @@ sim.initial_data_direction= "ingoing"
 #-----------------------------------------------------------------------------
 ## Details of computer setup 
 
-sim.computer= "home"#"della"#
+sim.computer= "della"#"home"#
 sim.out_stem= "/tigress/jripley/sf"
 
-sim.num_threads= 2 ## sets number of threads if using OpenMP 
+sim.num_threads= 4 ## sets number of threads if using OpenMP 
 #-----------------------------------------------------------------------------
 ## For writing slurm script
 
