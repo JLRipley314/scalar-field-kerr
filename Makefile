@@ -1,6 +1,9 @@
 all:
 	$(MAKE) --directory=Source/
 
+%.run:
+	$(MAKE) $@ --directory=Source/
+
 test:
 	$(MAKE) --directory=Test/
 
