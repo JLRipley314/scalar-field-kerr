@@ -14,6 +14,10 @@
 #define FREE_TMP \
    fftw_free(Sph_tmp); \
    fftw_free(Ylm_tmp);
+/* 
+ * Want m<=l if l<_mmax, otherwise m<_mmax 
+ */
+#define MMAX(l) (((l)<_mmax) ? (l+1) : _mmax)
 /*==========================================================================*/
 namespace Sphere {
 /*==========================================================================*/
@@ -165,8 +169,8 @@ void laplace_beltrami(
    }
    spat_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
-   for (size_t l=0; l<_lmax; l++) {
-   for (size_t m=0; m<_mmax; m++) {
+   for (size_t l=0; l<_lmax;   l++) {
+   for (size_t m=0; m<MMAX(l); m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= _lap[l];
    }
    }
@@ -194,8 +198,8 @@ void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 
    const cplx img(0,1);
 
-   for (size_t l=0; l<_lmax; l++) {
-   for (size_t m=0; m<_mmax; m++) {
+   for (size_t l=0; l<_lmax;   l++) {
+   for (size_t m=0; m<MMAX(l); m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= img*cplx(m);
    }
    }
@@ -219,8 +223,8 @@ void filter(std::vector<double> &v)
    }
    spat_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
-   for (size_t l=0; l<_lmax; l++) {
-   for (size_t m=0; m<_mmax; m++) {
+   for (size_t l=0; l<_lmax;   l++) {
+   for (size_t m=0; m<MMAX(l); m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= _low_pass[l]*_low_pass[m];
    }
    }
@@ -249,3 +253,4 @@ std::vector<double> compute_ylm(const int l_ang, const int m_ang)
 } /* Sphere */
 #undef ALLOCATE_TMP
 #undef FREE_TMP
+#undef MMAX

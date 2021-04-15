@@ -142,10 +142,10 @@ TEST(test_sphere, partial_phi) {
 /* Testing Spherical Laplace-Beltrami operator acts correctly
  */
 TEST(test_sphere, laplace_beltrami) {
-   const size_t nl   = 30;
-   const size_t nm   = 12;
-   const size_t nlat = 32;
-   const size_t nphi = 48;
+   const size_t nl   = 32;
+   const size_t nm   = 24;
+   const size_t nlat = 34;
+   const size_t nphi = 60;
    Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> v(   Sphere::nSph(),0);
@@ -178,7 +178,7 @@ TEST(test_sphere, laplace_beltrami) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       EXPECT_LT(
             fabs(ddv1[Sphere::indx(it,ip)]-ddv2[Sphere::indx(it,ip)]),
-            1e-11
+            5e-12
          );
    }
    }
