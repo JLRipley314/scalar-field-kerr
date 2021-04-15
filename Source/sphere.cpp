@@ -18,8 +18,8 @@
 namespace Sphere {
 /*==========================================================================*/
 namespace {
-   const size_t _mres = 1;     /* angular periodicity (2*pi/mres) */
-   const double _eps  = 1e-12; /* polar optimization threshold */
+   const size_t _mres = 1; /* angular periodicity (2*pi/mres) */
+   const double _eps  = 0; /* polar optimization threshold */
 
    size_t _lmax; /* highest l mode resolved */  
    size_t _mmax; /* highest azimuthal wavenumber described */
@@ -55,29 +55,40 @@ double phi(const size_t i_ph)
    return i_ph*2.0*M_PI/((_shtns->nphi)*(_shtns->mres));
 }
 /*==========================================================================*/
-void init(const size_t nl, const size_t nlat, const size_t nphi)
+void init(
+      const size_t nl, const size_t nm, 
+      const size_t nlat, const size_t nphi)
 {
    _lmax = nl;
-   _mmax = _lmax;
+   _mmax = nm;
    _nlat = nlat; 
    _nphi = nphi; 
 
    shtns_verbose(0);     /* displays informations during initialization. */
    shtns_use_threads(1); /* enable multi-threaded transforms (if supported). */
-   
+
+   _shtns = shtns_create(_lmax, _mmax, _mres, sht_orthonormal);
 #if SHTNS_CONTIGUOUS_LONGITUDES
-   _shtns = shtns_init( 
-         shtns_type(int(sht_gauss) | int(SHT_NATIVE_LAYOUT)), 
-         _lmax, _mmax, _mres, 
-         _nlat, _nphi
-      );
+   const int num_spat_allocate =
+      shtns_set_grid(
+            _shtns, 
+            shtns_type(int(sht_gauss) | int(SHT_NATIVE_LAYOUT)), 
+            _eps, 
+            _nlat, _nphi
+         );
 #else
-   _shtns = shtns_init( 
-         shtns_type(int(sht_gauss) | int(SHT_PHI_CONTIGUOUS)), 
-         _lmax, _mmax, _mres, 
-         _nlat, _nphi
-      );
+   const int num_spat_allocate =
+      shtns_set_grid(
+            _shtns, 
+            shtns_type(int(sht_gauss) | int(SHT_PHI_CONTIGUOUS)), 
+            _eps, 
+            _nlat, _nphi
+         );
 #endif
+   /* 
+    * check set shtns and grid 
+    */
+   assert(NSPAT_ALLOC(_shtns)==size_t(num_spat_allocate)); 
    /* 
     * Set Laplacian in spherical harmonic space: \Delta Y_{lm} = -l(l+1) Y_{lm}
     */
@@ -155,7 +166,7 @@ void laplace_beltrami(
    spat_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
    for (size_t l=0; l<_lmax; l++) {
-   for (size_t m=0; m<=l;    m++) {
+   for (size_t m=0; m<_mmax; m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= _lap[l];
    }
    }
@@ -184,7 +195,7 @@ void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
    const cplx img(0,1);
 
    for (size_t l=0; l<_lmax; l++) {
-   for (size_t m=0; m<=l;    m++) {
+   for (size_t m=0; m<_mmax; m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= img*cplx(m);
    }
    }
@@ -209,7 +220,7 @@ void filter(std::vector<double> &v)
    spat_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
    for (size_t l=0; l<_lmax; l++) {
-   for (size_t m=0; m<l;     m++) {
+   for (size_t m=0; m<_mmax; m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= _low_pass[l]*_low_pass[m];
    }
    }

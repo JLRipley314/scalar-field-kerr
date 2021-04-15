@@ -12,7 +12,7 @@
 /* Testing we can go to/from Chebyshev space,
  * without changing the value of the array (to within truncation error). 
  */
-TEST(cheb_test, to_and_from) {
+TEST(test_cheb, to_and_from) {
    const double eps = 1e-14;
    const size_t nr = pow(2,5);
    Cheb::init(nr, 0.0, 1.0);
@@ -39,7 +39,7 @@ TEST(cheb_test, to_and_from) {
 /*==========================================================================*/
 /* Testing we can compute derivatives of simple functions 
  */
-TEST(cheb_test, derivatives) {
+TEST(test_cheb, derivatives) {
    const double eps = 5e-14;
    const size_t nr = pow(2,5);
    Cheb::init(nr, 0.0, 1.0);
@@ -65,7 +65,7 @@ TEST(cheb_test, derivatives) {
 /* Testing spectral filter is total variation diminishing
  * when acting on ``rough'' data. 
  */
-TEST(cheb_test, filter_is_TVD) {
+TEST(test_cheb, filter_is_TVD) {
    const size_t nr = pow(2,5);
    Cheb::init(nr, 0.0, 1.0);
 

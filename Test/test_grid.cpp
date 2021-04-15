@@ -17,6 +17,7 @@
 std::vector<double> get_norm_diff(
       const size_t nx,
       const size_t nl,
+      const size_t nm,
       const size_t nlat,
       const size_t nphi,
       const double Rmin,
@@ -30,7 +31,7 @@ std::vector<double> get_norm_diff(
    const double ru    = 0.2*(Rmax-Rmin) + Rmin;
    const double width = ru-rl;
 
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nm, nlat, nphi);
    Cheb::init(nx, Rmin, Rmax);
    Grid::init(cl, nx, nlat, nphi);
 
@@ -114,6 +115,7 @@ std::vector<double> get_norm_diff(
 std::vector<double> get_total_variation(
       const size_t nx,
       const size_t nl,
+      const size_t nm,
       const size_t nlat,
       const size_t nphi,
       const double Rmin,
@@ -127,7 +129,7 @@ std::vector<double> get_total_variation(
    const double ru    = 0.5*(Rmax-Rmin) + Rmin;
    const double width = ru-rl;
 
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nm, nlat, nphi);
    Cheb::init(nx, Rmin, Rmax);
    Grid::init(cl, nx, nlat, nphi);
 
@@ -207,22 +209,24 @@ std::vector<double> get_total_variation(
 /*==========================================================================*/
 /* Testing application of cheb and sphere to 3d works 
  */
-TEST(grid_test, test_dr_dphi_lap) {
+TEST(test_grid, test_dr_dphi_lap) {
 
    const size_t Rmin = 1;
    const size_t Rmax = 10;
 
    const size_t nx1   = 48;
    const size_t nl1   = 16;
+   const size_t nm1   = 14;
    const size_t nlat1 = 2*nl1 + 2;
    const size_t nphi1 = nlat1;
-   std::vector<double> norms1 = get_norm_diff(nx1, nl1, nlat1, nphi1, Rmin, Rmax);
+   std::vector<double> norms1 = get_norm_diff(nx1, nl1, nm1, nlat1, nphi1, Rmin, Rmax);
 
    const size_t nx2   = 64;
    const size_t nl2   = 24;
+   const size_t nm2   = 20;
    const size_t nlat2 = 2*nl2 + 2;
    const size_t nphi2 = nlat2;
-   std::vector<double> norms2 = get_norm_diff(nx2, nl2, nlat2, nphi2, Rmin, Rmax);
+   std::vector<double> norms2 = get_norm_diff(nx2, nl2, nm2, nlat2, nphi2, Rmin, Rmax);
 
    EXPECT_LT(norms2[0], norms1[0]);
    EXPECT_LT(norms2[1], norms1[1]);
@@ -231,22 +235,24 @@ TEST(grid_test, test_dr_dphi_lap) {
 /*==========================================================================*/
 /* Testing grid filter is TVD 
  */
-TEST(grid_test, test_tvd) {
+TEST(test_grid, test_tvd) {
 
    const size_t Rmin = 1;
    const size_t Rmax = 100;
 
    const size_t nx1   = 96;
    const size_t nl1   = 16;
+   const size_t nm1   = 14;
    const size_t nlat1 = 2*nl1 + 2;
    const size_t nphi1 = nlat1;
-   std::vector<double> tv1 = get_total_variation(nx1, nl1, nlat1, nphi1, Rmin, Rmax);
+   std::vector<double> tv1 = get_total_variation(nx1, nl1, nm1, nlat1, nphi1, Rmin, Rmax);
 
    const size_t nx2   = 128;
    const size_t nl2   = 24;
+   const size_t nm2   = 20;
    const size_t nlat2 = 2*nl2 + 2;
    const size_t nphi2 = nlat2;
-   std::vector<double> tv2 = get_total_variation(nx2, nl2, nlat2, nphi2, Rmin, Rmax);
+   std::vector<double> tv2 = get_total_variation(nx2, nl2, nm2, nlat2, nphi2, Rmin, Rmax);
 
    EXPECT_LT(tv1[1], tv1[0]);
    EXPECT_LT(tv2[1], tv2[0]);

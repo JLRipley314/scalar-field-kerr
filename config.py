@@ -22,7 +22,8 @@ sim.evolve_time= float(1.0) ## units of black hole mass
 sim.num_saved_times= int(10)
 
 sim.nx= 48  ## Number of radial pts 
-sim.nl= 14   ## Number of angular values
+sim.nl= 14   ## Number of angular l values
+sim.nm= 14   ## Number of angular m values
 sim.nlat = 32 ## Number of theta collocation points 
 sim.nphi = 32 ## Number of phi collocation points; must be a multiple of 4 
 #-----------------------------------------------------------------------------

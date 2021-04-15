@@ -15,6 +15,7 @@ namespace Params
       size_t _nt;
       size_t _nx;
       size_t _nl;
+      size_t _nm;
       size_t _nlat;
       size_t _nphi;
       size_t _t_step_save;
@@ -63,47 +64,49 @@ namespace Params
       }
    }
    /*========================================================================*/
-   size_t nt() {return _nt;};
-   size_t nx() {return _nx;};
-   size_t nl() {return _nl;};
+   size_t nt() {return _nt;}
+   size_t nx() {return _nx;}
+   size_t nl() {return _nl;}
+   size_t nm() {return _nm;}
 
    size_t nx_nlat_nphi() { return _nx*_nlat*_nphi; }
-   size_t nxn() {return _nl;};
+   size_t nxn() {return _nl;}
 
-   size_t nlat() {return _nlat;};
-   size_t nphi() {return _nphi;};
-   size_t t_step_save() {return _t_step_save;};
+   size_t nlat() {return _nlat;}
+   size_t nphi() {return _nphi;}
+   size_t t_step_save() {return _t_step_save;}
 
-   double dt() {return _dt;};
+   double dt() {return _dt;}
 
-   double cl() {return _cl;};
+   double cl() {return _cl;}
 
-   double Rmax() {return _Rmax;};
-   double Rmin() {return _Rmin;};
+   double Rmax() {return _Rmax;}
+   double Rmin() {return _Rmin;}
 
-   double bh_mass() {return _bh_mass;};
-   double bh_spin() {return _bh_spin;};
+   double bh_mass() {return _bh_mass;}
+   double bh_spin() {return _bh_spin;}
 
-   double V2() {return _V2;};
-   double V3() {return _V3;};
-   double V4() {return _V4;};
+   double V2() {return _V2;}
+   double V3() {return _V3;}
+   double V4() {return _V4;}
 
-   std::string id() {return _id;};
+   std::string id() {return _id;}
 
-   std::string initial_data_direction() {return _initial_data_direction;};
+   std::string initial_data_direction() {return _initial_data_direction;}
 
-   double amp() {return _amp;};
-   double rl() {return _rl;};
-   double ru() {return _ru;};
+   double amp() {return _amp;}
+   double rl() {return _rl;}
+   double ru() {return _ru;}
 
-   int l_ang() {return _l_ang;};
-   int m_ang() {return _m_ang;};
+   int l_ang() {return _l_ang;}
+   int m_ang() {return _m_ang;}
    /*========================================================================*/
    void init(const std::string param_file)
    {
       _nt   = std::stoi(read(param_file,"nt"));
       _nx   = std::stoi(read(param_file,"nx"));
       _nl   = std::stoi(read(param_file,"nl"));
+      _nm   = std::stoi(read(param_file,"nm"));
       _nlat = std::stoi(read(param_file,"nlat"));
       _nphi = std::stoi(read(param_file,"nphi"));
 

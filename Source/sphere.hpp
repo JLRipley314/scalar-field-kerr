@@ -32,7 +32,12 @@
 /*===========================================================================*/
 namespace Sphere {
 /*===========================================================================*/
-   void init(const size_t nl, const size_t nlat, const size_t nphi);
+   void init(
+         const size_t nl, 
+         const size_t nm, 
+         const size_t nlat, 
+         const size_t nphi
+         );
    void cleanup();
 
    size_t indx(const size_t i_th, const size_t i_ph);

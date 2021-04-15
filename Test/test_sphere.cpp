@@ -15,11 +15,12 @@
  * and normalize the spherical harmonics so they are orthonormal on
  * the unit sphere. 
  */
-TEST(sphere_test, make_Ylm) {
+TEST(test_sphere, make_Ylm) {
    const size_t nl   = pow(2,5);
+   const size_t nm   = pow(2,4);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> y00 = Sphere::compute_ylm(0, 0);
    std::vector<double> y10 = Sphere::compute_ylm(1, 0);
@@ -56,11 +57,12 @@ TEST(sphere_test, make_Ylm) {
 /* Testing we can go to/from spherical harmonic space, 
  * without changing the value of the array (to within truncation error). 
  */
-TEST(sphere_test, to_and_from) {
+TEST(test_sphere, to_and_from) {
    const size_t nl   = pow(2,5);
+   const size_t nm   = pow(2,4);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> po1(Sphere::nSph(),0);
    std::vector<double> po2(Sphere::nSph(),0);
@@ -95,11 +97,12 @@ TEST(sphere_test, to_and_from) {
 /*==========================================================================*/
 /* Testing partial_{\phi} operator acts correctly
  */
-TEST(sphere_test, partial_phi) {
+TEST(test_sphere, partial_phi) {
    const size_t nl   = pow(2,5);
+   const size_t nm   = pow(2,4);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> v(  Sphere::nSph(),0);
    std::vector<double> dv1(Sphere::nSph(),0);
@@ -138,11 +141,12 @@ TEST(sphere_test, partial_phi) {
 /*==========================================================================*/
 /* Testing Spherical Laplace-Beltrami operator acts correctly
  */
-TEST(sphere_test, laplace_beltrami) {
-   const size_t nl   = pow(2,5);
-   const size_t nlat = nl + 2;
-   const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+TEST(test_sphere, laplace_beltrami) {
+   const size_t nl   = 30;
+   const size_t nm   = 12;
+   const size_t nlat = 32;
+   const size_t nphi = 48;
+   Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> v(   Sphere::nSph(),0);
    std::vector<double> ddv1(Sphere::nSph(),0);
@@ -174,7 +178,7 @@ TEST(sphere_test, laplace_beltrami) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       EXPECT_LT(
             fabs(ddv1[Sphere::indx(it,ip)]-ddv2[Sphere::indx(it,ip)]),
-            5e-12
+            1e-11
          );
    }
    }
@@ -184,11 +188,12 @@ TEST(sphere_test, laplace_beltrami) {
 /* Testing that the spectral filter is total variation diminishing
  * when acting on ``rough'' data. 
  */
-TEST(sphere_test, filter_is_TVD) {
+TEST(test_sphere, filter_is_TVD) {
    const size_t nl   = pow(2,5);
+   const size_t nm   = pow(2,4);
    const size_t nlat = nl + 2;
    const size_t nphi = 3*nl;
-   Sphere::init(nl, nlat, nphi);
+   Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> po1(Sphere::nSph(),0);
    std::vector<double> po2(Sphere::nSph(),0);

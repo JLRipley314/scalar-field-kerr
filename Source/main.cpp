@@ -23,7 +23,7 @@ int main(int argc, char **argv)
    Params::init(param_file);
 
    std::cout<<"Initializing Sphere"<<std::endl;
-   Sphere::init(Params::nl(), Params::nlat(), Params::nphi());
+   Sphere::init(Params::nl(), Params::nm(), Params::nlat(), Params::nphi());
 
    std::cout<<"Initializing Cheb"<<std::endl;
    Cheb::init(Params::nx(), Params::Rmin(), Params::Rmax());

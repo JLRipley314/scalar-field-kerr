@@ -20,6 +20,7 @@ namespace Params
    size_t nt();
    size_t nx();
    size_t nl();
+   size_t nm();
 
    size_t nx_nlat_nphi();
 
