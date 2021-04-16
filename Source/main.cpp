@@ -45,7 +45,14 @@ int main(int argc, char **argv)
    ID::ingoing_pulse(f.n, p.n);
 
    size_t save_indx = 0;
-   Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-3, 1e9, Params::Rmin(), Params::Rmax(), f.n);
+
+   const double save_rmin = Params::Rmin();
+   const double save_rmax = Params::Rmin() + ((Params::Rmax() - Params::Rmin())/4.0);
+
+   Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-8, 1e6, save_rmin, save_rmax, f.n);
+   Csv::write_th_ph(
+         output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.n
+      );
 
    const double res = Grid::norm_indep_res(Params::dt(), f.n, f.np1, p.n);
    const double tv  = Grid::total_variation(f.n);
@@ -69,10 +76,14 @@ int main(int argc, char **argv)
             <<std::setw(16)<<res
             <<std::setw(16)<<tv
             <<std::endl;
-
          if (std::isnan(res)) return EXIT_SUCCESS;
+
          save_indx += 1;
-         Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-3, 1e9, Params::Rmin(), Params::Rmax(), f.np1);
+
+         Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-8, 1e6, save_rmin, save_rmax, f.np1);
+         Csv::write_th_ph(
+               output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.np1
+            );
       }
       f.shift();
       p.shift();
