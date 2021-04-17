@@ -287,8 +287,7 @@ void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 void raise(const std::vector<double> &v, std::vector<cplx> &rv)
 {
    cplx *Sph_tmp = allocate_cplx(_nSph);
-   cplx *Ylm_tmp = allocate_cplx(_nYlm);
-
+   cplx *Ylm_tmp = allocate_cplx(pow(_lmax+1,2));
    assert(v.size() ==_nSph);
    assert(rv.size()==_nSph);
 
@@ -322,7 +321,7 @@ void raise(const std::vector<double> &v, std::vector<cplx> &rv)
 void lower(const std::vector<double> &v, std::vector<cplx> &lv)
 {
    cplx *Sph_tmp = allocate_cplx(_nSph);
-   cplx *Ylm_tmp = allocate_cplx(_nYlm);
+   cplx *Ylm_tmp = allocate_cplx(pow(_lmax+1,2));
 
    assert(v.size() ==_nSph);
    assert(lv.size()==_nSph);
@@ -358,12 +357,15 @@ void sphereX(const std::vector<double> &v, std::vector<double> &vX)
    assert(v.size() ==_nSph);
    assert(vX.size()==_nSph);
 
-   std::vector<cplx>   raise_v(_nSph);
-   std::vector<cplx>   lower_v(_nSph);
-   std::vector<double> partial_phi_v(_nSph);
+   std::vector<cplx>   raise_v(_nSph,0);
+   std::vector<cplx>   lower_v(_nSph,0);
+   std::vector<double> partial_phi_v(_nSph,0);
 
+   std::cout<<"raise"<<std::endl;
    raise(v,             raise_v);
+   std::cout<<"lower"<<std::endl;
    lower(v,             lower_v);
+   std::cout<<"partial_phi"<<std::endl;
    partial_phi(v, partial_phi_v);
 
    for (size_t i=0; i<_nSph; i++) {

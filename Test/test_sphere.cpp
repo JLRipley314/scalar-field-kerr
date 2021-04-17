@@ -139,6 +139,51 @@ TEST(test_sphere, partial_phi) {
    Sphere::cleanup();
 }
 /*==========================================================================*/
+/* Testing sphereX operator acts correctly 
+ */
+TEST(test_sphere, sphereX) {
+   const size_t nl   = 32;
+   const size_t nm   = 24;
+   const size_t nlat = 34;
+   const size_t nphi = 60;
+   Sphere::init(nl, nm, nlat, nphi);
+
+   std::vector<double> v(  Sphere::nSph(),0);
+   std::vector<double> vX1(Sphere::nSph(),0);
+   std::vector<double> vX2(Sphere::nSph(),0);
+   /* 
+    * fill in values
+    */
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      v[Sphere::indx(it,ip)] = 
+            1.0 
+         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
+         ;
+      vX2[Sphere::indx(it,ip)] = 
+         4.0*pow(sin(Sphere::theta(it))*cos(Sphere::phi(ip)),2)*(
+               pow(cos(Sphere::theta(it))*cos(Sphere::phi(ip)),2)
+            +  pow(sin(Sphere::phi(ip)),2)
+            ) 
+         ;
+   }
+   }
+   /* 
+    * Default transform 
+    */
+   Sphere::sphereX(v, vX1);
+
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      EXPECT_LT(
+            fabs(vX1[Sphere::indx(it,ip)]-vX2[Sphere::indx(it,ip)]),
+            5e-12
+         );
+   }
+   }
+   Sphere::cleanup();
+}
+/*==========================================================================*/
 /* Testing Spherical Laplace-Beltrami operator acts correctly
  */
 TEST(test_sphere, laplace_beltrami) {

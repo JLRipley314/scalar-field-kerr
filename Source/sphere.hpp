@@ -64,7 +64,10 @@ namespace Sphere {
    void raise(const std::vector<double> &v, std::vector<cplx> &rv);
    void lower(const std::vector<double> &v, std::vector<cplx> &lv);
 
-   /*(\partial_{\theta} f)^2 + (1/sin^2(theta)) (\partial_{\phi}f)^2 
+   /* sphereX
+    * =
+    * (\partial_{\theta} f)^2 + (1/sin^2(theta)) (\partial_{\phi}f)^2 
+    * =
     * - (L_+f)(L_-f) + (\partial_{\phi}f)^2 */
    void sphereX(const std::vector<double> &v, std::vector<double> &vX);
 
