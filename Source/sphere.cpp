@@ -2,22 +2,6 @@
 #include "sphere.hpp"
 
 #include <iostream>
-/* 
- * Need to use fftw_malloc instead of vectors
- * when using shtns. 
- */
-#define ALLOCATE_TMP \
-   double *Sph_tmp = (double *) fftw_malloc( NSPAT_ALLOC(_shtns) * sizeof(double)); \
-   cplx   *Ylm_tmp = (cplx *)   fftw_malloc(         _shtns->nlm * sizeof(cplx));   \
-   assert(Sph_tmp!=nullptr); \
-   assert(Ylm_tmp!=nullptr);
-#define FREE_TMP \
-   fftw_free(Sph_tmp); \
-   fftw_free(Ylm_tmp);
-/* 
- * Want m<=l if l<_mmax, otherwise m<_mmax 
- */
-#define MMAX(l) (((l)<_mmax) ? (l+1) : _mmax)
 /*==========================================================================*/
 namespace Sphere {
 /*==========================================================================*/
@@ -116,6 +100,35 @@ void cleanup()
    shtns_destroy(_shtns);
 }
 /*==========================================================================*/
+/* Need to use fftw_malloc instead of vectors
+ * when using shtns. */
+/*==========================================================================*/
+double* allocate_real(const size_t size)
+{
+   double *tmp = (double *) fftw_malloc(size * sizeof(double));
+   assert(tmp!=nullptr);
+   return tmp;
+}
+/*==========================================================================*/
+cplx* allocate_cplx(const size_t size)
+{
+   cplx *tmp = (cplx *) fftw_malloc(size * sizeof(cplx));
+   assert(tmp!=nullptr);
+   return tmp;
+}
+/*==========================================================================*/
+void free(double *tmp)
+{
+   fftw_free(tmp);
+   tmp = nullptr;
+}
+/*==========================================================================*/
+void free(cplx *tmp)
+{
+   fftw_free(tmp);
+   tmp = nullptr;
+}
+/*==========================================================================*/
 size_t indx(const size_t i_th, const size_t i_ph)
 {
 #if SHTNS_CONTIGUOUS_LONGITUDES
@@ -127,7 +140,11 @@ size_t indx(const size_t i_th, const size_t i_ph)
 /*==========================================================================*/
 void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
 {
-   ALLOCATE_TMP;
+   assert(sph.size()==NSPAT_ALLOC(_shtns));
+   assert(ylm.size()==_shtns->nlm);
+
+   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
+   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
 
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = sph[i];
@@ -137,12 +154,17 @@ void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
    for (size_t lm=0; lm<_nYlm; lm++) {
       ylm[lm] = Ylm_tmp[lm]; 
    }
-   FREE_TMP;
+   free(Sph_tmp);
+   free(Ylm_tmp);
 }
 /*==========================================================================*/
 void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
 {
-   ALLOCATE_TMP;
+   assert(sph.size()==NSPAT_ALLOC(_shtns));
+   assert(ylm.size()==_shtns->nlm);
+
+   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
+   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
 
    for (size_t lm=0; lm<_nYlm; lm++) {
       Ylm_tmp[lm] = ylm[lm];
@@ -152,14 +174,56 @@ void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
    for (size_t i=0; i<_nSph; i++) {
       sph[i] = Sph_tmp[i];
    }
-   FREE_TMP;
+   free(Sph_tmp);
+   free(Ylm_tmp);
+}
+/*==========================================================================*/
+void to_Ylm(const std::vector<cplx> &sph, std::vector<cplx> &ylm)
+{
+   assert(sph.size()==NSPAT_ALLOC(_shtns));
+   assert(ylm.size()==pow(_shtns->nlm+1,2));
+
+   cplx *Sph_tmp = allocate_cplx(NSPAT_ALLOC(_shtns));
+   cplx *Ylm_tmp = allocate_cplx(pow(_shtns->nlm+1,2));
+
+   for (size_t i=0; i<_nSph; i++) {
+      Sph_tmp[i] = sph[i];
+   }
+   spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp); 
+
+   for (size_t lm=0; lm<_nYlm; lm++) {
+      ylm[lm] = Ylm_tmp[lm]; 
+   }
+   free(Sph_tmp);
+   free(Ylm_tmp);
+}
+/*==========================================================================*/
+void to_Sph(const std::vector<cplx> &ylm, std::vector<cplx> &sph)
+{
+   assert(sph.size()==NSPAT_ALLOC(_shtns));
+   assert(ylm.size()==pow(_shtns->nlm+1,2));
+
+   cplx *Sph_tmp = allocate_cplx(NSPAT_ALLOC(_shtns));
+   cplx *Ylm_tmp = allocate_cplx(pow(_shtns->nlm+1,2));
+
+   for (size_t lm=0; lm<_nYlm; lm++) {
+      Ylm_tmp[lm] = ylm[lm];
+   }
+   SH_to_spat_cplx(_shtns, Ylm_tmp, Sph_tmp); 
+
+   for (size_t i=0; i<_nSph; i++) {
+      sph[i] = Sph_tmp[i];
+   }
+   free(Sph_tmp);
+   free(Ylm_tmp);
 }
 /*==========================================================================*/
 void laplace_beltrami(
       const std::vector<double> &v, 
       std::vector<double> &ddv)
 {
-   ALLOCATE_TMP;
+   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
+   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
 
    assert(v.size()  ==_nlat*_nphi);
    assert(ddv.size()==_nlat*_nphi);
@@ -169,8 +233,8 @@ void laplace_beltrami(
    }
    spat_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
-   for (size_t l=0; l<_lmax;   l++) {
-   for (size_t m=0; m<MMAX(l); m++) {
+   for (size_t l=0; l<_lmax;               l++) {
+   for (size_t m=0; m<std::min(l+1,_mmax); m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= _lap[l];
    }
    }
@@ -179,14 +243,16 @@ void laplace_beltrami(
    for (size_t i=0; i<_nSph; i++) {
       ddv[i] = Sph_tmp[i];
    }
-   FREE_TMP;
+   free(Sph_tmp);
+   free(Ylm_tmp);
 }
 /*==========================================================================*/
 /* partial_{\phi} operator */
 /*==========================================================================*/
 void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 {
-   ALLOCATE_TMP;
+   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
+   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
 
    assert(v.size() ==_nlat*_nphi);
    assert(dv.size()==_nlat*_nphi);
@@ -198,8 +264,8 @@ void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 
    const cplx img(0,1);
 
-   for (size_t l=0; l<_lmax;   l++) {
-   for (size_t m=0; m<MMAX(l); m++) {
+   for (size_t l=0; l<_lmax;               l++) {
+   for (size_t m=0; m<std::min(l+1,_mmax); m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= img*cplx(m);
    }
    }
@@ -208,7 +274,8 @@ void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
    for (size_t i=0; i<_nSph; i++) {
       dv[i] = Sph_tmp[i];
    }
-   FREE_TMP;
+   free(Sph_tmp);
+   free(Ylm_tmp);
 }
 /*==========================================================================*/
 /* low pass filter in spherical harmonic coefficient space
@@ -217,14 +284,16 @@ void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 /*==========================================================================*/
 void filter(std::vector<double> &v)
 {
-   ALLOCATE_TMP;
+   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
+   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
+
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = v[i];
    }
    spat_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
-   for (size_t l=0; l<_lmax;   l++) {
-   for (size_t m=0; m<MMAX(l); m++) {
+   for (size_t l=0; l<_lmax;               l++) {
+   for (size_t m=0; m<std::min(l+1,_mmax); m++) {
       Ylm_tmp[LM(_shtns,l,m)] *= _low_pass[l]*_low_pass[m];
    }
    }
@@ -233,7 +302,8 @@ void filter(std::vector<double> &v)
    for (size_t i=0; i<_nSph; i++) {
       v[i] = Sph_tmp[i];
    }
-   FREE_TMP;
+   free(Sph_tmp);
+   free(Ylm_tmp);
 }
 /*==========================================================================*/
 /* returns values for spherical harmonic in real space Y_{l_ang,m_ang} */
@@ -251,6 +321,3 @@ std::vector<double> compute_ylm(const int l_ang, const int m_ang)
 }
 /*==========================================================================*/
 } /* Sphere */
-#undef ALLOCATE_TMP
-#undef FREE_TMP
-#undef MMAX

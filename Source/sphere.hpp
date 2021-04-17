@@ -56,8 +56,13 @@ namespace Sphere {
    void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph);
    void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm);
 
+   void to_Sph(const std::vector<cplx> &ylm, std::vector<cplx> &sph);
+   void to_Ylm(const std::vector<cplx> &sph, std::vector<cplx> &ylm);
+
    void laplace_beltrami(const std::vector<double> &v, std::vector<double> &ddv);
    void partial_phi(const std::vector<double> &v, std::vector<double> &dv);
+   void raise(const std::vector<double> &v, std::vector<double> &rv);
+   void lower(const std::vector<double> &v, std::vector<double> &lv);
    void filter(std::vector<double> &v);
 
    std::vector<double> compute_ylm(const int l_ang, const int m_ang);
