@@ -140,11 +140,11 @@ size_t indx(const size_t i_th, const size_t i_ph)
 /*==========================================================================*/
 void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
 {
-   assert(sph.size()==NSPAT_ALLOC(_shtns));
-   assert(ylm.size()==_shtns->nlm);
+   assert(sph.size()==_nSph);
+   assert(ylm.size()==_nYlm);
 
-   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
-   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
+   double *Sph_tmp = allocate_real(_nSph);
+   cplx   *Ylm_tmp = allocate_cplx(_nYlm);
 
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = sph[i];
@@ -160,11 +160,11 @@ void to_Ylm(const std::vector<double> &sph, std::vector<cplx> &ylm)
 /*==========================================================================*/
 void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
 {
-   assert(sph.size()==NSPAT_ALLOC(_shtns));
-   assert(ylm.size()==_shtns->nlm);
+   assert(sph.size()==_nSph);
+   assert(ylm.size()==_nYlm);
 
-   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
-   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
+   double *Sph_tmp = allocate_real(_nSph);
+   cplx   *Ylm_tmp = allocate_cplx(_nYlm);
 
    for (size_t lm=0; lm<_nYlm; lm++) {
       Ylm_tmp[lm] = ylm[lm];
@@ -180,11 +180,11 @@ void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
 /*==========================================================================*/
 void to_Ylm(const std::vector<cplx> &sph, std::vector<cplx> &ylm)
 {
-   assert(sph.size()==NSPAT_ALLOC(_shtns));
-   assert(ylm.size()==pow(_shtns->nlm+1,2));
+   assert(sph.size()==_nSph);
+   assert(ylm.size()==pow(_nYlm+1,2));
 
-   cplx *Sph_tmp = allocate_cplx(NSPAT_ALLOC(_shtns));
-   cplx *Ylm_tmp = allocate_cplx(pow(_shtns->nlm+1,2));
+   cplx *Sph_tmp = allocate_cplx(_nSph);
+   cplx *Ylm_tmp = allocate_cplx(pow(_nYlm+1,2));
 
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = sph[i];
@@ -200,11 +200,11 @@ void to_Ylm(const std::vector<cplx> &sph, std::vector<cplx> &ylm)
 /*==========================================================================*/
 void to_Sph(const std::vector<cplx> &ylm, std::vector<cplx> &sph)
 {
-   assert(sph.size()==NSPAT_ALLOC(_shtns));
-   assert(ylm.size()==pow(_shtns->nlm+1,2));
+   assert(sph.size()==_nSph);
+   assert(ylm.size()==pow(_nYlm+1,2));
 
-   cplx *Sph_tmp = allocate_cplx(NSPAT_ALLOC(_shtns));
-   cplx *Ylm_tmp = allocate_cplx(pow(_shtns->nlm+1,2));
+   cplx *Sph_tmp = allocate_cplx(_nSph);
+   cplx *Ylm_tmp = allocate_cplx(pow(_nYlm+1,2));
 
    for (size_t lm=0; lm<_nYlm; lm++) {
       Ylm_tmp[lm] = ylm[lm];
@@ -222,11 +222,11 @@ void laplace_beltrami(
       const std::vector<double> &v, 
       std::vector<double> &ddv)
 {
-   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
-   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
+   double *Sph_tmp = allocate_real(_nSph);
+   cplx   *Ylm_tmp = allocate_cplx(_nYlm);
 
-   assert(v.size()  ==_nlat*_nphi);
-   assert(ddv.size()==_nlat*_nphi);
+   assert(v.size()  ==_nSph);
+   assert(ddv.size()==_nSph);
 
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = v[i];
@@ -251,11 +251,11 @@ void laplace_beltrami(
 /*==========================================================================*/
 void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 {
-   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
-   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
+   double *Sph_tmp = allocate_real(_nSph);
+   cplx   *Ylm_tmp = allocate_cplx(_nYlm);
 
-   assert(v.size() ==_nlat*_nphi);
-   assert(dv.size()==_nlat*_nphi);
+   assert(v.size() ==_nSph);
+   assert(dv.size()==_nSph);
 
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = v[i];
@@ -278,14 +278,108 @@ void partial_phi(const std::vector<double> &v, std::vector<double> &dv)
    free(Ylm_tmp);
 }
 /*==========================================================================*/
+/* Raising operator: notice that you obtain a complex function
+ * L_+ Y_{l,m} = sqrt((l-m)(l+m+1)) Y_{l,m+1}. 
+ * For the coefficients, that means
+ * (L_+ f)_{l,m} = sqrt((l-m+1)(l+m)) f_{l,m-1},
+ * so that (L_+ f)_{l,-l} = 0 */
+/*==========================================================================*/
+void raise(const std::vector<double> &v, std::vector<cplx> &rv)
+{
+   cplx *Sph_tmp = allocate_cplx(_nSph);
+   cplx *Ylm_tmp = allocate_cplx(_nYlm);
+
+   assert(v.size() ==_nSph);
+   assert(rv.size()==_nSph);
+
+   for (size_t i=0; i<_nSph; i++) {
+      Sph_tmp[i] = v[i];
+   }
+   spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp);
+
+   for (size_t l= 0; l<_lmax; l++) {
+
+      for (size_t m=l; m>-l; m--) {
+         Ylm_tmp[l*(l+1)+m] = pow((l-m+1)*(l+m),0.5)*Ylm_tmp[l*(l+1)+(m-1)];
+      }
+      Ylm_tmp[l*(l+1)+(-l)] = 0;
+   }
+   SH_to_spat_cplx(_shtns, Ylm_tmp, Sph_tmp);
+
+   for (size_t i=0; i<_nSph; i++) {
+      rv[i] = Sph_tmp[i];
+   }
+   free(Sph_tmp);
+   free(Ylm_tmp);
+}
+/*==========================================================================*/
+/* Lowering operator: notice that you obtain a complex function
+ * L_- Y_{l,m} = sqrt((l+m)(l-m+1)) Y_{l,m-1}. 
+ * For the coefficients, that means
+ * (L_- f)_{l,m} = sqrt((l+m+1)(l-m)) f_{l,m+1},
+ * so that (L_+ f)_{l,l} = 0 */
+/*==========================================================================*/
+void lower(const std::vector<double> &v, std::vector<cplx> &lv)
+{
+   cplx *Sph_tmp = allocate_cplx(_nSph);
+   cplx *Ylm_tmp = allocate_cplx(_nYlm);
+
+   assert(v.size() ==_nSph);
+   assert(lv.size()==_nSph);
+
+   for (size_t i=0; i<_nSph; i++) {
+      Sph_tmp[i] = v[i];
+   }
+   spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp);
+
+   for (size_t l= 0; l<_lmax; l++) {
+
+      for (size_t m=-l; m<l; m++) {
+         Ylm_tmp[l*(l+1)+m] = pow((l+m+1)*(l-m),0.5)*Ylm_tmp[l*(l+1)+(m+1)];
+      }
+      Ylm_tmp[l*(l+1)+(l)] = 0;
+   }
+   SH_to_spat_cplx(_shtns, Ylm_tmp, Sph_tmp);
+
+   for (size_t i=0; i<_nSph; i++) {
+      lv[i] = Sph_tmp[i];
+   }
+   free(Sph_tmp);
+   free(Ylm_tmp);
+}
+/*==========================================================================*/
+/* SphereX operator: this is
+ * (\partial_{\theta} f)^2 + (1/sin^2(theta)) (\partial_{\phi}f)^2 
+ * =
+ * - (L_+f)(L_-f) + (\partial_{\phi}f)^2 */
+/*==========================================================================*/
+void sphereX(const std::vector<double> &v, std::vector<double> &vX)
+{
+   assert(v.size() ==_nSph);
+   assert(vX.size()==_nSph);
+
+   std::vector<cplx>   raise_v(_nSph);
+   std::vector<cplx>   lower_v(_nSph);
+   std::vector<double> partial_phi_v(_nSph);
+
+   raise(v,             raise_v);
+   lower(v,             lower_v);
+   partial_phi(v, partial_phi_v);
+
+   for (size_t i=0; i<_nSph; i++) {
+      cplx vrvl = raise_v[i]*lower_v[i];
+      vX[i] = - vrvl.real() + pow(partial_phi_v[i],2);
+   }
+}
+/*==========================================================================*/
 /* low pass filter in spherical harmonic coefficient space
  * Note that only positive m are stored in spherical harmonic space,
  * as we only deal with real scalar fields. */
 /*==========================================================================*/
 void filter(std::vector<double> &v)
 {
-   double *Sph_tmp = allocate_real(NSPAT_ALLOC(_shtns));
-   cplx   *Ylm_tmp = allocate_cplx(_shtns->nlm);
+   double *Sph_tmp = allocate_real(_nSph);
+   cplx   *Ylm_tmp = allocate_cplx(_nYlm);
 
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = v[i];
