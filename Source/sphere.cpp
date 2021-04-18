@@ -2,6 +2,7 @@
 #include "sphere.hpp"
 
 #include <iostream>
+#include <iomanip>
 /*==========================================================================*/
 namespace Sphere {
 /*==========================================================================*/
@@ -292,7 +293,7 @@ void raise(const std::vector<double> &v, std::vector<cplx> &rv)
    assert(rv.size()==_nSph);
 
    for (size_t i=0; i<_nSph; i++) {
-      Sph_tmp[i] = v[i];
+      Sph_tmp[i] = cplx(v[i],0);
    }
    spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
@@ -316,7 +317,7 @@ void raise(const std::vector<double> &v, std::vector<cplx> &rv)
  * L_- Y_{l,m} = sqrt((l+m)(l-m+1)) Y_{l,m-1}. 
  * For the coefficients, that means
  * (L_- f)_{l,m} = sqrt((l+m+1)(l-m)) f_{l,m+1},
- * so that (L_+ f)_{l,l} = 0 */
+ * so that (L_- f)_{l,l} = 0 */
 /*==========================================================================*/
 void lower(const std::vector<double> &v, std::vector<cplx> &lv)
 {
@@ -327,11 +328,11 @@ void lower(const std::vector<double> &v, std::vector<cplx> &lv)
    assert(lv.size()==_nSph);
 
    for (size_t i=0; i<_nSph; i++) {
-      Sph_tmp[i] = v[i];
+      Sph_tmp[i] = cplx(v[i],0);
    }
    spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
-   for (size_t l= 0; l<_lmax; l++) {
+   for (size_t l=0; l<_lmax; l++) {
 
       for (size_t m=-l; m<l; m++) {
          Ylm_tmp[l*(l+1)+m] = pow((l+m+1)*(l-m),0.5)*Ylm_tmp[l*(l+1)+(m+1)];
@@ -361,16 +362,13 @@ void sphereX(const std::vector<double> &v, std::vector<double> &vX)
    std::vector<cplx>   lower_v(_nSph,0);
    std::vector<double> partial_phi_v(_nSph,0);
 
-   std::cout<<"raise"<<std::endl;
    raise(v,             raise_v);
-   std::cout<<"lower"<<std::endl;
    lower(v,             lower_v);
-   std::cout<<"partial_phi"<<std::endl;
    partial_phi(v, partial_phi_v);
 
    for (size_t i=0; i<_nSph; i++) {
-      cplx vrvl = raise_v[i]*lower_v[i];
-      vX[i] = - vrvl.real() + pow(partial_phi_v[i],2);
+      cplx vrvl = raise_v[i]*lower_v[i]; /* This should be real */
+      vX[i] = -vrvl.real() + pow(partial_phi_v[i],2);
    }
 }
 /*==========================================================================*/

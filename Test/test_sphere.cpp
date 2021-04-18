@@ -142,10 +142,10 @@ TEST(test_sphere, partial_phi) {
 /* Testing sphereX operator acts correctly 
  */
 TEST(test_sphere, sphereX) {
-   const size_t nl   = 32;
-   const size_t nm   = 24;
-   const size_t nlat = 34;
-   const size_t nphi = 60;
+   const size_t nl   = 20;
+   const size_t nm   = 14;
+   const size_t nlat = 32;
+   const size_t nphi = 30;
    Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> v(  Sphere::nSph(),0);
@@ -158,13 +158,11 @@ TEST(test_sphere, sphereX) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       v[Sphere::indx(it,ip)] = 
             1.0 
-         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
+//         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
+         +  pow(sin(Sphere::theta(it)),4)
          ;
       vX2[Sphere::indx(it,ip)] = 
-         4.0*pow(sin(Sphere::theta(it))*cos(Sphere::phi(ip)),2)*(
-               pow(cos(Sphere::theta(it))*cos(Sphere::phi(ip)),2)
-            +  pow(sin(Sphere::phi(ip)),2)
-            ) 
+            16.0*pow(sin(Sphere::theta(it)),6)*pow(cos(Sphere::theta(it)),2) 
          ;
    }
    }
@@ -175,10 +173,14 @@ TEST(test_sphere, sphereX) {
 
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
-      EXPECT_LT(
-            fabs(vX1[Sphere::indx(it,ip)]-vX2[Sphere::indx(it,ip)]),
-            5e-12
-         );
+      std::cout
+         <<std::setw(16)<<vX1[Sphere::indx(it,ip)]
+         <<std::setw(16)<<vX2[Sphere::indx(it,ip)]
+         <<std::endl;
+//      EXPECT_LT(
+//            fabs(vX1[Sphere::indx(it,ip)]-vX2[Sphere::indx(it,ip)]),
+//            5e-12
+//         );
    }
    }
    Sphere::cleanup();
