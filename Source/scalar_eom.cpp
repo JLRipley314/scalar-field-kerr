@@ -40,7 +40,6 @@ namespace {
    std::vector<double> _dr_dr_f;
    std::vector<double> _dphi_f;
    std::vector<double> _dphi_dr_f;
-
    std::vector<double> _sphereX_f;
 }
 /*==========================================================================*/
@@ -70,6 +69,7 @@ void init()
    _dr_dr_f.resize(  _n);
    _dphi_f.resize(   _n);
    _dphi_dr_f.resize(_n);
+   _sphereX_f.resize(_n);
 
    const size_t nx   = Params::nx();
    const size_t nlat = Params::nlat();

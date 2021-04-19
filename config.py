@@ -15,22 +15,22 @@ sim.run_type= "basic_run"
 sim.debug= False
 
 sim.black_hole_mass= float(0.5)
-sim.black_hole_spin= round(0.999999*sim.black_hole_mass,16)
+sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
 sim.compactification_length= float(50)
 
-sim.evolve_time= float(100.0) ## units of black hole mass
-sim.num_saved_times= int(400)
+sim.evolve_time= float(1.0) ## units of black hole mass
+sim.num_saved_times= int(4)
 
-sim.nx= 512  ## Number of radial pts 
-sim.nl= 50   ## Number of angular l values
-sim.nm= 40   ## Number of angular m values
-sim.nlat = 104 ## Number of theta collocation points 
-sim.nphi = 84 ## Number of phi collocation points; must be a multiple of 4 
+sim.nx= 64 ## Number of radial pts 
+sim.nl= 20 ## Number of angular l values
+sim.nm= 10 ## Number of angular m values
+sim.nlat = 40 ## Number of theta collocation points 
+sim.nphi = 24 ## Number of phi collocation points; must be a multiple of 4 
 #-----------------------------------------------------------------------------
 ## Prefactor to kinetric term.
 ## In the action:
 ## (km1/psi + k0 + k1*psi + k2*psi^2)*(1/2)*(\nabla\psi)^2
-sim.km1 = 0.0
+sim.km1 = 1.0
 sim.k0  = 0.0
 sim.k1  = 0.0
 sim.k2  = 0.0
@@ -54,10 +54,10 @@ sim.initial_data_direction= "ingoing"
 #-----------------------------------------------------------------------------
 ## Details of computer setup 
 
-sim.computer= "della"#"home"#
+sim.computer= "home"#"della"#
 sim.out_stem= "/tigress/jripley/sf/highres"
 
-sim.num_threads= 6 ## sets number of threads if using OpenMP 
+sim.num_threads= 2 ## sets number of threads if using OpenMP 
 #-----------------------------------------------------------------------------
 ## For writing slurm script
 
