@@ -38,9 +38,11 @@ std::vector<double> get_norm_diff(
    std::vector<double> v(n,0);
    std::vector<double> dr_v1(n,0);
    std::vector<double> dphi_v1(n,0);
+   std::vector<double> X_v1(n,0);
    std::vector<double> lap_v1(n,0);
    std::vector<double> dr_v2(n,0);
    std::vector<double> dphi_v2(n,0); 
+   std::vector<double> X_v2(n,0);
    std::vector<double> lap_v2(n,0); 
 
    for (size_t i=0; i<n; i++) {
@@ -64,7 +66,6 @@ std::vector<double> get_norm_diff(
       -  (2.0*pow((r-rl)/width,2)*(1.0                ))
       )*bump/width;
 
-
       v[i] = rval*(
             1.0 
          +  pow(sin(theta),2)/(1.0 + pow(cos(phi),2))
@@ -76,6 +77,11 @@ std::vector<double> get_norm_diff(
       dphi_v1[i] = rval*(
             pow(sin(theta),2)*sin(2*phi)/pow(1.0+pow(cos(phi),2),2)
          );
+      X_v1[i] = rval*pow(sin(theta),2)*(
+            pow(cos(theta),2)*pow(3.0+cos(2*phi),2)
+         +  pow(sin(2*phi),2)
+         )/pow(1.0 + pow(cos(phi),2),4)
+         ;
       lap_v1[i] = rval*(
             31.0
          +  57.0*cos(2*theta)
@@ -83,28 +89,58 @@ std::vector<double> get_norm_diff(
          -  6.0*cos(4*phi)*pow(sin(theta),2)
          )/pow(3.0 + cos(2*phi),3)
          ;
+/*
+      v[i] = rval*(
+            1.0 
+         +  pow(sin(theta),2)*pow(cos(10*phi),2)
+         );
+      dr_v1[i] = der_rval*(
+            1.0 
+         +  pow(sin(theta),2)*pow(cos(10*phi),2)
+         );
+      dphi_v1[i] = rval*(
+            -10.0*pow(sin(theta),2)*sin(20*phi)
+         );
+      X_v1[i] = rval*4*pow(cos(10*phi),2)*pow(sin(theta),2)*(
+            pow(cos(theta),2)*pow(cos(10*phi),2)
+         +  100*pow(sin(10*phi),2)
+         )
+         ;
+      lap_v1[i] = rval*0.5*(
+            1.0
+         +  3.0*cos(2*theta)
+         +  3.0*(-133.0 + cos(2*theta))*cos(20*phi)
+         )
+         ;
+*/
    }
    Grid::set_partial_r(    v,   dr_v2);
    Grid::set_partial_phi(  v, dphi_v2);
+   Grid::set_sphereX(      v,    X_v2);
    Grid::set_spherical_lap(v,  lap_v2);
 
    double norm_dr   = 0;
    double norm_dphi = 0;
+   double norm_X    = 0;
    double norm_lap  = 0;
    for (size_t i=0; i<n; i++) {
       norm_dr   += fabs(dr_v1[i]   - dr_v2[i]);
       norm_dphi += fabs(dphi_v1[i] - dphi_v2[i]);
+      norm_X    += fabs(X_v1[i]    - X_v2[i]);
       norm_lap  += fabs(lap_v1[i]  - lap_v2[i]);
+
    }
    norm_dr   /= n;
    norm_dphi /= n;
+   norm_X    /= n;
    norm_lap  /= n;
 
-   std::vector<double> norms(3,0);
+   std::vector<double> norms(4,0);
 
    norms[0] = norm_dr;
    norms[1] = norm_dphi;
-   norms[2] = norm_lap;
+   norms[2] = norm_X;
+   norms[3] = norm_lap;
 
    return norms;
 }
@@ -215,22 +251,28 @@ TEST(test_grid, test_dr_dphi_lap) {
    const size_t Rmax = 10;
 
    const size_t nx1   = 48;
-   const size_t nl1   = 16;
-   const size_t nm1   = 14;
-   const size_t nlat1 = 2*nl1 + 2;
+   const size_t nl1   = 20;
+   const size_t nm1   = 16;
+   const size_t nlat1 = 2*nl1+2;
    const size_t nphi1 = nlat1;
    std::vector<double> norms1 = get_norm_diff(nx1, nl1, nm1, nlat1, nphi1, Rmin, Rmax);
-
+   /* 
+    * test convergence of the radial 
+    */
    const size_t nx2   = 64;
-   const size_t nl2   = 24;
-   const size_t nm2   = 20;
-   const size_t nlat2 = 2*nl2 + 2;
-   const size_t nphi2 = nlat2;
-   std::vector<double> norms2 = get_norm_diff(nx2, nl2, nm2, nlat2, nphi2, Rmin, Rmax);
-
+   std::vector<double> norms2 = get_norm_diff(nx2, nl1, nm1, nlat1, nphi1, Rmin, Rmax);
    EXPECT_LT(norms2[0], norms1[0]);
-   EXPECT_LT(norms2[1], norms1[1]);
-   EXPECT_LT(norms2[2], norms1[2]);
+   /* 
+    * test convergence of the angular derivatives 
+    */
+   const size_t nl2   = 40;
+   const size_t nm2   = 32;
+   const size_t nlat2 = 2*nl2 + 4;
+   const size_t nphi2 = nlat2;
+   std::vector<double> norms3 = get_norm_diff(nx1, nl2, nm2, nlat2, nphi2, Rmin, Rmax);
+   EXPECT_LT(norms3[1], norms1[1]);
+   EXPECT_LT(norms3[2], norms1[2]);
+   EXPECT_LT(norms3[3], norms1[3]);
 }
 /*==========================================================================*/
 /* Testing grid filter is TVD 

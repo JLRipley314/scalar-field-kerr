@@ -223,10 +223,10 @@ TEST(test_sphere, raise_and_lower) {
 /* Testing sphereX operator acts correctly 
  */
 TEST(test_sphere, sphereX) {
-   const size_t nl   = 20;
-   const size_t nm   = 14;
-   const size_t nlat = 32;
-   const size_t nphi = 30;
+   const size_t nl   = 24;
+   const size_t nm   = 12;
+   const size_t nlat = 48;
+   const size_t nphi = 28;
    Sphere::init(nl, nm, nlat, nphi);
 
    std::vector<double> v(  Sphere::nSph(),0);
@@ -237,15 +237,18 @@ TEST(test_sphere, sphereX) {
     */
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
-      v[Sphere::indx(it,ip)] = 
+      const double theta = Sphere::theta(it);
+      const double phi   = Sphere::phi(ip);
+
+    v[Sphere::indx(it,ip)] =
             1.0 
-         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
+         +  pow(sin(theta),2)*pow(cos(phi),2)
          ;
-      vX2[Sphere::indx(it,ip)] = 
-          4.0 *pow(sin(Sphere::theta(it))*cos(Sphere::phi(ip)),2)*(
-               pow(cos(Sphere::theta(it))*cos(Sphere::phi(ip)),2)
-            +  pow(sin(Sphere::phi(ip)),2)
-         )
+      vX2[Sphere::indx(it,ip)] =
+            4.0*pow(sin(theta)*cos(phi),2)*(
+                  pow(cos(theta)*cos(phi),2)
+               +  pow(sin(phi),2)
+               )
          ;
    }
    }

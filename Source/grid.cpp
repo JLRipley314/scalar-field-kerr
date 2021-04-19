@@ -329,6 +329,24 @@ void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv)
    }
 }
 /*==========================================================================*/
+void set_sphereX(const std::vector<double> &v, std::vector<double> &vX)
+{
+   assert(v.size() ==_nx*_nlat*_nphi);
+   assert(vX.size()==_nx*_nlat*_nphi);
+
+#pragma omp parallel for
+   for (size_t ix=0; ix<_nx; ix++) {
+      std::vector<double> inter(   _nlat*_nphi);
+      std::vector<double> inter_vX(_nlat*_nphi);
+
+      get_row_th_ph(ix, v, inter); 
+
+      Sphere::sphereX(inter, inter_vX);
+
+      set_row_th_ph(ix, inter_vX, vX); 
+   }
+}
+/*==========================================================================*/
 void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
 {
    assert(v.size() ==_nx*_nlat*_nphi);

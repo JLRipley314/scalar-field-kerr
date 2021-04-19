@@ -105,6 +105,8 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> &dv);
 /*==========================================================================*/
 void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv);
 /*==========================================================================*/
+void set_sphereX(const std::vector<double> &v, std::vector<double> &vX);
+/*==========================================================================*/
 void set_partial_r(const std::vector<double> &v, std::vector<double> &dv);
 /*==========================================================================*/
 /* \partial_t f - p */
