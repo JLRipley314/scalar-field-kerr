@@ -54,7 +54,8 @@ TEST(test_sphere, make_Ylm) {
    Sphere::cleanup();
 }
 /*==========================================================================*/
-/* Testing we can go to/from spherical harmonic space, 
+/* Testing we can go to/from spherical harmonic space,
+ * (for both real and complex arrays) 
  * without changing the value of the array (to within truncation error). 
  */
 TEST(test_sphere, to_and_from) {
@@ -64,30 +65,49 @@ TEST(test_sphere, to_and_from) {
    const size_t nphi = 3*nl;
    Sphere::init(nl, nm, nlat, nphi);
 
-   std::vector<double> po1(Sphere::nSph(),0);
-   std::vector<double> po2(Sphere::nSph(),0);
-   std::vector<cplx>   ylm(Sphere::nYlm(),0);
+   std::vector<double> r_1(Sphere::nSph(),0);
+   std::vector<double> r_2(Sphere::nSph(),0);
+   std::vector<cplx>   c_1(Sphere::nSph(),0);
+   std::vector<cplx>   c_2(Sphere::nSph(),0);
+   std::vector<cplx>   r_ylm(Sphere::nYlm(),0);
+   std::vector<cplx>   c_ylm(pow(nl+1,2),0);
    /* 
     * fill in values
     */
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
-      po1[Sphere::indx(it,ip)] = 
+      r_1[Sphere::indx(it,ip)] = 
+            1.0 
+         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
+         ;
+      c_1[Sphere::indx(it,ip)] = 
             1.0 
          +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
          ;
    }
    }
    /* 
-    * Default transform 
+    * Real and complex transforms 
     */
-   Sphere::to_Ylm(po1, ylm);
-   Sphere::to_Sph(ylm, po2);
+   Sphere::to_Ylm(r_1, r_ylm);
+   Sphere::to_Sph(r_ylm, r_2);
+
+   Sphere::to_Ylm(c_1, c_ylm);
+   Sphere::to_Sph(c_ylm, c_2);
 
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       EXPECT_LT(
-            fabs(po1[Sphere::indx(it,ip)]-po2[Sphere::indx(it,ip)]),
+            fabs(r_1[Sphere::indx(it,ip)]-r_2[Sphere::indx(it,ip)]),
+            1e-14
+         );
+   }
+   }
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      EXPECT_LT(
+            0.5*fabs(c_1[Sphere::indx(it,ip)].real()-c_2[Sphere::indx(it,ip)].real())
+         +  0.5*fabs(c_1[Sphere::indx(it,ip)].imag()-c_2[Sphere::indx(it,ip)].imag()),
             1e-14
          );
    }
@@ -139,6 +159,67 @@ TEST(test_sphere, partial_phi) {
    Sphere::cleanup();
 }
 /*==========================================================================*/
+/* Testing raising and lowering operators 
+ */
+TEST(test_sphere, raise_and_lower) {
+   const size_t nl   = 20;
+   const size_t nm   = 14;
+   const size_t nlat = 40;
+   const size_t nphi = 32;
+   Sphere::init(nl, nm, nlat, nphi);
+
+   std::vector<double> v(Sphere::nSph(),0);
+   std::vector<cplx>  r1(Sphere::nSph(),0);
+   std::vector<cplx>  r2(Sphere::nSph(),0);
+   std::vector<cplx>  l1(Sphere::nSph(),0);
+   std::vector<cplx>  l2(Sphere::nSph(),0);
+   /* 
+    * fill in values
+    */
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      /* Y_{l=1,m=0} */
+      v[Sphere::indx(it,ip)] = 
+            0.5*pow(3/M_PI,0.5)*cos(Sphere::theta(it))
+         ;
+      /* sqrt(2) * Y_{l=1,m=1} */
+      r2[Sphere::indx(it,ip)] = 
+         pow(1*(1+1),0.5)*(
+            -  0.5*pow(3/(2.0*M_PI),0.5)*sin(Sphere::theta(it))*(
+                  cos(Sphere::phi(ip))
+               +  cplx(0,1)*sin(Sphere::phi(ip))
+               )
+            )
+         ;
+      /* sqrt(2) * Y_{l=1,m=-1} */
+      l2[Sphere::indx(it,ip)] = 
+         pow(1*(1+1),0.5)*(
+               0.5*pow(3/(2.0*M_PI),0.5)*sin(Sphere::theta(it))*(
+                  cos(Sphere::phi(ip))
+               -  cplx(0,1)*sin(Sphere::phi(ip))
+               )
+            )
+         ;
+   }
+   }
+   /* 
+    * Default transform 
+    */
+   Sphere::raise(v, r1);
+   Sphere::lower(v, l1);
+
+   for (size_t ip=0; ip<Sphere::nphi(); ip++) {
+   for (size_t it=0; it<Sphere::nlat(); it++) {
+      EXPECT_LT(
+            0.5*fabs(r1[Sphere::indx(it,ip)].real()-r2[Sphere::indx(it,ip)].real())
+         +  0.5*fabs(r1[Sphere::indx(it,ip)].imag()-r2[Sphere::indx(it,ip)].imag()),
+            5e-12
+         );
+   }
+   }
+   Sphere::cleanup();
+}
+/*==========================================================================*/
 /* Testing sphereX operator acts correctly 
  */
 TEST(test_sphere, sphereX) {
@@ -158,11 +239,13 @@ TEST(test_sphere, sphereX) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
       v[Sphere::indx(it,ip)] = 
             1.0 
-//         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
-         +  pow(sin(Sphere::theta(it)),4)
+         +  pow(sin(Sphere::theta(it)),2)*pow(cos(Sphere::phi(ip)),2)
          ;
       vX2[Sphere::indx(it,ip)] = 
-            16.0*pow(sin(Sphere::theta(it)),6)*pow(cos(Sphere::theta(it)),2) 
+          4.0 *pow(sin(Sphere::theta(it))*cos(Sphere::phi(ip)),2)*(
+               pow(cos(Sphere::theta(it))*cos(Sphere::phi(ip)),2)
+            +  pow(sin(Sphere::phi(ip)),2)
+         )
          ;
    }
    }
@@ -173,14 +256,10 @@ TEST(test_sphere, sphereX) {
 
    for (size_t ip=0; ip<Sphere::nphi(); ip++) {
    for (size_t it=0; it<Sphere::nlat(); it++) {
-      std::cout
-         <<std::setw(16)<<vX1[Sphere::indx(it,ip)]
-         <<std::setw(16)<<vX2[Sphere::indx(it,ip)]
-         <<std::endl;
-//      EXPECT_LT(
-//            fabs(vX1[Sphere::indx(it,ip)]-vX2[Sphere::indx(it,ip)]),
-//            5e-12
-//         );
+      EXPECT_LT(
+            fabs(vX1[Sphere::indx(it,ip)]-vX2[Sphere::indx(it,ip)]),
+            5e-12
+         );
    }
    }
    Sphere::cleanup();

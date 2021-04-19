@@ -182,18 +182,18 @@ void to_Sph(const std::vector<cplx> &ylm, std::vector<double> &sph)
 void to_Ylm(const std::vector<cplx> &sph, std::vector<cplx> &ylm)
 {
    assert(sph.size()==_nSph);
-   assert(ylm.size()==pow(_nYlm+1,2));
+   assert(ylm.size()==pow(_lmax+1,2));
 
    cplx *Sph_tmp = allocate_cplx(_nSph);
-   cplx *Ylm_tmp = allocate_cplx(pow(_nYlm+1,2));
+   cplx *Ylm_tmp = allocate_cplx(pow(_lmax+1,2));
 
    for (size_t i=0; i<_nSph; i++) {
       Sph_tmp[i] = sph[i];
    }
    spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp); 
 
-   for (size_t lm=0; lm<_nYlm; lm++) {
-      ylm[lm] = Ylm_tmp[lm]; 
+   for (size_t i=0; i<pow(_lmax+1,2); i++) {
+      ylm[i] = Ylm_tmp[i]; 
    }
    free(Sph_tmp);
    free(Ylm_tmp);
@@ -202,13 +202,13 @@ void to_Ylm(const std::vector<cplx> &sph, std::vector<cplx> &ylm)
 void to_Sph(const std::vector<cplx> &ylm, std::vector<cplx> &sph)
 {
    assert(sph.size()==_nSph);
-   assert(ylm.size()==pow(_nYlm+1,2));
+   assert(ylm.size()==pow(_lmax+1,2));
 
    cplx *Sph_tmp = allocate_cplx(_nSph);
-   cplx *Ylm_tmp = allocate_cplx(pow(_nYlm+1,2));
+   cplx *Ylm_tmp = allocate_cplx(pow(_lmax+1,2));
 
-   for (size_t lm=0; lm<_nYlm; lm++) {
-      Ylm_tmp[lm] = ylm[lm];
+   for (size_t i=0; i<pow(_lmax+1,2); i++) {
+      Ylm_tmp[i] = ylm[i];
    }
    SH_to_spat_cplx(_shtns, Ylm_tmp, Sph_tmp); 
 
@@ -297,9 +297,8 @@ void raise(const std::vector<double> &v, std::vector<cplx> &rv)
    }
    spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
-   for (size_t l= 0; l<_lmax; l++) {
-
-      for (size_t m=l; m>-l; m--) {
+   for (size_t l=0; l<_lmax; l++) {
+      for (int m=int(l); m>-int(l); m--) {
          Ylm_tmp[l*(l+1)+m] = pow((l-m+1)*(l+m),0.5)*Ylm_tmp[l*(l+1)+(m-1)];
       }
       Ylm_tmp[l*(l+1)+(-l)] = 0;
@@ -333,8 +332,7 @@ void lower(const std::vector<double> &v, std::vector<cplx> &lv)
    spat_cplx_to_SH(_shtns, Sph_tmp, Ylm_tmp);
 
    for (size_t l=0; l<_lmax; l++) {
-
-      for (size_t m=-l; m<l; m++) {
+      for (int m=-int(l); m<int(l); m++) {
          Ylm_tmp[l*(l+1)+m] = pow((l+m+1)*(l-m),0.5)*Ylm_tmp[l*(l+1)+(m+1)];
       }
       Ylm_tmp[l*(l+1)+(l)] = 0;
