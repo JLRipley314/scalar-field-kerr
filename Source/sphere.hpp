@@ -61,17 +61,12 @@ namespace Sphere {
 
    void laplace_beltrami(const std::vector<double> &v, std::vector<double> &ddv);
    void partial_phi(const std::vector<double> &v, std::vector<double> &dv);
+   void sphereX(const std::vector<double> &v, std::vector<double> &vX);
+   void filter(std::vector<double> &v);
+
    void raise(const std::vector<double> &v, std::vector<cplx> &rv);
    void lower(const std::vector<double> &v, std::vector<cplx> &lv);
 
-   /* sphereX
-    * =
-    * (\partial_{\theta} f)^2 + (1/sin^2(theta)) (\partial_{\phi}f)^2 
-    * =
-    * - (L_+f)(L_-f) + (\partial_{\phi}f)^2 */
-   void sphereX(const std::vector<double> &v, std::vector<double> &vX);
-
-   void filter(std::vector<double> &v);
 
    std::vector<double> compute_ylm(const int l_ang, const int m_ang);
 /*===========================================================================*/

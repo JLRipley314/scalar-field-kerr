@@ -27,8 +27,16 @@ sim.nm= 40   ## Number of angular m values
 sim.nlat = 104 ## Number of theta collocation points 
 sim.nphi = 84 ## Number of phi collocation points; must be a multiple of 4 
 #-----------------------------------------------------------------------------
+## Prefactor to kinetric term.
+## In the action:
+## (km1/psi + k0 + k1*psi + k2*psi^2)*(1/2)*(\nabla\psi)^2
+sim.km1 = 0.0
+sim.k0  = 0.0
+sim.k1  = 0.0
+sim.k2  = 0.0
+
 ## Scalar field potential
-## V = (V2/2)*phi^2 + (V3/6)*phi^3 + (V4/24)*phi^4
+## V = (V2/2)*psi^2 + (V3/6)*psi^3 + (V4/24)*psi^4
 
 sim.V2 = 0.5
 sim.V3 = 0.0

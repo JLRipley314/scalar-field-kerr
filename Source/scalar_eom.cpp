@@ -12,9 +12,15 @@ namespace {
    size_t _n;
    double _dt;
 
-   std::vector<double> _p_f1;
-   std::vector<double> _p_f2;
-   std::vector<double> _p_f3;
+   double _km1;
+   double _k0;
+   double _k1;
+   double _k2;
+
+   double _v2;
+   double _v3;
+   double _v4;
+   std::vector<double> _pre;
    std::vector<double> _p_p;
    std::vector<double> _p_dr_f;
    std::vector<double> _p_dr_p;
@@ -22,11 +28,20 @@ namespace {
    std::vector<double> _p_dphi_dr_f;
    std::vector<double> _p_lap_f;
 
+   std::vector<double> _p_p_p;
+   std::vector<double> _p_p_dr_f;
+   std::vector<double> _p_dr_f_dr_f;
+   std::vector<double> _p_dr_f_dphi_f;
+   std::vector<double> _p_sphereX_f;
+
    std::vector<double> _dr_f;
    std::vector<double> _lap_f;
    std::vector<double> _dr_p;
    std::vector<double> _dr_dr_f;
+   std::vector<double> _dphi_f;
    std::vector<double> _dphi_dr_f;
+
+   std::vector<double> _sphereX_f;
 }
 /*==========================================================================*/
 void init()
@@ -34,9 +49,8 @@ void init()
    _n  = Params::nx_nlat_nphi();
    _dt = Params::dt();
 
-   _p_f1.resize(       _n,0);
-   _p_f2.resize(       _n,0);
-   _p_f3.resize(       _n,0);
+   _pre.resize(_n,0);
+
    _p_p.resize(        _n,0);
    _p_dr_f.resize(     _n,0);
    _p_dr_p.resize(     _n,0);
@@ -44,10 +58,17 @@ void init()
    _p_dphi_dr_f.resize(_n,0);
    _p_lap_f.resize(    _n,0);
 
+   _p_p_p.resize(        _n,0);
+   _p_p_dr_f.resize(     _n,0);
+   _p_dr_f_dr_f.resize(  _n,0);
+   _p_dr_f_dphi_f.resize(_n,0);
+   _p_sphereX_f.resize(  _n,0);
+
    _dr_f.resize(     _n);
    _lap_f.resize(    _n);
    _dr_p.resize(     _n);
    _dr_dr_f.resize(  _n);
+   _dphi_f.resize(   _n);
    _dphi_dr_f.resize(_n);
 
    const size_t nx   = Params::nx();
@@ -59,9 +80,14 @@ void init()
    const double m = Params::bh_mass();
    const double a = Params::bh_spin();
 
-   const double V2 = Params::V2();
-   const double V3 = Params::V3();
-   const double V4 = Params::V4();
+   _km1 = Params::km1();
+   _k0  = Params::k0();
+   _k1  = Params::k1();
+   _k2  = Params::k2();
+
+   _v2  = Params::V2();
+   _v3  = Params::V3();
+   _v4  = Params::V4();
 
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
@@ -88,40 +114,33 @@ void init()
          ;
       const double Delta = (1.0 - rp*inv_r)*(1.0 - rm*inv_r); 
 
-      /* Notice the negative sign! 
-       * \Box\phi = V' 
-       * in -+++ signature */ 
-      _p_f1[indx] = - V2;
-      _p_f2[indx] = - V3/2.0;
-      _p_f3[indx] = - V4/6.0;
-
-      _p_p[indx] = (2.0*m/Sigma)*pow(inv_r,2);
-
-      _p_dr_f[indx] = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
-      _p_dr_p[indx] = 4.0*m*inv_r/Sigma;
-
-      _p_dr_dr_f[indx] = (Delta/Sigma);
-
+      _p_p[indx]         = (2.0*m/Sigma)*pow(inv_r,2);
+      _p_dr_f[indx]      = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
+      _p_dr_p[indx]      = 4.0*m*inv_r/Sigma;
+      _p_dr_dr_f[indx]   = (Delta/Sigma);
       _p_dphi_dr_f[indx] = (2.0*a/Sigma)*pow(inv_r,2);
+      _p_lap_f[indx]     = (1.0/Sigma)*pow(inv_r,2);
 
-      _p_lap_f[indx] = (1.0/Sigma)*pow(inv_r,2);
+      _p_p_p[indx]         = -(1.0 + (2.0*m*inv_r/Sigma));
+      _p_p_dr_f[indx]      = 4.0*m*inv_r/Sigma;
+      _p_dr_f_dr_f[indx]   = Delta/Sigma;
+      _p_dr_f_dphi_f[indx] = 2.0*a*pow(inv_r,2)/Sigma;
+      _p_sphereX_f[indx]   = pow(inv_r,2)/Sigma;
 
-      const double pre = 1.0 + (2.0*m*inv_r/Sigma);
+      _pre[indx] = 1.0 + (2.0*m*inv_r/Sigma);
 
-      _p_f1[indx] /= pre;
-      _p_f2[indx] /= pre;
-      _p_f3[indx] /= pre;
+      _p_p[indx]         /= _pre[indx];
+      _p_dr_f[indx]      /= _pre[indx];
+      _p_dr_p[indx]      /= _pre[indx];
+      _p_dr_dr_f[indx]   /= _pre[indx];
+      _p_dphi_dr_f[indx] /= _pre[indx];
+      _p_lap_f[indx]     /= _pre[indx];
 
-      _p_p[indx] /= pre;
-
-      _p_dr_f[indx] /= pre;
-      _p_dr_p[indx] /= pre;
-
-      _p_dr_dr_f[indx] /= pre;
-
-      _p_dphi_dr_f[indx] /= pre;
-
-      _p_lap_f[indx] /= pre;
+      _p_p_p[indx]         /= _pre[indx];
+      _p_p_dr_f[indx]      /= _pre[indx];
+      _p_dr_f_dr_f[indx]   /= _pre[indx];
+      _p_dr_f_dphi_f[indx] /= _pre[indx]; 
+      _p_sphereX_f[indx]   /= _pre[indx];
    }
    }
    }
@@ -138,19 +157,35 @@ void set_k(
    Grid::set_partial_r(    p,    _dr_p);
    Grid::set_partial_r(_dr_f, _dr_dr_f);
 
+   Grid::set_partial_phi(    f, _dphi_f);
    Grid::set_partial_phi(_dr_f, _dphi_dr_f);
+
+   Grid::set_sphereX(f, _sphereX_f);
 
    Grid::set_spherical_lap(f, _lap_f);
 
    for (size_t i=0; i<_n; i++) {
+      const double inverse_k = 1.0/( 
+            _k0 
+         +  _km1/(f[i]+1)
+         +  _k1*f[i]
+         +  (_k2/2.0)*pow(f[i],2)
+         );
+      const double kprime = 
+      -  _km1/pow(f[i]+1,2)
+      +  _k1
+      +  _k2*f[i]
+      ;
+      const double vprime = inverse_k*(
+            _v2*f[i]
+         +  (_v3/2.0)*pow(f[i],2)
+         +  (_v4/6.0)*pow(f[i],3)
+         );
+         
       f_k[i] = 
          p[i]
       ;
       p_k[i] = 
-      +  _p_f1[i]*f[i] 
-      +  _p_f2[i]*pow(f[i],2) 
-      +  _p_f3[i]*pow(f[i],3) 
-
       +  _p_p[i]*p[i] 
 
       +  _p_dr_f[i]*_dr_f[i]
@@ -161,6 +196,16 @@ void set_k(
       +  _p_dphi_dr_f[i]*_dphi_dr_f[i]
 
       +  _p_lap_f[i]*_lap_f[i]
+
+      +  0.5*(kprime*inverse_k)*(
+            _p_p_p[i]*pow(p[i],2)
+         +  _p_p_dr_f[i]*p[i]*_dr_f[i]
+         +  _p_dr_f_dr_f[i]*pow(_dr_f[i],2)
+         +  _p_dr_f_dphi_f[i]*_dr_f[i]*_dphi_f[i]
+         +  _p_sphereX_f[i]*_sphereX_f[i]
+         )
+
+      -  (1.0/_pre[i])*vprime
       ;
    }
 }

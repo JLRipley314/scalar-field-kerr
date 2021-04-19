@@ -40,6 +40,11 @@ namespace Params
    /* 
     * for the potentials 
     */
+   double km1();
+   double k0();
+   double k1();
+   double k2();
+
    double V2();
    double V3();
    double V4();
