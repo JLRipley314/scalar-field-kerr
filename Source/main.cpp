@@ -41,8 +41,13 @@ int main(int argc, char **argv)
    Field f("f", Params::nx_nlat_nphi(), 0.0);
    Field p("p", Params::nx_nlat_nphi(), 0.0);
 
+   std::vector<double> rho(Params::nx_nlat_nphi(), 0.0);
+
    std::cout<<"Setting initial data"<<std::endl;
+
    ID::ingoing_pulse(f.n, p.n);
+
+   Eom::set_rho(f.n, p.n, rho);
 
    size_t save_indx = 0;
 
@@ -50,9 +55,10 @@ int main(int argc, char **argv)
    const double save_rmax = Params::Rmin() + ((Params::Rmax() - Params::Rmin())/4.0);
 
    Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-8, 1e6, save_rmin, save_rmax, f.n);
-   Csv::write_th_ph(
-         output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.n
-      );
+   Csv::write_x_y_z(output_dir+"/rho",     save_indx, 1e-8, 1e6, save_rmin, save_rmax, rho);
+
+   Csv::write_th_ph(output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.n);
+   Csv::write_th_ph(output_dir+"/horizon_rho",     save_indx, Params::nx()-1, rho);
 
    const double res = Grid::norm_indep_res(Params::dt(), f.n, f.np1, p.n);
    const double tv  = Grid::total_variation(f.n);
@@ -78,12 +84,15 @@ int main(int argc, char **argv)
             <<std::endl;
          if (std::isnan(res)) return EXIT_SUCCESS;
 
+         Eom::set_rho(f.np1, p.np1, rho);
+
          save_indx += 1;
 
          Csv::write_x_y_z(output_dir+"/"+f.name, save_indx, 1e-8, 1e6, save_rmin, save_rmax, f.np1);
-         Csv::write_th_ph(
-               output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.np1
-            );
+         Csv::write_x_y_z(output_dir+"/rho",     save_indx, 1e-8, 1e6, save_rmin, save_rmax, rho);
+
+         Csv::write_th_ph(output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.np1);
+         Csv::write_th_ph(output_dir+"/horizon_rho",     save_indx, Params::nx()-1, rho);
       }
       f.shift();
       p.shift();
