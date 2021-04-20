@@ -1,31 +1,33 @@
 # Scalar field dynamics around a Kerr black hole
 
-A C++ (C++11 onwards) and Python code that solves the equations of 
+A C++ (version C++11 onwards) and code that solves the equations of 
 motion for a real scalar field around a Kerr black hole.
 
-Runtime parameters are configured in the `config.py` file.
+Runtime parameters are configured in the `config.py` file
+(with some preprocessing done by `sim_params.py`).
 
 ## Libraries
+
+See `INSTALL.md` for more information on installing some
+of the below libraries.
 
 * [FFTW](http://fftw.org) 
 	Fast Fourier transforms	
 
 * [SHTns](https://nschaeff.bitbucket.io/shtns/)
-	Fast spherical harmonic transforms	
+	Fast spherical harmonic transforms.
 
 * [OpenMP](https://www.openmp.org/)	
 
 * [googletest](https://github.com/google/googletest)
-	only used to run unit tests under `Test/`
+	This is only used to run unit tests under `Test/`.
 	
-I have successfully compiled the code with 
-the GNU C++ compiler (g++).
-
 ## Visualization
 
 I've mostly used [paraview](https://www.paraview.org/) to visualize the data.
 Contact me for more details about how to, e.g.
-read in and visualize the 3d data 
+read in and visualize the 3d data.
+For the moment all data are saved as `.csv` files. 
 
 ## Citation
 

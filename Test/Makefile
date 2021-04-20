@@ -5,14 +5,14 @@ SRC = ../Source
 
 # googletest
 GT_LIB = -lgtest -lpthread
-GT_INCLUDE = -I/usr/local/include
+GT_INCLUDE = -I$(HOME)/googletest/build/lib
 
 # shtns 
-SHTNS_INC = -I/usr/include -I/home/jripley/shtns/Library/include
-SHTNS_LIB = -L/lib/x86_64-linux-gnu -L/home/jripley/shtns/Library/lib
+SHTNS_INC = -I$(HOME)/shtns/Library/include
+SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
-	 -lshtns -lfftw3 -lm -D_GLIBCXX_DEBUG
+	 -lshtns -lfftw3 -lm #-D_GLIBCXX_DEBUG
 #=============================================================================
 OBJ = main.o \
       test_sphere.o $(SRC)/sphere.o \
