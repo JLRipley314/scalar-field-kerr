@@ -41,6 +41,15 @@ namespace {
    std::vector<double> _dphi_f;
    std::vector<double> _dphi_dr_f;
    std::vector<double> _sphereX_f;
+
+   /* 
+    * for computing energy density rho 
+    */
+   std::vector<double> _rho_vv;
+   std::vector<double> _rho_vr;
+   std::vector<double> _rho_rr;
+   std::vector<double> _rho_rphi;
+   std::vector<double> _rho_sphereX;
 }
 /*==========================================================================*/
 void init()
@@ -70,6 +79,12 @@ void init()
    _dphi_f.resize(   _n);
    _dphi_dr_f.resize(_n);
    _sphereX_f.resize(_n);
+
+   _rho_vv.resize(     _n,0);
+   _rho_vr.resize(     _n,0);
+   _rho_rr.resize(     _n,0);
+   _rho_rphi.resize(   _n,0);
+   _rho_sphereX.resize(_n,0);
 
    const size_t nx   = Params::nx();
    const size_t nlat = Params::nlat();
@@ -141,6 +156,15 @@ void init()
       _p_dr_f_dr_f[indx]   /= _pre[indx];
       _p_dr_f_dphi_f[indx] /= _pre[indx]; 
       _p_sphereX_f[indx]   /= _pre[indx];
+
+      _rho_vv[indx]      = 0.5*(1.0 + 2.0*m*inv_r/Sigma);
+      _rho_vr[indx]      = 2.0*m*inv_r/Sigma;
+      _rho_rr[indx]      = 0.5*( 
+            ((1.0+(2*m*inv_r)+pow(a*inv_r,2))/Sigma)
+         -  (4.0*m*inv_r/(2.0*m*inv_r + Sigma))     
+         );
+      _rho_rphi[indx]    = a*pow(inv_r,2)/Sigma;
+      _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
    }
    }
    }
@@ -251,6 +275,46 @@ void time_step(Field &f, Field &p)
    for (size_t i=0; i<_n; i++) {
       f.np1[i] = f.n[i] + (_dt/6.0)*(f.k1[i] + 2.0*f.k2[i] + 2.0*f.k3[i] + f.k4[i]);
       p.np1[i] = p.n[i] + (_dt/6.0)*(p.k1[i] + 2.0*p.k2[i] + 2.0*p.k3[i] + p.k4[i]);
+   }
+}
+/*==========================================================================*/
+void set_rho(
+      const std::vector<double> &f,
+      const std::vector<double> &p,
+      std::vector<double> &rho
+      )
+{
+   assert(f.size()  ==_n);
+   assert(p.size()  ==_n);
+   assert(rho.size()==_n);
+
+   Grid::set_partial_r(  f,      _dr_f);
+   Grid::set_partial_phi(f,    _dphi_f);
+   Grid::set_sphereX(    f, _sphereX_f);
+
+   for (size_t i=0; i<_n; i++) {
+      const double k = ( 
+            _k0 
+         +  _km1/(f[i]+1)
+         +  _k1*f[i]
+         +  (_k2/2.0)*pow(f[i],2)
+         );
+      const double v = (
+            (_v2/2.0) *pow(f[i],2)
+         +  (_v3/6.0 )*pow(f[i],3)
+         +  (_v4/24.0)*pow(f[i],4)
+         );
+         
+      rho[i] = 
+      +  k*(
+            _rho_vv[i]*pow(p[i],2) 
+         +  _rho_vr[i]*p[i]*_dr_f[i]
+         +  _rho_rr[i]*pow(_dr_f[i],2)
+         +  _rho_rphi[i]*_dr_f[i]*_dphi_f[i]
+         +  _rho_sphereX[i]*_sphereX_f[i]
+      )
+      +  v
+      ;
    }
 }
 /*==========================================================================*/
