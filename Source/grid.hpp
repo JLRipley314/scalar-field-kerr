@@ -16,7 +16,8 @@ namespace Grid
          const double Rmax,
          const size_t nx,
          const size_t nlat,
-         const size_t nphi);
+         const size_t nphi,
+         const size_t nl);
 
    size_t indx(const size_t i_x, const size_t i_th, const size_t i_ph); 
    /*
@@ -44,6 +45,16 @@ namespace Grid
     */
    std::vector<double> R_th(const size_t i_x, const size_t i_th); 
    std::vector<double> R_th(const size_t i); 
+   /*
+    * returns spherical coordinate {x, z} (cut along phi=constant)
+    */
+   std::vector<double> x_z(const size_t i_x, const size_t i_th); 
+   std::vector<double> x_z(const size_t i); 
+   /*
+    * returns {R, l}
+    */
+   std::vector<double> R_l(const size_t i_x, const size_t i_l); 
+   std::vector<double> R_l(const size_t i); 
    /*
     * Get row vals
     */
@@ -108,6 +119,8 @@ void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv);
 void set_sphereX(const std::vector<double> &v, std::vector<double> &vX);
 /*==========================================================================*/
 void set_partial_r(const std::vector<double> &v, std::vector<double> &dv);
+/*==========================================================================*/
+void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p);
 /*==========================================================================*/
 /* \partial_t f - p */
 /*==========================================================================*/

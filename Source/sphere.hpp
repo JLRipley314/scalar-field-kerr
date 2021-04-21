@@ -67,6 +67,7 @@ namespace Sphere {
    void raise(const std::vector<double> &v, std::vector<cplx> &rv);
    void lower(const std::vector<double> &v, std::vector<cplx> &lv);
 
+   void power_spectrum(const std::vector<double> &v, std::vector<double> &p);
 
    std::vector<double> compute_ylm(const int l_ang, const int m_ang);
 /*===========================================================================*/

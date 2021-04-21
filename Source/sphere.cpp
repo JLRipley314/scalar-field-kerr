@@ -376,6 +376,8 @@ void sphereX(const std::vector<double> &v, std::vector<double> &vX)
 /*==========================================================================*/
 void filter(std::vector<double> &v)
 {
+   assert(v.size()==_nSph);
+
    double *Sph_tmp = allocate_real(_nSph);
    cplx   *Ylm_tmp = allocate_cplx(_nYlm);
 
@@ -393,6 +395,42 @@ void filter(std::vector<double> &v)
 
    for (size_t i=0; i<_nSph; i++) {
       v[i] = Sph_tmp[i];
+   }
+   free(Sph_tmp);
+   free(Ylm_tmp);
+}
+/*==========================================================================*/
+void power_spectrum(const std::vector<double> &v, std::vector<double> &p)
+{
+   assert(v.size()==_nSph);
+   assert(p.size()==_lmax);
+
+   double *Sph_tmp = allocate_real(_nSph);
+   cplx   *Ylm_tmp = allocate_cplx(_nYlm);
+
+   for (size_t i=0; i<_nSph; i++) {
+      Sph_tmp[i] = v[i];
+   }
+   spat_to_SH(_shtns, Sph_tmp, Ylm_tmp);
+
+   for (size_t l=0; l<_lmax; l++) {
+
+      const double r_Ylm = Ylm_tmp[LM(_shtns,l,0)].real();
+      const double i_Ylm = Ylm_tmp[LM(_shtns,l,0)].imag();
+      p[l] = (pow(r_Ylm,2) + pow(i_Ylm,2));
+
+      for (size_t m=1; m<std::min(l+1,_mmax); m++) {
+         /*
+          * We double count positive m as we do not
+          * count negative m.
+          */
+         const double r_Ylm = Ylm_tmp[LM(_shtns,l,m)].real();
+         const double i_Ylm = Ylm_tmp[LM(_shtns,l,m)].imag();
+
+         p[l] += 2.0*(pow(r_Ylm,2) + pow(i_Ylm,2));
+      }
+      if (p[l]<1e-16) { p[l]=-16; }
+      else { p[l] = log(p[l])/log(10); }
    }
    free(Sph_tmp);
    free(Ylm_tmp);

@@ -6,6 +6,7 @@
 
 #define INDX_R_TH(ix,it) ((_nlat)*(ix) + (it))
 #define INDX_R_PH(ix,it) ((_nphi)*(ix) + (it))
+#define INDX_R_L(ix,il)  ((_nl  )*(ix) + (il))
 
 #if SHTNS_CONTIGUOUS_LONGITUDES
 #define INDX_R_TH_PH(ix,it,ip) ((_nphi)*(_nlat)*(ix) + (_nlat)*(ip) + (it))
@@ -22,12 +23,15 @@ namespace {
    size_t _nx;
    size_t _nlat; 
    size_t _nphi;
+   size_t _nl; 
 
    std::vector<std::vector<double>> _r_th_ph;
    std::vector<std::vector<double>> _R_th_ph;
    std::vector<std::vector<double>> _x_y_z;
+   std::vector<std::vector<double>> _x_z;
    std::vector<std::vector<double>> _th_ph;
    std::vector<std::vector<double>> _R_th;
+   std::vector<std::vector<double>> _R_l;
 
    std::vector<double> _partial_R_to_partial_r;
 }
@@ -36,11 +40,13 @@ void init(
       const double cl,
       const size_t nx,
       const size_t nlat,
-      const size_t nphi)
+      const size_t nphi,
+      const size_t nl)
 {
    _nx   = nx;
    _nlat = nlat; 
    _nphi = nphi; 
+   _nl   = nl; 
 
    _r_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _R_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
@@ -67,7 +73,6 @@ void init(
    }
    }
    _th_ph.resize(_nphi*_nlat, std::vector<double>(2,0));
-
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
       double theta = Sphere::theta(it);  
@@ -76,18 +81,28 @@ void init(
       _th_ph[INDX_TH_PH(it, ip)][1] = phi;
    }
    }
+   _x_z.resize( _nx*_nlat, std::vector<double>(2,0));
    _R_th.resize(_nx*_nlat, std::vector<double>(2,0));
-
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
       double R     = Cheb::pt(ix);
       double theta = Sphere::theta(it);  
       _R_th[INDX_R_TH(ix,it)][0] = R;
-      _R_th[INDX_R_TH(ix,it)][0] = theta;
+      _R_th[INDX_R_TH(ix,it)][1] = theta;
+      _x_z[ INDX_R_TH(ix,it)][0] = R*sin(theta); 
+      _x_z[ INDX_R_TH(ix,it)][1] = R*cos(theta);
    }
    }
-   _partial_R_to_partial_r.resize(_nx,0);
-   
+   _R_l.resize(_nx*_nl, std::vector<double>(2,0));
+   for (size_t ix=0; ix<_nx; ix++) {
+   for (size_t il=0; il<_nl; il++) {
+      double R = Cheb::pt(ix);
+      double l = il;  
+      _R_l[INDX_R_L(ix,il)][0] = R;
+      _R_l[INDX_R_L(ix,il)][1] = l;
+   }
+   }
+   _partial_R_to_partial_r.resize(_nx,0); 
    for (size_t ix=0; ix<_nx; ix++) {
       _partial_R_to_partial_r[ix] = pow(1.0 - (Cheb::pt(ix)/cl),2);
    }
@@ -146,6 +161,26 @@ std::vector<double> R_th(const size_t i_x, const size_t i_th)
 std::vector<double> R_th(const size_t i) 
 {
    return _R_th[i];
+}
+/*===========================================================================*/
+std::vector<double> x_z(const size_t i_x, const size_t i_th) 
+{
+   return _x_z[INDX_R_TH(i_x, i_th)];
+}
+/*===========================================================================*/
+std::vector<double> x_z(const size_t i) 
+{
+   return _x_z[i];
+}
+/*===========================================================================*/
+std::vector<double> R_l(const size_t i_x, const size_t i_l) 
+{
+   return _R_l[INDX_R_L(i_x, i_l)];
+}
+/*===========================================================================*/
+std::vector<double> R_l(const size_t i) 
+{
+   return _R_l[i];
 }
 /*=========================================================================*/
 void get_row_R(const size_t it, const size_t ip, 
@@ -250,6 +285,17 @@ void set_row_ph(const size_t ix, const size_t it,
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ip=0; ip<_nlat; ip++) {
       out[INDX_R_TH_PH(ix,it,ip)] = in[ip];
+   }
+} 
+/*=========================================================================*/
+void set_row_l(const size_t ix, 
+      const std::vector<double> &lvals, 
+      std::vector<double> &Rlvals)
+{
+   assert(lvals.size() ==_nl);
+   assert(Rlvals.size()==_nx*_nl);
+   for (size_t il=0; il<_nl; il++) {
+      Rlvals[INDX_R_L(ix,il)] = lvals[il];
    }
 } 
 /*=========================================================================*/
@@ -371,6 +417,24 @@ void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
    }
 }
 /*==========================================================================*/
+void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p)
+{
+   assert(v.size()==_nx*_nlat*_nphi);
+   assert(p.size()==_nx*_nl);
+
+#pragma omp parallel for
+   for (size_t ix=0; ix<_nx; ix++) {
+      std::vector<double> inter_sphere(_nlat*_nphi);
+      std::vector<double> inter_sphere_p(_nl);
+
+      get_row_th_ph(ix, v, inter_sphere); 
+
+      Sphere::power_spectrum(inter_sphere, inter_sphere_p);
+
+      set_row_l(ix, inter_sphere_p, p); 
+   }
+}
+/*==========================================================================*/
 /* Low pass filter in spectral space */
 /*==========================================================================*/
 void filter(std::vector<double> &v)
@@ -448,5 +512,6 @@ double total_variation(const std::vector<double> &v)
 
 #undef INDX_R_TH
 #undef INDX_R_PH
+#undef INDX_R_L
 #undef INDX_R_TH_PH
 #undef INDX_TH_PH

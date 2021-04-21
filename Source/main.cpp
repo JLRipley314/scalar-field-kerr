@@ -29,7 +29,7 @@ int main(int argc, char **argv)
    Cheb::init(Params::nx(), Params::Rmin(), Params::Rmax());
 
    std::cout<<"Initializing Grid"<<std::endl;
-   Grid::init(Params::cl(), Params::nx(), Params::nlat(), Params::nphi());
+   Grid::init(Params::cl(), Params::nx(), Params::nlat(), Params::nphi(), Params::nl());
 
    std::cout<<"Initializing Equations of motion"<<std::endl;
    Eom::init();
@@ -59,6 +59,12 @@ int main(int argc, char **argv)
 
    Csv::write_th_ph(output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.n);
    Csv::write_th_ph(output_dir+"/horizon_rho",     save_indx, Params::nx()-1, rho);
+
+   Csv::write_x_z(output_dir+"/"+f.name, save_indx, 0, f.n);
+   Csv::write_x_z(output_dir+"/rho",     save_indx, 0, rho);
+
+   Csv::write_R_psl(output_dir+"/"+f.name, save_indx, f.n);
+   Csv::write_R_psl(output_dir+"/rho",     save_indx, rho);
 
    const double res = Grid::norm_indep_res(Params::dt(), f.n, f.np1, p.n);
    const double tv  = Grid::total_variation(f.n);
@@ -93,6 +99,12 @@ int main(int argc, char **argv)
 
          Csv::write_th_ph(output_dir+"/horizon_"+f.name, save_indx, Params::nx()-1, f.np1);
          Csv::write_th_ph(output_dir+"/horizon_rho",     save_indx, Params::nx()-1, rho);
+
+         Csv::write_x_z(output_dir+"/"+f.name, save_indx, 0, f.np1);
+         Csv::write_x_z(output_dir+"/rho",     save_indx, 0, rho);
+
+         Csv::write_R_psl(output_dir+"/"+f.name, save_indx, f.np1);
+         Csv::write_R_psl(output_dir+"/rho",     save_indx, rho);
       }
       f.shift();
       p.shift();

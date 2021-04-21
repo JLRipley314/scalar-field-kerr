@@ -23,6 +23,23 @@ namespace Csv
          const size_t ix, 
          const std::vector<double> &vals
       );
+   void write_R_th(
+         const std::string name, 
+         const int itm,
+         const size_t ip,
+         const std::vector<double> &vals
+      );
+   void write_x_z(
+         const std::string name, 
+         const int itm,
+         const size_t ip,
+         const std::vector<double> &vals
+      );
+   void write_R_psl(
+         const std::string name, 
+         const int itm, 
+         const std::vector<double> &vals
+      );
    void write_x_y_z(
          const std::string name, 
          const int itm,

@@ -15,32 +15,32 @@ sim.run_type= "basic_run"
 sim.debug= False
 
 sim.black_hole_mass= float(0.5)
-sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
+sim.black_hole_spin= round(1.0*sim.black_hole_mass,16)
 sim.compactification_length= float(50)
 
-sim.evolve_time= float(10.0) ## units of black hole mass
-sim.num_saved_times= int(40)
+sim.evolve_time= float( 10.0) ## units of black hole mass
+sim.num_saved_times= int(100)
 
 sim.nx= 48 ## Number of radial pts 
 sim.nl= 16 ## Number of angular l values
-sim.nm= 10 ## Number of angular m values
+sim.nm= 12 ## Number of angular m values
 sim.nlat = 32 ## Number of theta collocation points 
-sim.nphi = 24 ## Number of phi collocation points; must be a multiple of 4 
+sim.nphi = 28 ## Number of phi collocation points; must be a multiple of 4 
 #-----------------------------------------------------------------------------
 ## Prefactor to kinetric term.
 ## In the action:
 ## (km1/psi + k0 + k1*psi + k2*psi^2)*(1/2)*(\nabla\psi)^2
-sim.km1 = 1.0
-sim.k0  = 0.0
+sim.km1 = 0.0
+sim.k0  = 1.0
 sim.k1  = 0.0
 sim.k2  = 0.0
 
 ## Scalar field potential
 ## V = (V2/2)*psi^2 + (V3/6)*psi^3 + (V4/24)*psi^4
 
-sim.V2 = 0.0
+sim.V2 = 2.0
 sim.V3 = 0.0
-sim.V4 = 0.0
+sim.V4 = 2.0
 #-----------------------------------------------------------------------------
 ## Initial data
 
