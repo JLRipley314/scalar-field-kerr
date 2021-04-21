@@ -51,10 +51,15 @@ namespace Grid
    std::vector<double> x_z(const size_t i_x, const size_t i_th); 
    std::vector<double> x_z(const size_t i); 
    /*
-    * returns {R, l}
+    * returns {R, l}; l is angular power spectrum coefficient
     */
    std::vector<double> R_l(const size_t i_x, const size_t i_l); 
    std::vector<double> R_l(const size_t i); 
+   /*
+    * returns {n, l}; n is Chebyshev, l is angular power spectrum coefficient
+    */
+   std::vector<double> n_l(const size_t i_x, const size_t i_l); 
+   std::vector<double> n_l(const size_t i); 
    /*
     * Get row vals
     */
@@ -121,6 +126,7 @@ void set_sphereX(const std::vector<double> &v, std::vector<double> &vX);
 void set_partial_r(const std::vector<double> &v, std::vector<double> &dv);
 /*==========================================================================*/
 void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p);
+void set_n_l_coef(              const std::vector<double> &v, std::vector<double> &p);
 /*==========================================================================*/
 /* \partial_t f - p */
 /*==========================================================================*/

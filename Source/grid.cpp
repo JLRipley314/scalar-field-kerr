@@ -32,6 +32,7 @@ namespace {
    std::vector<std::vector<double>> _th_ph;
    std::vector<std::vector<double>> _R_th;
    std::vector<std::vector<double>> _R_l;
+   std::vector<std::vector<double>> _n_l;
 
    std::vector<double> _partial_R_to_partial_r;
 }
@@ -93,6 +94,7 @@ void init(
       _x_z[ INDX_R_TH(ix,it)][1] = R*cos(theta);
    }
    }
+   _n_l.resize(_nx*_nl, std::vector<double>(2,0));
    _R_l.resize(_nx*_nl, std::vector<double>(2,0));
    for (size_t ix=0; ix<_nx; ix++) {
    for (size_t il=0; il<_nl; il++) {
@@ -100,6 +102,8 @@ void init(
       double l = il;  
       _R_l[INDX_R_L(ix,il)][0] = R;
       _R_l[INDX_R_L(ix,il)][1] = l;
+      _n_l[INDX_R_L(ix,il)][0] = double(ix);
+      _n_l[INDX_R_L(ix,il)][1] = l;
    }
    }
    _partial_R_to_partial_r.resize(_nx,0); 
@@ -182,6 +186,16 @@ std::vector<double> R_l(const size_t i)
 {
    return _R_l[i];
 }
+/*===========================================================================*/
+std::vector<double> n_l(const size_t i_x, const size_t i_l) 
+{
+   return _n_l[INDX_R_L(i_x, i_l)];
+}
+/*===========================================================================*/
+std::vector<double> n_l(const size_t i) 
+{
+   return _n_l[i];
+}
 /*=========================================================================*/
 void get_row_R(const size_t it, const size_t ip, 
       const std::vector<double> &in,
@@ -213,6 +227,17 @@ void get_row_ph(const size_t ix, const size_t it,
    assert(out.size()==_nphi);
    for (size_t ip=0; ip<_nphi; ip++) {
       out[ip] = in[INDX_R_TH_PH(ix,it,ip)];
+   }
+} 
+/*=========================================================================*/
+void get_row_n(const size_t il, 
+      const std::vector<double> &in, 
+      std::vector<double> &out)
+{
+   assert(in.size() ==_nx*_nl);
+   assert(out.size()==_nx);
+   for (size_t ix=0; ix<_nx; ix++) {
+      out[ix] = in[INDX_R_L(ix,il)];
    }
 } 
 /*=========================================================================*/
@@ -296,6 +321,17 @@ void set_row_l(const size_t ix,
    assert(Rlvals.size()==_nx*_nl);
    for (size_t il=0; il<_nl; il++) {
       Rlvals[INDX_R_L(ix,il)] = lvals[il];
+   }
+} 
+/*=========================================================================*/
+void set_row_n(const size_t il, 
+      const std::vector<double> &in, 
+      std::vector<double> &out)
+{
+   assert(in.size() ==_nx);
+   assert(out.size()==_nx*_nl);
+   for (size_t ix=0; ix<_nx; ix++) {
+      out[INDX_R_L(ix,il)] = in[ix];
    }
 } 
 /*=========================================================================*/
@@ -432,6 +468,31 @@ void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double
       Sphere::power_spectrum(inter_sphere, inter_sphere_p);
 
       set_row_l(ix, inter_sphere_p, p); 
+   }
+}
+/*==========================================================================*/
+void set_n_l_coef(const std::vector<double> &v, std::vector<double> &p)
+{
+   assert(v.size()==_nx*_nlat*_nphi);
+   assert(p.size()==_nx*_nl);
+
+   set_angular_power_spectrum(v, p);
+
+#pragma omp parallel for
+   for (size_t il=0; il<_nl; il++) {
+      std::vector<double> inter_v(_nx);
+      std::vector<double> inter_p(_nx);
+
+      get_row_n(il, p, inter_v); 
+
+      /* undo square root of Psl power spectrum */
+      for (size_t ix=0; ix<_nx; ix++) {
+         inter_v[ix] = pow(inter_v[ix],0.5);
+      } 
+      /* compute power spectrum */
+      Cheb::to_ch(inter_v, inter_p);
+
+      set_row_n(il, inter_p, p); 
    }
 }
 /*==========================================================================*/

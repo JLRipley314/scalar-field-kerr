@@ -429,8 +429,6 @@ void power_spectrum(const std::vector<double> &v, std::vector<double> &p)
 
          p[l] += 2.0*(pow(r_Ylm,2) + pow(i_Ylm,2));
       }
-      if (p[l]<1e-16) { p[l]=-16; }
-      else { p[l] = log(p[l])/log(10); }
    }
    free(Sph_tmp);
    free(Ylm_tmp);
