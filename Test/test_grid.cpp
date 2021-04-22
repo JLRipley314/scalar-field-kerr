@@ -33,7 +33,7 @@ std::vector<double> get_norm_diff(
 
    Sphere::init(nl, nm, nlat, nphi);
    Cheb::init(nx, Rmin, Rmax);
-   Grid::init(cl, nx, nlat, nphi);
+   Grid::init(cl, nx, nlat, nphi, nl);
 
    std::vector<double> v(n,0);
    std::vector<double> dr_v1(n,0);
@@ -167,8 +167,10 @@ std::vector<double> get_total_variation(
 
    Sphere::init(nl, nm, nlat, nphi);
    Cheb::init(nx, Rmin, Rmax);
-   Grid::init(cl, nx, nlat, nphi);
-
+   Grid::init(cl, nx, nlat, nphi, nl);
+   /*
+    * noisy grid + filter of it
+    */
    std::vector<double> v(n,0);
    std::vector<double> filter_v(n,0);
 
@@ -194,7 +196,9 @@ std::vector<double> get_total_variation(
       filter_v[i] = v[i];
    }
    Grid::filter(filter_v);
-
+   /*
+    * total variation of grid and filtered version of it 
+    */
    double tv_v        = 0;
    double tv_filter_v = 0;
 

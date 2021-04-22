@@ -193,7 +193,9 @@ void write_x_z(
    out.close();
 }
 /*===========================================================================*/
-void write_n_psl(
+/* f_{n,l}, with l = sqrt(Sum_m f_{l,m}) */
+/*===========================================================================*/
+void write_n_l(
       const std::string name, 
       const int itm,
       const std::vector<double> &vals)

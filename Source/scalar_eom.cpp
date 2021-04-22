@@ -50,6 +50,10 @@ namespace {
    std::vector<double> _rho_rr;
    std::vector<double> _rho_rphi;
    std::vector<double> _rho_sphereX;
+   /* 
+    * no evolution at spatial infinity 
+    */
+   std::vector<double> _not_at_spat_infty;
 }
 /*==========================================================================*/
 void init()
@@ -85,6 +89,8 @@ void init()
    _rho_rr.resize(     _n,0);
    _rho_rphi.resize(   _n,0);
    _rho_sphereX.resize(_n,0);
+
+   _not_at_spat_infty.resize(_n,0);
 
    const size_t nx   = Params::nx();
    const size_t nlat = Params::nlat();
@@ -125,7 +131,7 @@ void init()
          (fabs(a)        <1e-16) ? (2*m) : (m + pow((m-a)*(m+a),0.5))
          );
       const double rm = 
-         (fabs(m-a)<1e-16) ? (m)   : (pow(a,2)/rp)
+         (fabs(m-fabs(a))<1e-16) ? (m)   : (pow(a,2)/rp)
          ;
       const double Delta = (1.0 - rp*inv_r)*(1.0 - rm*inv_r); 
 
@@ -167,6 +173,14 @@ void init()
       _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
    }
    }
+   }
+   for (size_t i=0; i<_n; i++) {
+      std::vector<double> R_th_ph = Grid::R_th_ph(i); 
+      if (fabs(R_th_ph[0]-Params::cl())<1e-16) {
+         _not_at_spat_infty[i] = 0.0;
+      } else {
+         _not_at_spat_infty[i] = 1.0;
+      }
    }
 }
 /*==========================================================================*/
@@ -231,6 +245,8 @@ void set_k(
 
       -  (1.0/_pre[i])*vprime
       ;
+      f_k[i] *= _not_at_spat_infty[i];
+      p_k[i] *= _not_at_spat_infty[i];
    }
 }
 /*==========================================================================*/

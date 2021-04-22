@@ -460,8 +460,8 @@ void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double
 
 #pragma omp parallel for
    for (size_t ix=0; ix<_nx; ix++) {
-      std::vector<double> inter_sphere(_nlat*_nphi);
-      std::vector<double> inter_sphere_p(_nl);
+      std::vector<double> inter_sphere(_nlat*_nphi, 0);
+      std::vector<double> inter_sphere_p(_nl, 0);
 
       get_row_th_ph(ix, v, inter_sphere); 
 
@@ -480,8 +480,8 @@ void set_n_l_coef(const std::vector<double> &v, std::vector<double> &p)
 
 #pragma omp parallel for
    for (size_t il=0; il<_nl; il++) {
-      std::vector<double> inter_v(_nx);
-      std::vector<double> inter_p(_nx);
+      std::vector<double> inter_v(_nx, 0);
+      std::vector<double> inter_p(_nx, 0);
 
       get_row_n(il, p, inter_v); 
 

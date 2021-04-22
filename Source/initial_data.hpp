@@ -4,13 +4,15 @@
 #ifndef _ID_HPP_
 #define _ID_HPP_
 
+#include <string>
 #include <vector>
 
 /*==========================================================================*/
 namespace ID 
 {
 /*==========================================================================*/
-void ingoing_pulse(
+void compact_pulse(
+      std::string initial_data_direction,
       std::vector<double> &f,
       std::vector<double> &p
    );

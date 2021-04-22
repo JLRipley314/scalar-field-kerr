@@ -40,7 +40,7 @@ namespace Csv
          const int itm, 
          const std::vector<double> &vals
       );
-   void write_n_psl(
+   void write_n_l(
          const std::string name, 
          const int itm, 
          const std::vector<double> &vals

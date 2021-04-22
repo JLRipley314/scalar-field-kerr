@@ -11,7 +11,8 @@ namespace ID
 /*==========================================================================*/
 /* time symmetric compact bump for phi of angular dependence Y_{lm} */
 /*==========================================================================*/
-void ingoing_pulse(
+void compact_pulse(
+      std::string initial_data_direction,
       std::vector<double> &f,
       std::vector<double> &p)
 {
@@ -44,10 +45,28 @@ void ingoing_pulse(
          bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
       }
       f[Grid::indx(ix,it,ip)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
-      /*
-       * time symmetric for now
-       */ 
-      p[Grid::indx(ix,it,ip)] = 0.0;
+
+      const double partial_r_f = (
+            2.0*   ((r-rl)/width  )*pow((ru-r)/width,2) 
+         -  2.0*pow((r-rl)/width,2)*   ((ru-r)/width  )
+         +                          pow((ru-r)/width,2)
+         -  2.0*pow((r-rl)/width,2) 
+         )*(bump/width)
+         ;
+      if (initial_data_direction=="ingoing") {
+         p[Grid::indx(ix,it,ip)] =  partial_r_f;
+      } else
+      if (initial_data_direction=="outgoing") { 
+         p[Grid::indx(ix,it,ip)] = -partial_r_f;
+      } else
+      if (initial_data_direction=="time_symmetric") { 
+         p[Grid::indx(ix,it,ip)] = 0; 
+      } else {
+         std::cout
+            <<"Using default initial data direction: time_symmetric."
+            <<std::endl;
+         p[Grid::indx(ix,it,ip)] = 0; 
+      } 
       /*
        * give angular structure Y_{lm} 
        */

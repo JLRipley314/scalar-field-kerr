@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
    std::cout<<"Setting initial data"<<std::endl;
 
-   ID::ingoing_pulse(f.n, p.n);
+   ID::compact_pulse(Params::initial_data_direction(), f.n, p.n);
 
    Eom::set_rho(f.n, p.n, rho);
 
@@ -63,8 +63,11 @@ int main(int argc, char **argv)
    Csv::write_x_z(output_dir+"/"+f.name, save_indx, 0, f.n);
    Csv::write_x_z(output_dir+"/rho",     save_indx, 0, rho);
 
-   Csv::write_n_psl(output_dir+"/"+f.name, save_indx, f.n);
-   Csv::write_n_psl(output_dir+"/rho",     save_indx, rho);
+   Csv::write_R_psl(output_dir+"/"+f.name, save_indx, f.n);
+   Csv::write_R_psl(output_dir+"/rho",     save_indx, rho);
+
+   Csv::write_n_l(output_dir+"/"+f.name, save_indx, f.n);
+   Csv::write_n_l(output_dir+"/rho",     save_indx, rho);
 
    const double res = Grid::norm_indep_res(Params::dt(), f.n, f.np1, p.n);
    const double tv  = Grid::total_variation(f.n);
@@ -103,8 +106,11 @@ int main(int argc, char **argv)
          Csv::write_x_z(output_dir+"/"+f.name, save_indx, 0, f.np1);
          Csv::write_x_z(output_dir+"/rho",     save_indx, 0, rho);
 
-         Csv::write_n_psl(output_dir+"/"+f.name, save_indx, f.np1);
-         Csv::write_n_psl(output_dir+"/rho",     save_indx, rho);
+         Csv::write_R_psl(output_dir+"/"+f.name, save_indx, f.np1);
+         Csv::write_R_psl(output_dir+"/rho",     save_indx, rho);
+
+         Csv::write_n_l(output_dir+"/"+f.name, save_indx, f.np1);
+         Csv::write_n_l(output_dir+"/rho",     save_indx, rho);
       }
       f.shift();
       p.shift();
