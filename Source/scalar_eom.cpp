@@ -3,120 +3,60 @@
 #include <iomanip>
 
 #include "scalar_eom.hpp"
-#include "params.hpp"
-#include "grid.hpp"
 /*==========================================================================*/
-namespace Eom {
-/*==========================================================================*/
-namespace {
-   size_t _n;
-   double _dt;
+Eom::Eom(
+      const Grid &grid,
+      const Params &params
+      )
+:  _n{grid.nx()*grid.nlat()*grid.nphi()},
+   _dt{params.dt()},
+   _km1{params.km1()},
+   _k0{params.k0()},
+   _k1{params.k1()},
+   _k2{params.k2()},
+   _v2{params.V2()},
+   _v3{params.V3()},
+   _v4{params.V4()},
+  
+   _pre(_n,0),
 
-   double _km1;
-   double _k0;
-   double _k1;
-   double _k2;
+   _p_p(        _n,0),
+   _p_dr_f(     _n,0),
+   _p_dr_p(     _n,0),
+   _p_dr_dr_f(  _n,0),
+   _p_dphi_dr_f(_n,0),
+   _p_lap_f(    _n,0),
 
-   double _v2;
-   double _v3;
-   double _v4;
-   std::vector<double> _pre;
-   std::vector<double> _p_p;
-   std::vector<double> _p_dr_f;
-   std::vector<double> _p_dr_p;
-   std::vector<double> _p_dr_dr_f;
-   std::vector<double> _p_dphi_dr_f;
-   std::vector<double> _p_lap_f;
+   _p_p_p(        _n,0),
+   _p_p_dr_f(     _n,0),
+   _p_dr_f_dr_f(  _n,0),
+   _p_dr_f_dphi_f(_n,0),
+   _p_sphereX_f(  _n,0),
 
-   std::vector<double> _p_p_p;
-   std::vector<double> _p_p_dr_f;
-   std::vector<double> _p_dr_f_dr_f;
-   std::vector<double> _p_dr_f_dphi_f;
-   std::vector<double> _p_sphereX_f;
+   _rho_vv(     _n,0),
+   _rho_vr(     _n,0),
+   _rho_rr(     _n,0),
+   _rho_rphi(   _n,0),
+   _rho_sphereX(_n,0),
 
-   std::vector<double> _dr_f;
-   std::vector<double> _lap_f;
-   std::vector<double> _dr_p;
-   std::vector<double> _dr_dr_f;
-   std::vector<double> _dphi_f;
-   std::vector<double> _dphi_dr_f;
-   std::vector<double> _sphereX_f;
-
-   /* 
-    * for computing energy density rho 
-    */
-   std::vector<double> _rho_vv;
-   std::vector<double> _rho_vr;
-   std::vector<double> _rho_rr;
-   std::vector<double> _rho_rphi;
-   std::vector<double> _rho_sphereX;
-   /* 
-    * no evolution at spatial infinity 
-    */
-   std::vector<double> _not_at_spat_infty;
-}
-/*==========================================================================*/
-void init()
+   _not_at_spat_infty(_n,0)
 {
-   _n  = Params::nx_nlat_nphi();
-   _dt = Params::dt();
+   const size_t nx   = grid.nx();
+   const size_t nlat = grid.nlat();
+   const size_t nphi = grid.nphi();
 
-   _pre.resize(_n,0);
+   const double cl = params.cl();
 
-   _p_p.resize(        _n,0);
-   _p_dr_f.resize(     _n,0);
-   _p_dr_p.resize(     _n,0);
-   _p_dr_dr_f.resize(  _n,0);
-   _p_dphi_dr_f.resize(_n,0);
-   _p_lap_f.resize(    _n,0);
-
-   _p_p_p.resize(        _n,0);
-   _p_p_dr_f.resize(     _n,0);
-   _p_dr_f_dr_f.resize(  _n,0);
-   _p_dr_f_dphi_f.resize(_n,0);
-   _p_sphereX_f.resize(  _n,0);
-
-   _dr_f.resize(     _n);
-   _lap_f.resize(    _n);
-   _dr_p.resize(     _n);
-   _dr_dr_f.resize(  _n);
-   _dphi_f.resize(   _n);
-   _dphi_dr_f.resize(_n);
-   _sphereX_f.resize(_n);
-
-   _rho_vv.resize(     _n,0);
-   _rho_vr.resize(     _n,0);
-   _rho_rr.resize(     _n,0);
-   _rho_rphi.resize(   _n,0);
-   _rho_sphereX.resize(_n,0);
-
-   _not_at_spat_infty.resize(_n,0);
-
-   const size_t nx   = Params::nx();
-   const size_t nlat = Params::nlat();
-   const size_t nphi = Params::nphi();
-
-   const double cl  = Params::cl();
-
-   const double m = Params::bh_mass();
-   const double a = Params::bh_spin();
-
-   _km1 = Params::km1();
-   _k0  = Params::k0();
-   _k1  = Params::k1();
-   _k2  = Params::k2();
-
-   _v2  = Params::V2();
-   _v3  = Params::V3();
-   _v4  = Params::V4();
+   const double m = params.bh_mass();
+   const double a = params.bh_spin();
 
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
-      const size_t indx = Grid::indx(ix,it,ip);
+      const size_t indx = grid.indx(ix,it,ip);
       
-      std::vector<double> R_th_ph = Grid::R_th_ph(ix, it, ip); 
-      std::vector<double> r_th_ph = Grid::r_th_ph(ix, it, ip); 
+      std::vector<double> R_th_ph = grid.R_th_ph(ix, it, ip); 
+      std::vector<double> r_th_ph = grid.r_th_ph(ix, it, ip); 
 
       const double inv_r = (fabs(R_th_ph[0]-cl)<1e-16) ? 0 : (1.0/r_th_ph[0]);
       const double th = r_th_ph[1];
@@ -175,8 +115,8 @@ void init()
    }
    }
    for (size_t i=0; i<_n; i++) {
-      std::vector<double> R_th_ph = Grid::R_th_ph(i); 
-      if (fabs(R_th_ph[0]-Params::cl())<1e-16) {
+      std::vector<double> R_th_ph = grid.R_th_ph(i); 
+      if (fabs(R_th_ph[0]-cl)<1e-16) {
          _not_at_spat_infty[i] = 0.0;
       } else {
          _not_at_spat_infty[i] = 1.0;
@@ -184,23 +124,41 @@ void init()
    }
 }
 /*==========================================================================*/
-void set_k(
+Eom::~Eom()
+{
+}
+/*==========================================================================*/
+void Eom::set_k(
+      const Grid &grid,
       const std::vector<double> &f,
       const std::vector<double> &p,
       std::vector<double> &f_k,
       std::vector<double> &p_k
-      )
+      ) const
 {
-   Grid::set_partial_r(    f,    _dr_f);
-   Grid::set_partial_r(    p,    _dr_p);
-   Grid::set_partial_r(_dr_f, _dr_dr_f);
+   assert(f.size()  ==_n);
+   assert(p.size()  ==_n);
+   assert(f_k.size()==_n);
+   assert(p_k.size()==_n);
 
-   Grid::set_partial_phi(    f, _dphi_f);
-   Grid::set_partial_phi(_dr_f, _dphi_dr_f);
+   std::vector<double> _dr_f(     _n);
+   std::vector<double> _lap_f(    _n);
+   std::vector<double> _dr_p(     _n);
+   std::vector<double> _dr_dr_f(  _n);
+   std::vector<double> _dphi_f(   _n);
+   std::vector<double> _dphi_dr_f(_n);
+   std::vector<double> _sphereX_f(_n);
 
-   Grid::set_sphereX(f, _sphereX_f);
+   grid.set_partial_r(    f,    _dr_f);
+   grid.set_partial_r(    p,    _dr_p);
+   grid.set_partial_r(_dr_f, _dr_dr_f);
 
-   Grid::set_spherical_lap(f, _lap_f);
+   grid.set_partial_phi(    f, _dphi_f);
+   grid.set_partial_phi(_dr_f, _dphi_dr_f);
+
+   grid.set_sphereX(f, _sphereX_f);
+
+   grid.set_spherical_lap(f, _lap_f);
 
    for (size_t i=0; i<_n; i++) {
       const double inverse_k = 1.0/( 
@@ -252,41 +210,33 @@ void set_k(
 /*==========================================================================*/
 /* Fourth order Runge-Kutta integrator */
 /*==========================================================================*/
-void time_step(Field &f, Field &p)
+void Eom::time_step(const Grid &grid, Field &f, Field &p) const
 {
    assert(f.size==_n);
    assert(p.size==_n);
 
-   Grid::filter(f.n);
-   Grid::filter(p.n);
+   grid.filter(f.n);
+   grid.filter(p.n);
    /*--------------------------------------------*/
-   set_k(f.n, p.n, 
-         f.k1, p.k1
-      );
+   set_k(grid, f.n, p.n, f.k1, p.k1);
    /*--------------------------------------------*/
    for (size_t i=0; i<_n; i++) {
       f.l2[i] = f.n[i] + 0.5*_dt*f.k1[i];
       p.l2[i] = p.n[i] + 0.5*_dt*p.k1[i];
    }
-   set_k(f.l2, p.l2, 
-         f.k2, p.k2
-      );
+   set_k(grid, f.l2, p.l2, f.k2, p.k2);
    /*--------------------------------------------*/
    for (size_t i=0; i<_n; i++) {
       f.l3[i] = f.n[i] + 0.5*_dt*f.k2[i];
       p.l3[i] = p.n[i] + 0.5*_dt*p.k2[i];
    }
-   set_k(f.l3, p.l3, 
-         f.k3, p.k3
-      );
+   set_k(grid, f.l3, p.l3, f.k3, p.k3);
    /*--------------------------------------------*/
    for (size_t i=0; i<_n; i++) {
       f.l4[i] = f.n[i] + _dt*f.k3[i];
       p.l4[i] = p.n[i] + _dt*p.k3[i];
    }
-   set_k(f.l4, p.l4,
-         f.k4, p.k4
-      );
+   set_k(grid, f.l4, p.l4, f.k4, p.k4);
    /*--------------------------------------------*/
    for (size_t i=0; i<_n; i++) {
       f.np1[i] = f.n[i] + (_dt/6.0)*(f.k1[i] + 2.0*f.k2[i] + 2.0*f.k3[i] + f.k4[i]);
@@ -294,19 +244,24 @@ void time_step(Field &f, Field &p)
    }
 }
 /*==========================================================================*/
-void set_rho(
+void Eom::set_rho(
+      const Grid &grid, 
       const std::vector<double> &f,
       const std::vector<double> &p,
       std::vector<double> &rho
-      )
+      ) const
 {
    assert(f.size()  ==_n);
    assert(p.size()  ==_n);
    assert(rho.size()==_n);
 
-   Grid::set_partial_r(  f,      _dr_f);
-   Grid::set_partial_phi(f,    _dphi_f);
-   Grid::set_sphereX(    f, _sphereX_f);
+   std::vector<double> _dr_f(_n);
+   std::vector<double> _dphi_f(_n);
+   std::vector<double> _sphereX_f(_n);
+
+   grid.set_partial_r(  f,      _dr_f);
+   grid.set_partial_phi(f,    _dphi_f);
+   grid.set_sphereX(    f, _sphereX_f);
 
    for (size_t i=0; i<_n; i++) {
       const double k = ( 
@@ -333,5 +288,3 @@ void set_rho(
       ;
    }
 }
-/*==========================================================================*/
-} /* Eom */

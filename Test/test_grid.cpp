@@ -31,9 +31,7 @@ std::vector<double> get_norm_diff(
    const double ru    = 0.2*(Rmax-Rmin) + Rmin;
    const double width = ru-rl;
 
-   Sphere::init(nl, nm, nlat, nphi);
-   Cheb::init(nx, Rmin, Rmax);
-   Grid::init(cl, nx, nlat, nphi, nl);
+   Grid grid(cl, Rmin, Rmax, nx, nl, nm, nlat, nphi);
 
    std::vector<double> v(n,0);
    std::vector<double> dr_v1(n,0);
@@ -46,7 +44,7 @@ std::vector<double> get_norm_diff(
    std::vector<double> lap_v2(n,0); 
 
    for (size_t i=0; i<n; i++) {
-      const std::vector<double> r_th_ph = Grid::r_th_ph(i);
+      const std::vector<double> r_th_ph = grid.r_th_ph(i);
       const double r     = r_th_ph[0];
       const double theta = r_th_ph[1];
       const double phi   = r_th_ph[2];
@@ -89,35 +87,11 @@ std::vector<double> get_norm_diff(
          -  6.0*cos(4*phi)*pow(sin(theta),2)
          )/pow(3.0 + cos(2*phi),3)
          ;
-/*
-      v[i] = rval*(
-            1.0 
-         +  pow(sin(theta),2)*pow(cos(10*phi),2)
-         );
-      dr_v1[i] = der_rval*(
-            1.0 
-         +  pow(sin(theta),2)*pow(cos(10*phi),2)
-         );
-      dphi_v1[i] = rval*(
-            -10.0*pow(sin(theta),2)*sin(20*phi)
-         );
-      X_v1[i] = rval*4*pow(cos(10*phi),2)*pow(sin(theta),2)*(
-            pow(cos(theta),2)*pow(cos(10*phi),2)
-         +  100*pow(sin(10*phi),2)
-         )
-         ;
-      lap_v1[i] = rval*0.5*(
-            1.0
-         +  3.0*cos(2*theta)
-         +  3.0*(-133.0 + cos(2*theta))*cos(20*phi)
-         )
-         ;
-*/
    }
-   Grid::set_partial_r(    v,   dr_v2);
-   Grid::set_partial_phi(  v, dphi_v2);
-   Grid::set_sphereX(      v,    X_v2);
-   Grid::set_spherical_lap(v,  lap_v2);
+   grid.set_partial_r(    v,   dr_v2);
+   grid.set_partial_phi(  v, dphi_v2);
+   grid.set_sphereX(      v,    X_v2);
+   grid.set_spherical_lap(v,  lap_v2);
 
    double norm_dr   = 0;
    double norm_dphi = 0;
@@ -165,9 +139,7 @@ std::vector<double> get_total_variation(
    const double ru    = 0.5*(Rmax-Rmin) + Rmin;
    const double width = ru-rl;
 
-   Sphere::init(nl, nm, nlat, nphi);
-   Cheb::init(nx, Rmin, Rmax);
-   Grid::init(cl, nx, nlat, nphi, nl);
+   Grid grid(cl, Rmin, Rmax, nx, nl, nm, nlat, nphi);
    /*
     * noisy grid + filter of it
     */
@@ -175,7 +147,7 @@ std::vector<double> get_total_variation(
    std::vector<double> filter_v(n,0);
 
    for (size_t i=0; i<n; i++) {
-      const std::vector<double> loc_r = Grid::r_th_ph(i);
+      const std::vector<double> loc_r = grid.r_th_ph(i);
       const double r     = loc_r[0];
       const double theta = loc_r[1];
       const double phi   = loc_r[2];
@@ -195,7 +167,7 @@ std::vector<double> get_total_variation(
       v[i] *= (1.0 + (0.1*rand()/RAND_MAX));
       filter_v[i] = v[i];
    }
-   Grid::filter(filter_v);
+   grid.filter(filter_v);
    /*
     * total variation of grid and filtered version of it 
     */
@@ -207,32 +179,32 @@ std::vector<double> get_total_variation(
    for (size_t ip=0; ip<nphi-1; ip++) {
       tv_v += pow(
                pow(
-                  v[Grid::indx(ix+1, it, ip)] 
-               -  v[Grid::indx(ix,   it, ip)]
+                  v[grid.indx(ix+1, it, ip)] 
+               -  v[grid.indx(ix,   it, ip)]
                ,2)
             +  pow(
-                  v[Grid::indx(ix, it+1, ip)] 
-               -  v[Grid::indx(ix, it,   ip)]
+                  v[grid.indx(ix, it+1, ip)] 
+               -  v[grid.indx(ix, it,   ip)]
                ,2)
             +  pow(
-                  v[Grid::indx(ix, it, ip+1)] 
-               -  v[Grid::indx(ix, it, ip)]
+                  v[grid.indx(ix, it, ip+1)] 
+               -  v[grid.indx(ix, it, ip)]
                ,2)
             ,
             0.5); 
 
       tv_filter_v += pow(
                pow(
-                  filter_v[Grid::indx(ix+1, it, ip)] 
-               -  filter_v[Grid::indx(ix,   it, ip)]
+                  filter_v[grid.indx(ix+1, it, ip)] 
+               -  filter_v[grid.indx(ix,   it, ip)]
                ,2)
             +  pow(
-                  filter_v[Grid::indx(ix, it+1, ip)] 
-               -  filter_v[Grid::indx(ix, it,   ip)]
+                  filter_v[grid.indx(ix, it+1, ip)] 
+               -  filter_v[grid.indx(ix, it,   ip)]
                ,2)
             +  pow(
-                  filter_v[Grid::indx(ix, it, ip+1)] 
-               -  filter_v[Grid::indx(ix, it, ip)]
+                  filter_v[grid.indx(ix, it, ip+1)] 
+               -  filter_v[grid.indx(ix, it, ip)]
                ,2)
             ,
             0.5); 

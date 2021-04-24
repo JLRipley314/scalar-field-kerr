@@ -3,36 +3,14 @@
 #include <iostream>
 #include "cheb.hpp"
 /*==========================================================================*/
-namespace Cheb {
-/*==========================================================================*/
-namespace {
-      size_t _n;
-
-      double _lower;
-      double _upper;
-      double _jacobian; 
-      /* 
-       * Chebyshev points over interval [lower,upper] 
-       */
-      std::vector<double> _pts;
-      std::vector<double> _low_pass;
-      /* 
-       * for fftw Fourier transform 
-       */
-      fftw_plan _plan_dct;
-}
-/*==========================================================================*/
-/* setup fftw and vectors */
-/*==========================================================================*/
-void init(const int n, const double lower, const double upper) 
+Cheb::Cheb(const size_t n, const double lower, const double upper)
+:  _n{n},
+   _lower{lower},
+   _upper{upper},
+   _jacobian{(_upper-_lower) / 2.0},
+   _pts(_n,0),
+   _low_pass(_n,0)
 {
-   _n = n;
-   _lower = lower;
-   _upper = upper;
-   _jacobian = (_upper-_lower) / 2.0;
-
-   _pts.resize(_n,0.0);
-   _low_pass.resize(_n,0.0);
    /* 
     * Chebyshev points on interval [lower, upper]
     */
@@ -56,7 +34,7 @@ void init(const int n, const double lower, const double upper)
    assert(_plan_dct!=nullptr);
 }
 /*==========================================================================*/
-void cleanup()
+Cheb::~Cheb()
 {
    assert(_plan_dct!=nullptr);
 
@@ -66,7 +44,7 @@ void cleanup()
 /*==========================================================================*/
 /* position space to Chebyshev space */
 /*==========================================================================*/
-void to_ch(std::vector<double> &po, std::vector<double> &ch) 
+void Cheb::to_ch(std::vector<double> &po, std::vector<double> &ch) const 
 {
    /*
     * compute Fourier transform
@@ -86,7 +64,7 @@ void to_ch(std::vector<double> &po, std::vector<double> &ch)
 /*==========================================================================*/
 /* Chebyshev space to position space */
 /*==========================================================================*/
-void to_po(std::vector<double> &ch, std::vector<double> &po) 
+void Cheb::to_po(std::vector<double> &ch, std::vector<double> &po) const 
 {
    /*
     * compute Fourier transform
@@ -104,7 +82,7 @@ void to_po(std::vector<double> &ch, std::vector<double> &po)
 /*==========================================================================*/
 /* Compute derivative over interval */
 /*==========================================================================*/
-void der(std::vector<double> &v, std::vector<double> &dv)
+void Cheb::der(std::vector<double> &v, std::vector<double> &dv) const
 {
    std::vector<double> ch_tmp(_n,0);
    assert(v.size( )==_n);
@@ -140,7 +118,7 @@ void der(std::vector<double> &v, std::vector<double> &dv)
 /*==========================================================================*/
 /* Low pass filter of Chebyshev coefficients */
 /*==========================================================================*/
-void filter(std::vector<double> &v)
+void Cheb::filter(std::vector<double> &v) const
 {
    std::vector<double> ch_tmp(_n,0);
    assert(v.size()==_n);
@@ -152,9 +130,8 @@ void filter(std::vector<double> &v)
    to_po(ch_tmp,v);
 }
 /*==========================================================================*/
-size_t n() { return _n; }
-double lower() { return _lower; }
-double upper() { return _upper; }
-double pt(const size_t i) { return _pts[i]; }
+size_t Cheb::n() const { return _n; }
+double Cheb::lower() const { return _lower; }
+double Cheb::upper() const { return _upper; }
+double Cheb::pt(const size_t i) const { return _pts[i]; }
 /*==========================================================================*/
-} /* Cheb */

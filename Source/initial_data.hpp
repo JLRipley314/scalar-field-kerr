@@ -7,12 +7,16 @@
 #include <string>
 #include <vector>
 
+#include "grid.hpp"
+#include "params.hpp"
+
 /*==========================================================================*/
 namespace ID 
 {
 /*==========================================================================*/
 void compact_pulse(
-      std::string initial_data_direction,
+      const Grid &grid,
+      const Params &params,
       std::vector<double> &f,
       std::vector<double> &p
    );

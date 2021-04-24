@@ -17,47 +17,35 @@
 #endif
 
 /*===========================================================================*/
-namespace Grid 
-{
-namespace {
-   size_t _nx;
-   size_t _nlat; 
-   size_t _nphi;
-   size_t _nl; 
-
-   std::vector<std::vector<double>> _r_th_ph;
-   std::vector<std::vector<double>> _R_th_ph;
-   std::vector<std::vector<double>> _x_y_z;
-   std::vector<std::vector<double>> _x_z;
-   std::vector<std::vector<double>> _th_ph;
-   std::vector<std::vector<double>> _R_th;
-   std::vector<std::vector<double>> _R_l;
-   std::vector<std::vector<double>> _n_l;
-
-   std::vector<double> _partial_R_to_partial_r;
-}
-/*===========================================================================*/
-void init(
+Grid::Grid(
       const double cl,
+      const double Rmin,
+      const double Rmax,
       const size_t nx,
+      const size_t nl,
+      const size_t nm,
       const size_t nlat,
-      const size_t nphi,
-      const size_t nl)
+      const size_t nphi)
+:  _cl{cl},
+   _Rmin{Rmin},
+   _Rmax{Rmax},
+   _nx{nx},
+   _nl{nl},
+   _nm{nm},
+   _nlat{nlat},
+   _nphi{nphi},
+   _sphere(_nl, _nm, _nlat, _nphi),
+   _cheb(_nx, _Rmin, _Rmax)
 {
-   _nx   = nx;
-   _nlat = nlat; 
-   _nphi = nphi; 
-   _nl   = nl; 
-
    _r_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _R_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _x_y_z.resize(  _nx*_nphi*_nlat, std::vector<double>(3,0));
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      double R     = Cheb::pt(ix);
-      double theta = Sphere::theta(it);  
-      double phi   = Sphere::phi(  ip);
+      double R     = _cheb.pt(ix);
+      double theta = _sphere.theta(it);  
+      double phi   = _sphere.phi(  ip);
 
       _r_th_ph[INDX_R_TH_PH(ix,it,ip)][0] = (fabs(R-cl)>1e-16) ? (R/(1.0 - (R/cl))) : 1e12; 
       _r_th_ph[INDX_R_TH_PH(ix,it,ip)][1] = theta; 
@@ -76,8 +64,8 @@ void init(
    _th_ph.resize(_nphi*_nlat, std::vector<double>(2,0));
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      double theta = Sphere::theta(it);  
-      double phi   = Sphere::phi(  ip);
+      double theta = _sphere.theta(it);  
+      double phi   = _sphere.phi(  ip);
       _th_ph[INDX_TH_PH(it, ip)][0] = theta;
       _th_ph[INDX_TH_PH(it, ip)][1] = phi;
    }
@@ -86,8 +74,8 @@ void init(
    _R_th.resize(_nx*_nlat, std::vector<double>(2,0));
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      double R     = Cheb::pt(ix);
-      double theta = Sphere::theta(it);  
+      double R     = _cheb.pt(ix);
+      double theta = _sphere.theta(it);  
       _R_th[INDX_R_TH(ix,it)][0] = R;
       _R_th[INDX_R_TH(ix,it)][1] = theta;
       _x_z[ INDX_R_TH(ix,it)][0] = R*sin(theta); 
@@ -98,7 +86,7 @@ void init(
    _R_l.resize(_nx*_nl, std::vector<double>(2,0));
    for (size_t ix=0; ix<_nx; ix++) {
    for (size_t il=0; il<_nl; il++) {
-      double R = Cheb::pt(ix);
+      double R = _cheb.pt(ix);
       double l = il;  
       _R_l[INDX_R_L(ix,il)][0] = R;
       _R_l[INDX_R_L(ix,il)][1] = l;
@@ -108,98 +96,85 @@ void init(
    }
    _partial_R_to_partial_r.resize(_nx,0); 
    for (size_t ix=0; ix<_nx; ix++) {
-      _partial_R_to_partial_r[ix] = pow(1.0 - (Cheb::pt(ix)/cl),2);
+      _partial_R_to_partial_r[ix] = pow(1.0 - (_cheb.pt(ix)/cl),2);
    }
 }
 /*=========================================================================*/
-size_t indx(const size_t i_x, const size_t i_th, const size_t i_ph) 
+Grid::~Grid()
+{
+}
+/*=========================================================================*/
+size_t Grid::indx(const size_t i_x, const size_t i_th, const size_t i_ph) const 
 {
    return INDX_R_TH_PH(i_x, i_th, i_ph);
 }
-/*===========================================================================*/
-std::vector<double> r_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) 
+size_t Grid::sphere_indx(const size_t i_th, const size_t i_ph) const 
+{
+   return INDX_TH_PH(i_th, i_ph);
+}
+/*=========================================================================*/
+std::vector<double> Grid::r_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) const 
 {
    return _r_th_ph[INDX_R_TH_PH(i_x, i_th, i_ph)];
 }
-/*===========================================================================*/
-std::vector<double> r_th_ph(const size_t i) 
+std::vector<double> Grid::r_th_ph(const size_t i) const 
 {
    return _r_th_ph[i];
 }
-/*===========================================================================*/
-std::vector<double> R_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) 
+/*=========================================================================*/
+std::vector<double> Grid::R_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) const 
 {
    return _R_th_ph[INDX_R_TH_PH(i_x, i_th, i_ph)];
 }
-/*===========================================================================*/
-std::vector<double> R_th_ph(const size_t i) 
+std::vector<double> Grid::R_th_ph(const size_t i) const 
 {
    return _R_th_ph[i];
 }
-/*===========================================================================*/
-std::vector<double> x_y_z(const size_t i_x, const size_t i_th, const size_t i_ph) 
+/*=========================================================================*/
+std::vector<double> Grid::x_y_z(const size_t i_x, const size_t i_th, const size_t i_ph) const 
 {
    return _x_y_z[INDX_R_TH_PH(i_x, i_th, i_ph)];
 }
-/*===========================================================================*/
-std::vector<double> x_y_z(const size_t i) 
+std::vector<double> Grid::x_y_z(const size_t i) const 
 {
    return _x_y_z[i];
 }
-/*===========================================================================*/
-std::vector<double> th_ph(const size_t i_th, const size_t i_ph) 
+/*=========================================================================*/
+std::vector<double> Grid::th_ph(const size_t i_th, const size_t i_ph) const 
 {
    return _th_ph[INDX_TH_PH(i_th, i_ph)];
 }
-/*===========================================================================*/
-std::vector<double> th_ph(const size_t i) 
+std::vector<double> Grid::th_ph(const size_t i) const 
 {
    return _th_ph[i];
 }
-/*===========================================================================*/
-std::vector<double> R_th(const size_t i_x, const size_t i_th) 
-{
-   return _R_th[INDX_R_TH(i_x, i_th)];
-}
-/*===========================================================================*/
-std::vector<double> R_th(const size_t i) 
-{
-   return _R_th[i];
-}
-/*===========================================================================*/
-std::vector<double> x_z(const size_t i_x, const size_t i_th) 
-{
-   return _x_z[INDX_R_TH(i_x, i_th)];
-}
-/*===========================================================================*/
-std::vector<double> x_z(const size_t i) 
-{
-   return _x_z[i];
-}
-/*===========================================================================*/
-std::vector<double> R_l(const size_t i_x, const size_t i_l) 
+/*=========================================================================*/
+std::vector<double> Grid::R_l(const size_t i_x, const size_t i_l) const 
 {
    return _R_l[INDX_R_L(i_x, i_l)];
 }
-/*===========================================================================*/
-std::vector<double> R_l(const size_t i) 
+std::vector<double> Grid::R_l(const size_t i) const 
 {
    return _R_l[i];
 }
-/*===========================================================================*/
-std::vector<double> n_l(const size_t i_x, const size_t i_l) 
+/*=========================================================================*/
+std::vector<double> Grid::n_l(const size_t i_x, const size_t i_l) const 
 {
    return _n_l[INDX_R_L(i_x, i_l)];
 }
-/*===========================================================================*/
-std::vector<double> n_l(const size_t i) 
+std::vector<double> Grid::n_l(const size_t i) const 
 {
    return _n_l[i];
 }
 /*=========================================================================*/
-void get_row_R(const size_t it, const size_t ip, 
+std::vector<double> Grid::compute_ylm(const size_t l_ang, const size_t m_ang) const
+{
+   return _sphere.compute_ylm(l_ang, m_ang);
+}
+/*=========================================================================*/
+void Grid::get_row_R(const size_t it, const size_t ip, 
       const std::vector<double> &in,
-      std::vector<double> &out) 
+      std::vector<double> &out) const 
 {
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nx);
@@ -207,10 +182,20 @@ void get_row_R(const size_t it, const size_t ip,
       out[ix] = in[INDX_R_TH_PH(ix,it,ip)];
    }
 } 
-/*=========================================================================*/
-void get_row_th(const size_t ix, const size_t ip, 
+void Grid::set_row_R(const size_t it, const size_t ip, 
       const std::vector<double> &in,
-      std::vector<double> &out) 
+      std::vector<double> &out) const 
+{
+   assert(in.size() ==_nx);
+   assert(out.size()==_nx*_nphi*_nlat);
+   for (size_t ix=0; ix<_nx; ix++) {
+      out[INDX_R_TH_PH(ix,it,ip)] = in[ix];
+   }
+} 
+/*=========================================================================*/
+void Grid::get_row_th(const size_t ix, const size_t ip, 
+      const std::vector<double> &in,
+      std::vector<double> &out) const 
 {
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nlat);
@@ -218,10 +203,20 @@ void get_row_th(const size_t ix, const size_t ip,
       out[it] = in[INDX_R_TH_PH(ix,it,ip)];
    }
 } 
-/*=========================================================================*/
-void get_row_ph(const size_t ix, const size_t it, 
+void Grid::set_row_th(const size_t ix, const size_t ip, 
       const std::vector<double> &in,
-      std::vector<double> &out) 
+      std::vector<double> &out) const 
+{
+   assert(in.size() ==_nlat);
+   assert(out.size()==_nx*_nphi*_nlat);
+   for (size_t it=0; it<_nlat; it++) {
+      out[INDX_R_TH_PH(ix,it,ip)] = in[it];
+   }
+} 
+/*=========================================================================*/
+void Grid::get_row_ph(const size_t ix, const size_t it, 
+      const std::vector<double> &in,
+      std::vector<double> &out) const 
 {
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nphi);
@@ -229,10 +224,20 @@ void get_row_ph(const size_t ix, const size_t it,
       out[ip] = in[INDX_R_TH_PH(ix,it,ip)];
    }
 } 
+void Grid::set_row_ph(const size_t ix, const size_t it, 
+      const std::vector<double> &in,
+      std::vector<double> &out) const 
+{
+   assert(in.size() ==_nphi);
+   assert(out.size()==_nx*_nphi*_nlat);
+   for (size_t ip=0; ip<_nlat; ip++) {
+      out[INDX_R_TH_PH(ix,it,ip)] = in[ip];
+   }
+} 
 /*=========================================================================*/
-void get_row_n(const size_t il, 
+void Grid::get_row_n(const size_t il, 
       const std::vector<double> &in, 
-      std::vector<double> &out)
+      std::vector<double> &out) const
 {
    assert(in.size() ==_nx*_nl);
    assert(out.size()==_nx);
@@ -240,10 +245,20 @@ void get_row_n(const size_t il,
       out[ix] = in[INDX_R_L(ix,il)];
    }
 } 
+void Grid::set_row_n(const size_t il, 
+      const std::vector<double> &in, 
+      std::vector<double> &out) const
+{
+   assert(in.size() ==_nx);
+   assert(out.size()==_nx*_nl);
+   for (size_t ix=0; ix<_nx; ix++) {
+      out[INDX_R_L(ix,il)] = in[ix];
+   }
+} 
 /*=========================================================================*/
-void get_row_R_th(const size_t ip, 
+void Grid::get_row_R_th(const size_t ip, 
       const std::vector<double> &in,
-      std::vector<double> &out)
+      std::vector<double> &out) const
 {
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nx*_nlat);
@@ -253,91 +268,9 @@ void get_row_R_th(const size_t ip,
    }
    }
 }
-/*=========================================================================*/
-void get_row_R_ph(const size_t it, 
+void Grid::set_row_R_th(const size_t ip, 
       const std::vector<double> &in,
-      std::vector<double> &out)
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nx*_nlat);
-   for (size_t ix=0; ix<_nx;   ix++) {
-   for (size_t ip=0; ip<_nphi; ip++) {
-      out[INDX_R_PH(ix,ip)] = in[INDX_R_TH_PH(ix,it,ip)];
-   }
-   }
-}
-/*=========================================================================*/
-void get_row_th_ph(const size_t ix, 
-      const std::vector<double> &in,
-      std::vector<double> &out)
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nphi*_nlat);
-   for (size_t it=0; it<_nlat; it++) {
-   for (size_t ip=0; ip<_nphi; ip++) {
-      out[INDX_TH_PH(it,ip)] = in[INDX_R_TH_PH(ix,it,ip)];
-   }
-   }
-}
-/*=========================================================================*/
-void set_row_R(const size_t it, const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) 
-{
-   assert(in.size() ==_nx);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t ix=0; ix<_nx; ix++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[ix];
-   }
-} 
-/*=========================================================================*/
-void set_row_th(const size_t ix, const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) 
-{
-   assert(in.size() ==_nlat);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t it=0; it<_nlat; it++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[it];
-   }
-} 
-/*=========================================================================*/
-void set_row_ph(const size_t ix, const size_t it, 
-      const std::vector<double> &in,
-      std::vector<double> &out) 
-{
-   assert(in.size() ==_nphi);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t ip=0; ip<_nlat; ip++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[ip];
-   }
-} 
-/*=========================================================================*/
-void set_row_l(const size_t ix, 
-      const std::vector<double> &lvals, 
-      std::vector<double> &Rlvals)
-{
-   assert(lvals.size() ==_nl);
-   assert(Rlvals.size()==_nx*_nl);
-   for (size_t il=0; il<_nl; il++) {
-      Rlvals[INDX_R_L(ix,il)] = lvals[il];
-   }
-} 
-/*=========================================================================*/
-void set_row_n(const size_t il, 
-      const std::vector<double> &in, 
-      std::vector<double> &out)
-{
-   assert(in.size() ==_nx);
-   assert(out.size()==_nx*_nl);
-   for (size_t ix=0; ix<_nx; ix++) {
-      out[INDX_R_L(ix,il)] = in[ix];
-   }
-} 
-/*=========================================================================*/
-void set_row_R_th(const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out)
+      std::vector<double> &out) const
 {
    assert(in.size() ==_nx*_nlat);
    assert(out.size()==_nx*_nphi*_nlat);
@@ -348,9 +281,21 @@ void set_row_R_th(const size_t ip,
    }
 }
 /*=========================================================================*/
-void set_row_R_ph(const size_t it, 
+void Grid::get_row_R_ph(const size_t it, 
       const std::vector<double> &in,
-      std::vector<double> &out)
+      std::vector<double> &out) const
+{
+   assert(in.size() ==_nx*_nphi*_nlat);
+   assert(out.size()==_nx*_nlat);
+   for (size_t ix=0; ix<_nx;   ix++) {
+   for (size_t ip=0; ip<_nphi; ip++) {
+      out[INDX_R_PH(ix,ip)] = in[INDX_R_TH_PH(ix,it,ip)];
+   }
+   }
+}
+void Grid::set_row_R_ph(const size_t it, 
+      const std::vector<double> &in,
+      std::vector<double> &out) const
 {
    assert(in.size() ==_nx*_nphi);
    assert(out.size()==_nx*_nphi*_nlat);
@@ -361,9 +306,21 @@ void set_row_R_ph(const size_t it,
    }
 }
 /*=========================================================================*/
-void set_row_th_ph(const size_t ix, 
+void Grid::get_row_th_ph(const size_t ix, 
       const std::vector<double> &in,
-      std::vector<double> &out)
+      std::vector<double> &out) const
+{
+   assert(in.size() ==_nx*_nphi*_nlat);
+   assert(out.size()==_nphi*_nlat);
+   for (size_t it=0; it<_nlat; it++) {
+   for (size_t ip=0; ip<_nphi; ip++) {
+      out[INDX_TH_PH(it,ip)] = in[INDX_R_TH_PH(ix,it,ip)];
+   }
+   }
+}
+void Grid::set_row_th_ph(const size_t ix, 
+      const std::vector<double> &in,
+      std::vector<double> &out) const
 {
    assert(in.size() ==_nphi*_nlat);
    assert(out.size()==_nx*_nphi*_nlat);
@@ -374,8 +331,19 @@ void set_row_th_ph(const size_t ix,
    }
    }
 }
+/*=========================================================================*/
+void Grid::set_row_l(const size_t ix, 
+      const std::vector<double> &lvals, 
+      std::vector<double> &Rlvals) const
+{
+   assert(lvals.size() ==_nl);
+   assert(Rlvals.size()==_nx*_nl);
+   for (size_t il=0; il<_nl; il++) {
+      Rlvals[INDX_R_L(ix,il)] = lvals[il];
+   }
+} 
 /*==========================================================================*/
-void set_partial_phi(const std::vector<double> &v, std::vector<double> &dv)
+void Grid::set_partial_phi(const std::vector<double> &v, std::vector<double> &dv) const
 {
    assert(v.size() ==_nx*_nlat*_nphi);
    assert(dv.size()==_nx*_nlat*_nphi);
@@ -387,13 +355,13 @@ void set_partial_phi(const std::vector<double> &v, std::vector<double> &dv)
 
       get_row_th_ph(ix, v, inter); 
 
-      Sphere::partial_phi(inter, inter_dv);
+      _sphere.partial_phi(inter, inter_dv);
 
       set_row_th_ph(ix, inter_dv, dv); 
    }
 }
 /*==========================================================================*/
-void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv)
+void Grid::set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv) const
 {
    assert(v.size()  ==_nx*_nlat*_nphi);
    assert(ddv.size()==_nx*_nlat*_nphi);
@@ -405,13 +373,13 @@ void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv)
 
       get_row_th_ph(ix, v, inter); 
 
-      Sphere::laplace_beltrami(inter, inter_ddv);
+      _sphere.laplace_beltrami(inter, inter_ddv);
 
       set_row_th_ph(ix, inter_ddv, ddv); 
    }
 }
 /*==========================================================================*/
-void set_sphereX(const std::vector<double> &v, std::vector<double> &vX)
+void Grid::set_sphereX(const std::vector<double> &v, std::vector<double> &vX) const
 {
    assert(v.size() ==_nx*_nlat*_nphi);
    assert(vX.size()==_nx*_nlat*_nphi);
@@ -423,13 +391,13 @@ void set_sphereX(const std::vector<double> &v, std::vector<double> &vX)
 
       get_row_th_ph(ix, v, inter); 
 
-      Sphere::sphereX(inter, inter_vX);
+      _sphere.sphereX(inter, inter_vX);
 
       set_row_th_ph(ix, inter_vX, vX); 
    }
 }
 /*==========================================================================*/
-void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
+void Grid::set_partial_r(const std::vector<double> &v, std::vector<double> &dv) const
 {
    assert(v.size() ==_nx*_nlat*_nphi);
    assert(dv.size()==_nx*_nlat*_nphi);
@@ -442,7 +410,7 @@ void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
 
       get_row_R(it, ip, v, inter); 
 
-      Cheb::der(inter, inter_dv);
+      _cheb.der(inter, inter_dv);
 
       for (size_t ix=0; ix<_nx; ix++) {
          inter_dv[ix] *= _partial_R_to_partial_r[ix];
@@ -453,25 +421,25 @@ void set_partial_r(const std::vector<double> &v, std::vector<double> &dv)
    }
 }
 /*==========================================================================*/
-void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p)
+void Grid::set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p) const
 {
    assert(v.size()==_nx*_nlat*_nphi);
    assert(p.size()==_nx*_nl);
 
 #pragma omp parallel for
    for (size_t ix=0; ix<_nx; ix++) {
-      std::vector<double> inter_sphere(_nlat*_nphi, 0);
-      std::vector<double> inter_sphere_p(_nl, 0);
+      std::vector<double> inter__sphere(_nlat*_nphi, 0);
+      std::vector<double> inter__sphere_p(_nl, 0);
 
-      get_row_th_ph(ix, v, inter_sphere); 
+      get_row_th_ph(ix, v, inter__sphere); 
 
-      Sphere::power_spectrum(inter_sphere, inter_sphere_p);
+      _sphere.power_spectrum(inter__sphere, inter__sphere_p);
 
-      set_row_l(ix, inter_sphere_p, p); 
+      set_row_l(ix, inter__sphere_p, p); 
    }
 }
 /*==========================================================================*/
-void set_n_l_coef(const std::vector<double> &v, std::vector<double> &p)
+void Grid::set_n_l_coef(const std::vector<double> &v, std::vector<double> &p) const
 {
    assert(v.size()==_nx*_nlat*_nphi);
    assert(p.size()==_nx*_nl);
@@ -490,7 +458,7 @@ void set_n_l_coef(const std::vector<double> &v, std::vector<double> &p)
          inter_v[ix] = pow(inter_v[ix],0.5);
       } 
       /* compute power spectrum */
-      Cheb::to_ch(inter_v, inter_p);
+      _cheb.to_ch(inter_v, inter_p);
 
       set_row_n(il, inter_p, p); 
    }
@@ -498,33 +466,33 @@ void set_n_l_coef(const std::vector<double> &v, std::vector<double> &p)
 /*==========================================================================*/
 /* Low pass filter in spectral space */
 /*==========================================================================*/
-void filter(std::vector<double> &v)
+void Grid::filter(std::vector<double> &v) const
 {
    assert(v.size()==_nx*_nlat*_nphi);
 
 #pragma omp parallel for
    for (size_t ix=0; ix<_nx; ix++) {
-      std::vector<double> inter_sphere(_nlat*_nphi);
-      get_row_th_ph(ix, v, inter_sphere); 
-      Sphere::filter(inter_sphere);
-      set_row_th_ph(ix, inter_sphere, v); 
+      std::vector<double> inter__sphere(_nlat*_nphi);
+      get_row_th_ph(ix, v, inter__sphere); 
+      _sphere.filter(inter__sphere);
+      set_row_th_ph(ix, inter__sphere, v); 
    }
 #pragma omp parallel for
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
       std::vector<double> inter_radial(_nx);
       get_row_R(it, ip, v, inter_radial); 
-      Cheb::filter(inter_radial);
+      _cheb.filter(inter_radial);
       set_row_R(it, ip, inter_radial, v); 
    }
    }
 }
 /*==========================================================================*/
-double norm_indep_res(
+double Grid::norm_indep_res(
       const double dt, 
       const std::vector<double> &f_n, 
       const std::vector<double> &f_np1, 
-      const std::vector<double> &p) 
+      const std::vector<double> &p) const 
 {
    assert(f_n.size()  ==_nx*_nlat*_nphi);
    assert(f_np1.size()==_nx*_nlat*_nphi);
@@ -540,7 +508,7 @@ double norm_indep_res(
    return res;
 }
 /*==========================================================================*/
-double total_variation(const std::vector<double> &v) 
+double Grid::total_variation(const std::vector<double> &v) const 
 {
    assert(v.size()==_nx*_nlat*_nphi);
 
@@ -569,8 +537,6 @@ double total_variation(const std::vector<double> &v)
    return tv/(_nx*_nlat*_nphi);
 }
 /*===========================================================================*/
-} /* Grid */
-
 #undef INDX_R_TH
 #undef INDX_R_PH
 #undef INDX_R_L
