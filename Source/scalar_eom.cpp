@@ -4,7 +4,7 @@
 
 #include "scalar_eom.hpp"
 /*==========================================================================*/
-Eom::Eom(
+Scalar_eom::Scalar_eom(
       const Grid &grid,
       const Params &params
       )
@@ -53,7 +53,7 @@ Eom::Eom(
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
-      const size_t indx = grid.indx(ix,it,ip);
+      const size_t indx = grid.indx_r_th_ph(ix,it,ip);
       
       std::vector<double> R_th_ph = grid.R_th_ph(ix, it, ip); 
       std::vector<double> r_th_ph = grid.r_th_ph(ix, it, ip); 
@@ -124,11 +124,11 @@ Eom::Eom(
    }
 }
 /*==========================================================================*/
-Eom::~Eom()
+Scalar_eom::~Scalar_eom()
 {
 }
 /*==========================================================================*/
-void Eom::set_k(
+void Scalar_eom::set_k(
       const Grid &grid,
       const std::vector<double> &f,
       const std::vector<double> &p,
@@ -208,43 +208,63 @@ void Eom::set_k(
    }
 }
 /*==========================================================================*/
+void Scalar_eom::set_level(
+      const int level,
+      Field &f,
+      Field &p) const
+{
+   if (level==2) {
+      for (size_t i=0; i<_n; i++) {
+         f.l2[i] = f.n[i] + 0.5*_dt*f.k1[i];
+         p.l2[i] = p.n[i] + 0.5*_dt*p.k1[i];
+      }
+   } else
+   if (level==3) {
+      for (size_t i=0; i<_n; i++) {
+         f.l3[i] = f.n[i] + 0.5*_dt*f.k2[i];
+         p.l3[i] = p.n[i] + 0.5*_dt*p.k2[i];
+      }
+   } else
+   if (level==4) {
+      for (size_t i=0; i<_n; i++) {
+         f.l4[i] = f.n[i] + _dt*f.k3[i];
+         p.l4[i] = p.n[i] + _dt*p.k3[i];
+      }
+   } else
+   if (level==5) {
+      for (size_t i=0; i<_n; i++) {
+         f.np1[i] = f.n[i] + (_dt/6.0)*(f.k1[i] + 2.0*f.k2[i] + 2.0*f.k3[i] + f.k4[i]);
+         p.np1[i] = p.n[i] + (_dt/6.0)*(p.k1[i] + 2.0*p.k2[i] + 2.0*p.k3[i] + p.k4[i]);
+      }
+   } else {
+      std::cout<<"ERROR(set_level): level = "<<level<<std::endl;
+   }
+}
+/*==========================================================================*/
 /* Fourth order Runge-Kutta integrator */
 /*==========================================================================*/
-void Eom::time_step(const Grid &grid, Field &f, Field &p) const
+void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
 {
    assert(f.size==_n);
    assert(p.size==_n);
 
    grid.filter(f.n);
    grid.filter(p.n);
-   /*--------------------------------------------*/
+
    set_k(grid, f.n, p.n, f.k1, p.k1);
-   /*--------------------------------------------*/
-   for (size_t i=0; i<_n; i++) {
-      f.l2[i] = f.n[i] + 0.5*_dt*f.k1[i];
-      p.l2[i] = p.n[i] + 0.5*_dt*p.k1[i];
-   }
+   set_level(2, f, p);
+
    set_k(grid, f.l2, p.l2, f.k2, p.k2);
-   /*--------------------------------------------*/
-   for (size_t i=0; i<_n; i++) {
-      f.l3[i] = f.n[i] + 0.5*_dt*f.k2[i];
-      p.l3[i] = p.n[i] + 0.5*_dt*p.k2[i];
-   }
+   set_level(3, f, p);
+
    set_k(grid, f.l3, p.l3, f.k3, p.k3);
-   /*--------------------------------------------*/
-   for (size_t i=0; i<_n; i++) {
-      f.l4[i] = f.n[i] + _dt*f.k3[i];
-      p.l4[i] = p.n[i] + _dt*p.k3[i];
-   }
+   set_level(4, f, p);
+
    set_k(grid, f.l4, p.l4, f.k4, p.k4);
-   /*--------------------------------------------*/
-   for (size_t i=0; i<_n; i++) {
-      f.np1[i] = f.n[i] + (_dt/6.0)*(f.k1[i] + 2.0*f.k2[i] + 2.0*f.k3[i] + f.k4[i]);
-      p.np1[i] = p.n[i] + (_dt/6.0)*(p.k1[i] + 2.0*p.k2[i] + 2.0*p.k3[i] + p.k4[i]);
-   }
+   set_level(5, f, p);
 }
 /*==========================================================================*/
-void Eom::set_rho(
+void Scalar_eom::set_rho(
       const Grid &grid, 
       const std::vector<double> &f,
       const std::vector<double> &p,

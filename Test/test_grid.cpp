@@ -179,32 +179,32 @@ std::vector<double> get_total_variation(
    for (size_t ip=0; ip<nphi-1; ip++) {
       tv_v += pow(
                pow(
-                  v[grid.indx(ix+1, it, ip)] 
-               -  v[grid.indx(ix,   it, ip)]
+                  v[grid.indx_r_th_ph(ix+1, it, ip)] 
+               -  v[grid.indx_r_th_ph(ix,   it, ip)]
                ,2)
             +  pow(
-                  v[grid.indx(ix, it+1, ip)] 
-               -  v[grid.indx(ix, it,   ip)]
+                  v[grid.indx_r_th_ph(ix, it+1, ip)] 
+               -  v[grid.indx_r_th_ph(ix, it,   ip)]
                ,2)
             +  pow(
-                  v[grid.indx(ix, it, ip+1)] 
-               -  v[grid.indx(ix, it, ip)]
+                  v[grid.indx_r_th_ph(ix, it, ip+1)] 
+               -  v[grid.indx_r_th_ph(ix, it, ip)]
                ,2)
             ,
             0.5); 
 
       tv_filter_v += pow(
                pow(
-                  filter_v[grid.indx(ix+1, it, ip)] 
-               -  filter_v[grid.indx(ix,   it, ip)]
+                  filter_v[grid.indx_r_th_ph(ix+1, it, ip)] 
+               -  filter_v[grid.indx_r_th_ph(ix,   it, ip)]
                ,2)
             +  pow(
-                  filter_v[grid.indx(ix, it+1, ip)] 
-               -  filter_v[grid.indx(ix, it,   ip)]
+                  filter_v[grid.indx_r_th_ph(ix, it+1, ip)] 
+               -  filter_v[grid.indx_r_th_ph(ix, it,   ip)]
                ,2)
             +  pow(
-                  filter_v[grid.indx(ix, it, ip+1)] 
-               -  filter_v[grid.indx(ix, it, ip)]
+                  filter_v[grid.indx_r_th_ph(ix, it, ip+1)] 
+               -  filter_v[grid.indx_r_th_ph(ix, it, ip)]
                ,2)
             ,
             0.5); 

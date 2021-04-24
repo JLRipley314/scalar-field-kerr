@@ -43,7 +43,7 @@ void compact_pulse(
       if ((r<ru) && (r>rl)) {
          bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
       }
-      f[grid.indx(ix,it,ip)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
+      f[grid.indx_r_th_ph(ix,it,ip)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
 
       const double partial_r_f = (
             2.0*   ((r-rl)/width  )*pow((ru-r)/width,2) 
@@ -53,27 +53,27 @@ void compact_pulse(
          )*(bump/width)
          ;
       if (initial_data_direction=="ingoing") {
-         p[grid.indx(ix,it,ip)] =  partial_r_f;
+         p[grid.indx_r_th_ph(ix,it,ip)] =  partial_r_f;
       } else
       if (initial_data_direction=="outgoing") { 
-         p[grid.indx(ix,it,ip)] = -partial_r_f;
+         p[grid.indx_r_th_ph(ix,it,ip)] = -partial_r_f;
       } else
       if (initial_data_direction=="time_symmetric") { 
-         p[grid.indx(ix,it,ip)] = 0; 
+         p[grid.indx_r_th_ph(ix,it,ip)] = 0; 
       } else {
          std::cout
             <<"Using default initial data direction: time_symmetric."
             <<std::endl;
-         p[grid.indx(ix,it,ip)] = 0; 
+         p[grid.indx_r_th_ph(ix,it,ip)] = 0; 
       } 
       /*
        * give angular structure Y_{lm} 
        */
-      f[grid.indx(ix,it,ip)] *= ylm[grid.sphere_indx(it,ip)];
-      p[grid.indx(ix,it,ip)] *= ylm[grid.sphere_indx(it,ip)];
+      f[grid.indx_r_th_ph(ix,it,ip)] *= ylm[grid.indx_th_ph(it,ip)];
+      p[grid.indx_r_th_ph(ix,it,ip)] *= ylm[grid.indx_th_ph(it,ip)];
 
-      if (fabs(f[grid.indx(ix,it,ip)]) > max_val) {
-         max_val = fabs(f[grid.indx(ix,it,ip)]);
+      if (fabs(f[grid.indx_r_th_ph(ix,it,ip)]) > max_val) {
+         max_val = fabs(f[grid.indx_r_th_ph(ix,it,ip)]);
       }
    }
    }
@@ -84,8 +84,8 @@ void compact_pulse(
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
-      f[grid.indx(ix,it,ip)] *= amp / max_val;
-      p[grid.indx(ix,it,ip)] *= amp / max_val;
+      f[grid.indx_r_th_ph(ix,it,ip)] *= amp / max_val;
+      p[grid.indx_r_th_ph(ix,it,ip)] *= amp / max_val;
    }
    }
    }

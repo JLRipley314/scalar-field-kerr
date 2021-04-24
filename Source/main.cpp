@@ -33,7 +33,7 @@ int main(int argc, char **argv)
       );
 
    std::cout<<"Initializing Equations of motion"<<std::endl;
-   Eom eom(grid, params);
+   Scalar_eom scalar_eom(grid, params);
 
    std::cout<<"Initializing Fields"<<std::endl;
    Field f("f", params.nx_nlat_nphi(), 0.0);
@@ -49,15 +49,17 @@ int main(int argc, char **argv)
          f.n, p.n
       );
 
-   eom.set_rho(grid, f.n, p.n, rho);
+   scalar_eom.set_rho(grid, f.n, p.n, rho);
 
    size_t save_indx = 0;
 
    const double save_rmin = params.Rmin();
-   const double save_rmax = params.Rmin() + ((params.Rmax() - params.Rmin())/8.0);
+   const double save_rmax = params.Rmin() + ((params.Rmax() - params.Rmin())/4.0);
+   const double val_min = 1e-4;
+   const double val_max = 1e4;
 
-   Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_indx, 1e-8, 1e6, save_rmin, save_rmax, f.n);
-   Csv::write_x_y_z(grid, output_dir+"/rho",     save_indx, 1e-8, 1e6, save_rmin, save_rmax, rho);
+   Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_indx, val_min, val_max, save_rmin, save_rmax, f.n);
+   Csv::write_x_y_z(grid, output_dir+"/rho",     save_indx, val_min, val_max, save_rmin, save_rmax, rho);
 
    Csv::write_R_psl(grid, output_dir+"/"+f.name, save_indx, f.n);
    Csv::write_R_psl(grid, output_dir+"/rho",     save_indx, rho);
@@ -76,7 +78,7 @@ int main(int argc, char **argv)
    std::cout<<"Beginning evolution"<<std::endl;
    for (size_t itm=1; itm<params.nt(); itm++) {
 
-      eom.time_step(grid, f, p);
+      scalar_eom.time_step(grid, f, p);
 
       /* save to file */
       if (itm%params.t_step_save()==0) {
@@ -89,12 +91,12 @@ int main(int argc, char **argv)
             <<std::endl;
          if (std::isnan(res)) return EXIT_SUCCESS;
 
-         eom.set_rho(grid, f.np1, p.np1, rho);
+         scalar_eom.set_rho(grid, f.np1, p.np1, rho);
 
          save_indx += 1;
 
-         Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_indx, 1e-8, 1e6, save_rmin, save_rmax, f.np1);
-         Csv::write_x_y_z(grid, output_dir+"/rho",     save_indx, 1e-8, 1e6, save_rmin, save_rmax, rho);
+         Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_indx, val_min, val_max, save_rmin, save_rmax, f.np1);
+         Csv::write_x_y_z(grid, output_dir+"/rho",     save_indx, val_min, val_max, save_rmin, save_rmax, rho);
 
          Csv::write_R_psl(grid, output_dir+"/"+f.name, save_indx, f.np1);
          Csv::write_R_psl(grid, output_dir+"/rho",     save_indx, rho);

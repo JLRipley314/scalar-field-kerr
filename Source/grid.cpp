@@ -4,18 +4,6 @@
 
 #include "grid.hpp"
 
-#define INDX_R_TH(ix,it) ((_nlat)*(ix) + (it))
-#define INDX_R_PH(ix,it) ((_nphi)*(ix) + (it))
-#define INDX_R_L(ix,il)  ((_nl  )*(ix) + (il))
-
-#if SHTNS_CONTIGUOUS_LONGITUDES
-#define INDX_R_TH_PH(ix,it,ip) ((_nphi)*(_nlat)*(ix) + (_nlat)*(ip) + (it))
-#define INDX_TH_PH(it,ip) ((_nlat)*(ip) + (it))
-#else 
-#define INDX_R_TH_PH(ix,it,ip) ((_nlat)*(_nphi)*(ix) + (_nphi)*(it) + (ip))
-#define INDX_TH_PH(it,ip) ((_nphi)*(it) + (ip))
-#endif
-
 /*===========================================================================*/
 Grid::Grid(
       const double cl,
@@ -47,17 +35,17 @@ Grid::Grid(
       double theta = _sphere.theta(it);  
       double phi   = _sphere.phi(  ip);
 
-      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][0] = (fabs(R-cl)>1e-16) ? (R/(1.0 - (R/cl))) : 1e12; 
-      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][1] = theta; 
-      _r_th_ph[INDX_R_TH_PH(ix,it,ip)][2] = phi; 
+      _r_th_ph[indx_r_th_ph(ix,it,ip)][0] = (fabs(R-cl)>1e-16) ? (R/(1.0 - (R/cl))) : 1e12; 
+      _r_th_ph[indx_r_th_ph(ix,it,ip)][1] = theta; 
+      _r_th_ph[indx_r_th_ph(ix,it,ip)][2] = phi; 
 
-      _R_th_ph[INDX_R_TH_PH(ix,it,ip)][0] = R;
-      _R_th_ph[INDX_R_TH_PH(ix,it,ip)][1] = theta;
-      _R_th_ph[INDX_R_TH_PH(ix,it,ip)][2] = phi;
+      _R_th_ph[indx_r_th_ph(ix,it,ip)][0] = R;
+      _R_th_ph[indx_r_th_ph(ix,it,ip)][1] = theta;
+      _R_th_ph[indx_r_th_ph(ix,it,ip)][2] = phi;
 
-      _x_y_z[INDX_R_TH_PH(ix,it,ip)][0] = R*cos(phi)*sin(theta); 
-      _x_y_z[INDX_R_TH_PH(ix,it,ip)][1] = R*sin(phi)*sin(theta);
-      _x_y_z[INDX_R_TH_PH(ix,it,ip)][2] = R*cos(theta);
+      _x_y_z[indx_r_th_ph(ix,it,ip)][0] = R*cos(phi)*sin(theta); 
+      _x_y_z[indx_r_th_ph(ix,it,ip)][1] = R*sin(phi)*sin(theta);
+      _x_y_z[indx_r_th_ph(ix,it,ip)][2] = R*cos(theta);
    }
    }
    }
@@ -66,8 +54,8 @@ Grid::Grid(
    for (size_t ip=0; ip<_nphi; ip++) {
       double theta = _sphere.theta(it);  
       double phi   = _sphere.phi(  ip);
-      _th_ph[INDX_TH_PH(it, ip)][0] = theta;
-      _th_ph[INDX_TH_PH(it, ip)][1] = phi;
+      _th_ph[indx_th_ph(it, ip)][0] = theta;
+      _th_ph[indx_th_ph(it, ip)][1] = phi;
    }
    }
    _x_z.resize( _nx*_nlat, std::vector<double>(2,0));
@@ -76,10 +64,10 @@ Grid::Grid(
    for (size_t it=0; it<_nlat; it++) {
       double R     = _cheb.pt(ix);
       double theta = _sphere.theta(it);  
-      _R_th[INDX_R_TH(ix,it)][0] = R;
-      _R_th[INDX_R_TH(ix,it)][1] = theta;
-      _x_z[ INDX_R_TH(ix,it)][0] = R*sin(theta); 
-      _x_z[ INDX_R_TH(ix,it)][1] = R*cos(theta);
+      _R_th[indx_r_th(ix,it)][0] = R;
+      _R_th[indx_r_th(ix,it)][1] = theta;
+      _x_z[ indx_r_th(ix,it)][0] = R*sin(theta); 
+      _x_z[ indx_r_th(ix,it)][1] = R*cos(theta);
    }
    }
    _n_l.resize(_nx*_nl, std::vector<double>(2,0));
@@ -88,10 +76,10 @@ Grid::Grid(
    for (size_t il=0; il<_nl; il++) {
       double R = _cheb.pt(ix);
       double l = il;  
-      _R_l[INDX_R_L(ix,il)][0] = R;
-      _R_l[INDX_R_L(ix,il)][1] = l;
-      _n_l[INDX_R_L(ix,il)][0] = double(ix);
-      _n_l[INDX_R_L(ix,il)][1] = l;
+      _R_l[indx_r_l(ix,il)][0] = R;
+      _R_l[indx_r_l(ix,il)][1] = l;
+      _n_l[indx_r_l(ix,il)][0] = double(ix);
+      _n_l[indx_r_l(ix,il)][1] = l;
    }
    }
    _partial_R_to_partial_r.resize(_nx,0); 
@@ -102,69 +90,6 @@ Grid::Grid(
 /*=========================================================================*/
 Grid::~Grid()
 {
-}
-/*=========================================================================*/
-size_t Grid::indx(const size_t i_x, const size_t i_th, const size_t i_ph) const 
-{
-   return INDX_R_TH_PH(i_x, i_th, i_ph);
-}
-size_t Grid::sphere_indx(const size_t i_th, const size_t i_ph) const 
-{
-   return INDX_TH_PH(i_th, i_ph);
-}
-/*=========================================================================*/
-std::vector<double> Grid::r_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) const 
-{
-   return _r_th_ph[INDX_R_TH_PH(i_x, i_th, i_ph)];
-}
-std::vector<double> Grid::r_th_ph(const size_t i) const 
-{
-   return _r_th_ph[i];
-}
-/*=========================================================================*/
-std::vector<double> Grid::R_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) const 
-{
-   return _R_th_ph[INDX_R_TH_PH(i_x, i_th, i_ph)];
-}
-std::vector<double> Grid::R_th_ph(const size_t i) const 
-{
-   return _R_th_ph[i];
-}
-/*=========================================================================*/
-std::vector<double> Grid::x_y_z(const size_t i_x, const size_t i_th, const size_t i_ph) const 
-{
-   return _x_y_z[INDX_R_TH_PH(i_x, i_th, i_ph)];
-}
-std::vector<double> Grid::x_y_z(const size_t i) const 
-{
-   return _x_y_z[i];
-}
-/*=========================================================================*/
-std::vector<double> Grid::th_ph(const size_t i_th, const size_t i_ph) const 
-{
-   return _th_ph[INDX_TH_PH(i_th, i_ph)];
-}
-std::vector<double> Grid::th_ph(const size_t i) const 
-{
-   return _th_ph[i];
-}
-/*=========================================================================*/
-std::vector<double> Grid::R_l(const size_t i_x, const size_t i_l) const 
-{
-   return _R_l[INDX_R_L(i_x, i_l)];
-}
-std::vector<double> Grid::R_l(const size_t i) const 
-{
-   return _R_l[i];
-}
-/*=========================================================================*/
-std::vector<double> Grid::n_l(const size_t i_x, const size_t i_l) const 
-{
-   return _n_l[INDX_R_L(i_x, i_l)];
-}
-std::vector<double> Grid::n_l(const size_t i) const 
-{
-   return _n_l[i];
 }
 /*=========================================================================*/
 std::vector<double> Grid::compute_ylm(const size_t l_ang, const size_t m_ang) const
@@ -179,7 +104,7 @@ void Grid::get_row_R(const size_t it, const size_t ip,
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nx);
    for (size_t ix=0; ix<_nx; ix++) {
-      out[ix] = in[INDX_R_TH_PH(ix,it,ip)];
+      out[ix] = in[indx_r_th_ph(ix,it,ip)];
    }
 } 
 void Grid::set_row_R(const size_t it, const size_t ip, 
@@ -189,7 +114,7 @@ void Grid::set_row_R(const size_t it, const size_t ip,
    assert(in.size() ==_nx);
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ix=0; ix<_nx; ix++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[ix];
+      out[indx_r_th_ph(ix,it,ip)] = in[ix];
    }
 } 
 /*=========================================================================*/
@@ -200,7 +125,7 @@ void Grid::get_row_th(const size_t ix, const size_t ip,
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nlat);
    for (size_t it=0; it<_nlat; it++) {
-      out[it] = in[INDX_R_TH_PH(ix,it,ip)];
+      out[it] = in[indx_r_th_ph(ix,it,ip)];
    }
 } 
 void Grid::set_row_th(const size_t ix, const size_t ip, 
@@ -210,7 +135,7 @@ void Grid::set_row_th(const size_t ix, const size_t ip,
    assert(in.size() ==_nlat);
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t it=0; it<_nlat; it++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[it];
+      out[indx_r_th_ph(ix,it,ip)] = in[it];
    }
 } 
 /*=========================================================================*/
@@ -221,7 +146,7 @@ void Grid::get_row_ph(const size_t ix, const size_t it,
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nphi);
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[ip] = in[INDX_R_TH_PH(ix,it,ip)];
+      out[ip] = in[indx_r_th_ph(ix,it,ip)];
    }
 } 
 void Grid::set_row_ph(const size_t ix, const size_t it, 
@@ -231,7 +156,7 @@ void Grid::set_row_ph(const size_t ix, const size_t it,
    assert(in.size() ==_nphi);
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ip=0; ip<_nlat; ip++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[ip];
+      out[indx_r_th_ph(ix,it,ip)] = in[ip];
    }
 } 
 /*=========================================================================*/
@@ -242,7 +167,7 @@ void Grid::get_row_n(const size_t il,
    assert(in.size() ==_nx*_nl);
    assert(out.size()==_nx);
    for (size_t ix=0; ix<_nx; ix++) {
-      out[ix] = in[INDX_R_L(ix,il)];
+      out[ix] = in[indx_r_l(ix,il)];
    }
 } 
 void Grid::set_row_n(const size_t il, 
@@ -252,7 +177,7 @@ void Grid::set_row_n(const size_t il,
    assert(in.size() ==_nx);
    assert(out.size()==_nx*_nl);
    for (size_t ix=0; ix<_nx; ix++) {
-      out[INDX_R_L(ix,il)] = in[ix];
+      out[indx_r_l(ix,il)] = in[ix];
    }
 } 
 /*=========================================================================*/
@@ -264,7 +189,7 @@ void Grid::get_row_R_th(const size_t ip,
    assert(out.size()==_nx*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      out[INDX_R_TH(ix,it)] = in[INDX_R_TH_PH(ix,it,ip)];
+      out[indx_r_th(ix,it)] = in[indx_r_th_ph(ix,it,ip)];
    }
    }
 }
@@ -276,7 +201,7 @@ void Grid::set_row_R_th(const size_t ip,
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[INDX_R_TH(ix,it)];
+      out[indx_r_th_ph(ix,it,ip)] = in[indx_r_th(ix,it)];
    }
    }
 }
@@ -289,7 +214,7 @@ void Grid::get_row_R_ph(const size_t it,
    assert(out.size()==_nx*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[INDX_R_PH(ix,ip)] = in[INDX_R_TH_PH(ix,it,ip)];
+      out[indx_r_ph(ix,ip)] = in[indx_r_th_ph(ix,it,ip)];
    }
    }
 }
@@ -301,7 +226,7 @@ void Grid::set_row_R_ph(const size_t it,
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[INDX_R_PH(ix,ip)];
+      out[indx_r_th_ph(ix,it,ip)] = in[indx_r_ph(ix,ip)];
    }
    }
 }
@@ -314,7 +239,7 @@ void Grid::get_row_th_ph(const size_t ix,
    assert(out.size()==_nphi*_nlat);
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[INDX_TH_PH(it,ip)] = in[INDX_R_TH_PH(ix,it,ip)];
+      out[indx_th_ph(it,ip)] = in[indx_r_th_ph(ix,it,ip)];
    }
    }
 }
@@ -327,7 +252,7 @@ void Grid::set_row_th_ph(const size_t ix,
 
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[INDX_R_TH_PH(ix,it,ip)] = in[INDX_TH_PH(it,ip)];
+      out[indx_r_th_ph(ix,it,ip)] = in[indx_th_ph(it,ip)];
    }
    }
 }
@@ -339,7 +264,7 @@ void Grid::set_row_l(const size_t ix,
    assert(lvals.size() ==_nl);
    assert(Rlvals.size()==_nx*_nl);
    for (size_t il=0; il<_nl; il++) {
-      Rlvals[INDX_R_L(ix,il)] = lvals[il];
+      Rlvals[indx_r_l(ix,il)] = lvals[il];
    }
 } 
 /*==========================================================================*/
@@ -518,16 +443,16 @@ double Grid::total_variation(const std::vector<double> &v) const
    for (size_t ip=0; ip<_nphi-1; ip++) {
       tv += pow(
                pow(
-                  v[indx(ix+1, it, ip)] 
-               -  v[indx(ix,   it, ip)]
+                  v[indx_r_th_ph(ix+1, it, ip)] 
+               -  v[indx_r_th_ph(ix,   it, ip)]
                ,2)
             +  pow(
-                  v[indx(ix, it+1, ip)] 
-               -  v[indx(ix, it,   ip)]
+                  v[indx_r_th_ph(ix, it+1, ip)] 
+               -  v[indx_r_th_ph(ix, it,   ip)]
                ,2)
             +  pow(
-                  v[indx(ix, it, ip+1)] 
-               -  v[indx(ix, it, ip)]
+                  v[indx_r_th_ph(ix, it, ip+1)] 
+               -  v[indx_r_th_ph(ix, it, ip)]
                ,2)
             ,
             0.5); 
@@ -537,8 +462,3 @@ double Grid::total_variation(const std::vector<double> &v) const
    return tv/(_nx*_nlat*_nphi);
 }
 /*===========================================================================*/
-#undef INDX_R_TH
-#undef INDX_R_PH
-#undef INDX_R_L
-#undef INDX_R_TH_PH
-#undef INDX_TH_PH

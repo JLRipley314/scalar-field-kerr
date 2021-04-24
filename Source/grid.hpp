@@ -5,6 +5,8 @@
  * the sphere and the full three dimensional space,
  * and taking derivatives over the grid.
  */
+#define SHTNS_CONTIGUOUS_LONGITUDES true
+
 #include <vector>
 
 #include "cheb.hpp"
@@ -24,23 +26,6 @@ public:
       const size_t nphi
       );
    ~Grid();
-
-   size_t indx(const size_t i_x, const size_t i_th, const size_t i_ph) const; 
-   size_t sphere_indx(const size_t i_th, const size_t i_ph) const; 
-
-   std::vector<double> r_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) const; 
-   std::vector<double> R_th_ph(const size_t i_x, const size_t i_th, const size_t i_ph) const; 
-   std::vector<double> x_y_z(  const size_t i_x, const size_t i_th, const size_t i_ph) const; 
-   std::vector<double> r_th_ph(const size_t i) const; 
-   std::vector<double> R_th_ph(const size_t i) const; 
-   std::vector<double> x_y_z(  const size_t i) const; 
-
-   std::vector<double> th_ph(const size_t i_th, const size_t i_ph) const; 
-   std::vector<double> R_l(  const size_t i_x,  const size_t i_l) const; 
-   std::vector<double> n_l(  const size_t i_x, const size_t i_l) const; 
-   std::vector<double> th_ph(const size_t i) const; 
-   std::vector<double> R_l(  const size_t i) const; 
-   std::vector<double> n_l(  const size_t i) const; 
 
    std::vector<double> compute_ylm(const size_t l_ang, const size_t m_ang) const;
    /* Functions acting on full 3d grid functions 
@@ -158,13 +143,93 @@ private:
    std::vector<double> _partial_R_to_partial_r;
 
 public:
-   double cl() const {return _cl;}
-   double Rmin() const {return _Rmin;}
-   double Rmax() const {return _Rmax;}
-   size_t nx() const {return _nx;}
-   size_t nl() const {return _nl;}
-   size_t nm() const {return _nm;}
-   size_t nlat() const {return _nlat;}
-   size_t nphi() const {return _nphi;}
+   inline double cl() const {return _cl;}
+   inline double Rmin() const {return _Rmin;}
+   inline double Rmax() const {return _Rmax;}
+   inline size_t nx() const {return _nx;}
+   inline size_t nl() const {return _nl;}
+   inline size_t nm() const {return _nm;}
+   inline size_t nlat() const {return _nlat;}
+   inline size_t nphi() const {return _nphi;}
+
+   /* 
+    * accesing indices of 1,2, and 3d arrays 
+    */
+   inline size_t indx_r_th(const size_t ix, const size_t it) const
+   {
+      return (_nlat)*(ix) + (it);
+   }
+   inline size_t indx_r_ph(const size_t ix, const size_t ip) const
+   {
+      return (_nphi)*(ix) + (ip);
+   }
+   inline size_t indx_r_l(const size_t ix, const size_t il) const
+   {
+         return (_nl)*(ix) + (il);
+   } 
+   inline size_t indx_r_th_ph(const size_t ix, const size_t it, const size_t ip) const 
+   {
+      #if SHTNS_CONTIGUOUS_LONGITUDES
+      return (_nphi)*(_nlat)*(ix) + (_nlat)*(ip) + (it);
+      #else
+      return (_nlat)*(_nphi)*(ix) + (_nphi)*(it) + (ip);
+      #endif
+   }
+   inline size_t indx_th_ph(const size_t it, const size_t ip) const 
+   {
+      #if SHTNS_CONTIGUOUS_LONGITUDES
+      return (_nlat)*(ip) + (it);
+      #else 
+      return (_nphi)*(it) + (ip);
+      #endif
+   }
+   inline std::vector<double> r_th_ph(const size_t ix, const size_t it, const size_t ip) const 
+   {
+      return _r_th_ph[indx_r_th_ph(ix, it, ip)];
+   }
+   inline std::vector<double> r_th_ph(const size_t i) const 
+   {
+      return _r_th_ph[i];
+   }
+   inline std::vector<double> R_th_ph(const size_t ix, const size_t it, const size_t ip) const 
+   {
+      return _R_th_ph[indx_r_th_ph(ix, it, ip)];
+   }
+   inline std::vector<double> R_th_ph(const size_t i) const 
+   {
+      return _R_th_ph[i];
+   }
+   inline std::vector<double> x_y_z(const size_t ix, const size_t it, const size_t ip) const 
+   {
+      return _x_y_z[indx_r_th_ph(ix, it, ip)];
+   }
+   inline std::vector<double> x_y_z(const size_t i) const 
+   {
+      return _x_y_z[i];
+   }
+   inline std::vector<double> th_ph(const size_t it, const size_t ip) const 
+   {
+      return _th_ph[indx_th_ph(it, ip)];
+   }
+   inline std::vector<double> th_ph(const size_t i) const 
+   {
+      return _th_ph[i];
+   }
+   inline std::vector<double> R_l(const size_t ix, const size_t il) const 
+   {
+      return _R_l[indx_r_l(ix, il)];
+   }
+   inline std::vector<double> R_l(const size_t i) const 
+   {
+      return _R_l[i];
+   }
+   inline std::vector<double> n_l(const size_t ix, const size_t il) const 
+   {
+      return _n_l[indx_r_l(ix, il)];
+   }
+   inline std::vector<double> n_l(const size_t i) const 
+   {
+      return _n_l[i];
+   }
 };
 #endif /* _GRID_HPP */

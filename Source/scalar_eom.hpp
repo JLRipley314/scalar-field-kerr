@@ -10,15 +10,28 @@
 #include "params.hpp"
 #include "field.hpp"
 /*==========================================================================*/
-class Eom 
+class Scalar_eom 
 {
 public:
-   Eom(  const Grid &grid,
+   Scalar_eom(  const Grid &grid,
          const Params &params
       );
-   ~Eom();
+   ~Scalar_eom();
 
    void time_step(const Grid &grid, Field &f, Field &p) const;
+
+   void set_k(
+         const Grid &grid,
+         const std::vector<double> &f,
+         const std::vector<double> &p,
+         std::vector<double> &f_k,
+         std::vector<double> &p_k
+         ) const;
+
+   void set_level(
+         const int level,
+         Field &f,
+         Field &p) const;
 
    /* local energy density */
    void set_rho(
@@ -68,14 +81,5 @@ private:
     * no evolution at spatial infinity 
     */
    std::vector<double> _not_at_spat_infty;
-
-   void set_k(
-         const Grid &grid,
-         const std::vector<double> &f,
-         const std::vector<double> &p,
-         std::vector<double> &f_k,
-         std::vector<double> &p_k
-         ) const;
-
 };
 #endif /* _SCALAR_EOM_HPP_ */
