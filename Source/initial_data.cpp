@@ -8,11 +8,13 @@ namespace ID
 /* time symmetric compact bump for phi of angular dependence Y_{lm} */
 /*==========================================================================*/
 void compact_pulse(
-      const Grid &grid,
       const Params &params,
+      const Grid &grid,
       std::vector<double> &f,
       std::vector<double> &p)
 {
+   std::cout<<"Setting compact_pulse initial data"<<std::endl;
+
    const size_t nx   = grid.nx();
    const size_t nphi = grid.nphi();
    const size_t nlat = grid.nlat();
@@ -89,6 +91,7 @@ void compact_pulse(
    }
    }
    }
+   std::cout<<"Finished setting compact_pulse initial data"<<std::endl;
 }
 /*==========================================================================*/
 } /* ID */

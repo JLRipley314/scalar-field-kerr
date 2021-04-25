@@ -16,8 +16,8 @@ OBJ = params.o \
       field.o \
       initial_data.o \
       scalar_eom.o \
+      unit_manager.o \
       main.o
-#      evolution_units.o \
 
 DEPS = params.hpp \
        cheb.hpp \
@@ -26,8 +26,8 @@ DEPS = params.hpp \
        io.hpp \
        field.hpp \
        initial_data.hpp \
-       scalar_eom.hpp #\
-       evolution_units.hpp
+       scalar_eom.hpp \
+       unit_manager.hpp
 #=============================================================================
 .PHONY: all
 all: default.run

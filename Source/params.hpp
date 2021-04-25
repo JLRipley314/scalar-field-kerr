@@ -12,6 +12,7 @@
 class Params
 {
 public:
+   Params() {}; /* default: does nothing */
    Params(const std::string output_dir);
    ~Params();
 
@@ -27,6 +28,7 @@ private:
    size_t _nphi;
    size_t _t_step_save;
 
+   size_t _ngrids;
    std::vector<double> _Rvals;
    std::vector<size_t> _nxs;
 
@@ -81,6 +83,7 @@ public:
    inline size_t nl() const {return _nl;}
    inline size_t nm() const {return _nm;}
 
+   inline size_t ngrids() const {return _ngrids;}
    inline size_t Rvals(const size_t i) const {return _Rvals[i];}
    inline size_t nxs(const size_t i) const {return _nxs[i];}
 

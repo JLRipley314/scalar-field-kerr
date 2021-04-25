@@ -16,6 +16,7 @@ Sphere::Sphere(
    _lap(_lmax,0),
    _low_pass(_lmax,0)
 {
+   std::cout<<"Initializing Sphere"<<std::endl;
    shtns_verbose(0);     /* displays informations during initialization. */
    shtns_use_threads(1); /* enable multi-threaded transforms (if supported). */
 
@@ -55,6 +56,7 @@ Sphere::Sphere(
    }
    _nSph = NSPAT_ALLOC(_shtns);
    _nYlm = _shtns->nlm;
+   std::cout<<"Finished initializing Sphere"<<std::endl;
 }
 /*==========================================================================*/
 Sphere::~Sphere()

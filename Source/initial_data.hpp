@@ -15,8 +15,8 @@ namespace ID
 {
 /*==========================================================================*/
 void compact_pulse(
-      const Grid &grid,
       const Params &params,
+      const Grid &grid,
       std::vector<double> &f,
       std::vector<double> &p
    );

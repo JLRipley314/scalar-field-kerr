@@ -11,6 +11,7 @@ Cheb::Cheb(const size_t n, const double lower, const double upper)
    _pts(_n,0),
    _low_pass(_n,0)
 {
+   std::cout<<"Initializing Cheb"<<std::endl;
    /* 
     * Chebyshev points on interval [lower, upper]
     */
@@ -32,6 +33,7 @@ Cheb::Cheb(const size_t n, const double lower, const double upper)
    _plan_dct = fftw_plan_r2r_1d(_n,i_n.data(),out_.data(),FFTW_REDFT00,FFTW_PATIENT);
 
    assert(_plan_dct!=nullptr);
+   std::cout<<"Finished initializing Cheb"<<std::endl;
 }
 /*==========================================================================*/
 Cheb::~Cheb()

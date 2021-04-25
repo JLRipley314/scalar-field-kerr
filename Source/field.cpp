@@ -1,5 +1,5 @@
 #include "field.hpp"
-
+#include <iostream>
 /*==========================================================================*/
 Field::Field(
          std::string name,
@@ -20,6 +20,8 @@ Field::Field(
    k5(size,init_val),
    size{size}
 {
+   std::cout<<"Initializing Field "<<name<<std::endl;
+   std::cout<<"Finished initializing Field "<<name<<std::endl;
 }
 /*==========================================================================*/
 Field::~Field()

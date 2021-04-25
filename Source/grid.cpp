@@ -25,6 +25,8 @@ Grid::Grid(
    _sphere(_nl, _nm, _nlat, _nphi),
    _cheb(_nx, _Rmin, _Rmax)
 {
+   std::cout<<"Initializing Grid"<<std::endl;
+
    _r_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _R_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _x_y_z.resize(  _nx*_nphi*_nlat, std::vector<double>(3,0));
@@ -86,6 +88,7 @@ Grid::Grid(
    for (size_t ix=0; ix<_nx; ix++) {
       _partial_R_to_partial_r[ix] = pow(1.0 - (_cheb.pt(ix)/cl),2);
    }
+   std::cout<<"Finished initializing Grid"<<std::endl;
 }
 /*=========================================================================*/
 Grid::~Grid()

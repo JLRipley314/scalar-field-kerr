@@ -19,10 +19,10 @@ class Sim:
       +	'_nx'+str(self.nx)
       +	'_nl'+str(self.nl)
       )
-      if (self.computer=="home"):
-         self.output_dir= "Output/"+self.output_stem
+      if (self.computer=='home'):
+         self.output_dir= 'Output/'+self.output_stem
       else:
-         self.output_dir=self.out_stem+"/"+self.output_stem
+         self.output_dir=self.out_stem+'/'+self.output_stem
       os.makedirs(self.output_dir)
 #=============================================================================
 ## stereographic projection
@@ -46,8 +46,14 @@ class Sim:
       self.rl= self.horizon*self.rl_0
       self.ru= self.horizon*self.ru_0
 #-----------------------------------------------------------------------------
+      self.Rvals = []
+      for r in self.rvals:
+         self.Rvals.append(self.horizon*self.compactification(r))
+      self.ngrids = len(self.Rvals)
+      self.Rvals.append(self.compactification_length) ## last point at infty
+#-----------------------------------------------------------------------------
       self.dt= float(
-         9.*pow(max([self.nx,self.nlat,self.nphi]),-2)
+         9.*pow(max([max(self.nxs),self.nlat,self.nphi]),-2)
       )
 #-----------------------------------------------------------------------------
       self.nt= int(

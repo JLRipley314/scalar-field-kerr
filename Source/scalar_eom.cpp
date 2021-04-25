@@ -41,6 +41,7 @@ Scalar_eom::Scalar_eom(
 
    _not_at_spat_infty(_n,0)
 {
+   std::cout<<"Initializing Scalar_eom"<<std::endl;
    const size_t nx   = grid.nx();
    const size_t nlat = grid.nlat();
    const size_t nphi = grid.nphi();
@@ -122,6 +123,7 @@ Scalar_eom::Scalar_eom(
          _not_at_spat_infty[i] = 1.0;
       }
    }
+   std::cout<<"Finished initializing Scalar_eom"<<std::endl;
 }
 /*==========================================================================*/
 Scalar_eom::~Scalar_eom()
