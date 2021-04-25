@@ -26,6 +26,9 @@ sim.nl= 16 ## Number of angular l values
 sim.nm= 12 ## Number of angular m values
 sim.nlat = 32 ## Number of theta collocation points 
 sim.nphi = 28 ## Number of phi collocation points; must be a multiple of 4 
+
+sim.nxs=   "64 64 64" ## Number of radial pts on each domain 
+sim.Rvals= "0 1 2 3" ## Radial Boundary of each domain 
 #-----------------------------------------------------------------------------
 ## Prefactor to kinetric term.
 ## In the action:

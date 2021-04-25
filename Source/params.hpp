@@ -6,6 +6,7 @@
 #define _PARAMS_HPP_
 
 #include <string>
+#include <vector>
 
 /*===========================================================================*/
 class Params
@@ -25,6 +26,9 @@ private:
    size_t _nlat;
    size_t _nphi;
    size_t _t_step_save;
+
+   std::vector<double> _Rvals;
+   std::vector<size_t> _nxs;
 
    double _dt;
 
@@ -60,12 +64,25 @@ private:
          const std::string param_file, 
          const std::string find_this_var);
 
+   void _read_array(
+         const std::string param_file, 
+         const std::string find_this_var,
+         std::vector<size_t> &arr);
+
+   void _read_array(
+         const std::string param_file, 
+         const std::string find_this_var,
+         std::vector<double> &arr);
+
 public:
 
    inline size_t nt() const {return _nt;}
    inline size_t nx() const {return _nx;}
    inline size_t nl() const {return _nl;}
    inline size_t nm() const {return _nm;}
+
+   inline size_t Rvals(const size_t i) const {return _Rvals[i];}
+   inline size_t nxs(const size_t i) const {return _nxs[i];}
 
    inline size_t nx_nlat_nphi() const { return _nx*_nlat*_nphi; }
    inline size_t nxn() const {return _nl;}

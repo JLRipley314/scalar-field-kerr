@@ -1,9 +1,9 @@
 #include <cassert>
-#include <fstream>
-#include <iostream>
-#include <string>
 #include <iomanip>
 #include <fstream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "params.hpp"
 
@@ -16,6 +16,9 @@ Params::Params(const std::string param_file)
    _nm   = std::stoi(_read(param_file,"nm"));
    _nlat = std::stoi(_read(param_file,"nlat"));
    _nphi = std::stoi(_read(param_file,"nphi"));
+
+   _read_array(param_file,"nxs",     _nxs);
+   _read_array(param_file,"Rvals", _Rvals);
 
    _t_step_save = std::stoi(_read(param_file,"t_step_save"));
 
@@ -63,12 +66,82 @@ std::string Params::_read(
    std::ifstream infile(param_file);
    assert(infile.good());
 
-   std::string name, val;
+   std::string line;
 
-   while (infile >> name >> val) {
+   while (std::getline(infile,line)) {
+      std::stringstream linestream(line);
+
+      std::string name;
+      std::getline(linestream, name, ' ');
       if (name==find_this_var) {
-         std::cout<<name<<" "<<val<<std::endl;
+
+         std::string val;
+         linestream >> val;
+         
+         std::cout<<name<<"\t"<<val<<std::endl;
+
          return val;
+      }
+   }
+   std::cout<<"ERROR: did not find "<<find_this_var<<std::endl;
+   std::quick_exit(0);
+}
+/*========================================================================*/
+void Params::_read_array(
+      const std::string param_file, 
+      const std::string find_this_var,
+      std::vector<size_t> &arr)
+{
+   std::ifstream infile(param_file);
+   assert(infile.good());
+
+   std::string line;
+
+   while (std::getline(infile,line)) {
+      std::stringstream linestream(line);
+
+      std::string name;
+      std::getline(linestream, name, ' ');
+
+      if (name==find_this_var) {
+         std::cout<<name;
+         size_t val;
+         while (linestream >> val) {
+            arr.push_back(size_t(val));
+            std::cout<<" "<<val;
+         }
+         std::cout<<std::endl;
+         return;
+      }
+   }
+   std::cout<<"ERROR: did not find "<<find_this_var<<std::endl;
+   std::quick_exit(0);
+}
+/*========================================================================*/
+void Params::_read_array(
+      const std::string param_file, 
+      const std::string find_this_var,
+      std::vector<double> &arr)
+{
+   std::ifstream infile(param_file);
+   assert(infile.good());
+
+   std::string line;
+
+   while (std::getline(infile,line)) {
+      std::stringstream linestream(line);
+
+      std::string name;
+      std::getline(linestream, name, ' ');
+      if (name==find_this_var) {
+         std::cout<<name;
+         double val;
+         while (linestream >> val) {
+            arr.push_back(val);
+            std::cout<<" "<<val;
+         }
+         std::cout<<std::endl;
+         return;
       }
    }
    std::cout<<"ERROR: did not find "<<find_this_var<<std::endl;
