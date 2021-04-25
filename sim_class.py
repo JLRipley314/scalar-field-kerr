@@ -65,7 +65,13 @@ class Sim:
       with open(self.parameter_file,'w') as f:
          attrs= vars(self)
          for param in attrs:
-            f.write('{} {}\n'.format(param,attrs[param]))	
+            if type(attrs[param])==list:
+               vals = ''
+               for val in attrs[param]:
+                  vals+= ' '+str(val)
+               f.write('{}{}\n'.format(param,vals))	
+            else:
+               f.write('{} {}\n'.format(param,attrs[param]))	
 #=============================================================================
    def write_slurm_script(self, run_str:str):
       with open('{}/run.slurm'.format(self.home_dir), 'w') as f:
