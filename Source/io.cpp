@@ -45,6 +45,7 @@ void write(
 void write_n_psl(
       const Grid &grid,
       const std::string name, 
+      const bool save_coords, 
       const int itm,
       const std::vector<double> &vals)
 {
@@ -58,11 +59,12 @@ void write_n_psl(
    if (out.is_open()) {
 
       const size_t indxs = _labels_n_l.size();
-      for (size_t i=0; i<indxs-1; i++) { 
-         out<<_labels_n_l[i]<<",";
-      }		
-      out<<_labels_n_l[indxs-1]<<std::endl;
-
+      if (save_coords) {
+         for (size_t i=0; i<indxs-1; i++) { 
+            out<<_labels_n_l[i]<<",";
+         }		
+         out<<_labels_n_l[indxs-1]<<std::endl;
+      }
       const size_t n= power_spectrum.size();
       for (size_t i=0; i<n; i++) {
          for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
@@ -84,6 +86,7 @@ void write_n_psl(
 void write_R_psl(
       const Grid &grid,
       const std::string name, 
+      const bool save_coords, 
       const int itm,
       const std::vector<double> &vals)
 {
@@ -97,11 +100,12 @@ void write_R_psl(
    if (out.is_open()) {
 
       const size_t indxs = _labels_R_l.size();
-      for (size_t i=0; i<indxs-1; i++) { 
-         out<<_labels_R_l[i]<<",";
-      }		
-      out<<_labels_R_l[indxs-1]<<std::endl;
-
+      if (save_coords) {
+         for (size_t i=0; i<indxs-1; i++) { 
+            out<<_labels_R_l[i]<<",";
+         }		
+         out<<_labels_R_l[indxs-1]<<std::endl;
+      }
       const size_t n= power_spectrum.size();
       for (size_t i=0; i<n; i++) {
          for (size_t j=0; j<indxs-1; ++j) { /* grid point location */
@@ -132,6 +136,7 @@ inline double magnitude(const std::vector<double> &v)
 void write_x_y_z(
       const Grid &grid, 
       const std::string name, 
+      const bool save_coords, 
       const int itm,
       const double vmin,
       const double vmax,
@@ -146,11 +151,12 @@ void write_x_y_z(
    if (out.is_open()) {
 
       const size_t indxs = _labels_x_y_z.size();
-      for (size_t i=0; i<indxs-1; i++) { 
-         out<<_labels_x_y_z[i]<<",";
-      }		
-      out<<_labels_x_y_z[indxs-1]<<std::endl;
-
+      if (save_coords) {
+         for (size_t i=0; i<indxs-1; i++) { 
+            out<<_labels_x_y_z[i]<<",";
+         }		
+         out<<_labels_x_y_z[indxs-1]<<std::endl;
+      }
       const size_t n= vals.size();
       for (size_t i=0; i<n; ++i) {
          if ((fabs(vals[i])>vmin)

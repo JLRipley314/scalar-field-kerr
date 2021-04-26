@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 
 #include "initial_data.hpp"
 /*==========================================================================*/
@@ -39,6 +40,7 @@ void compact_pulse(
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
       const std::vector<double> loc = grid.r_th_ph(ix,it,ip);
+
       const double r = loc[0];
       double bump = 0.0;
 
@@ -83,13 +85,15 @@ void compact_pulse(
    /* 
     * rescale so initial amplitude is amp
     */
-   for (size_t ix=0; ix<nx;   ix++) {
-   for (size_t ip=0; ip<nphi; ip++) {
-   for (size_t it=0; it<nlat; it++) {
-      f[grid.indx_r_th_ph(ix,it,ip)] *= amp / max_val;
-      p[grid.indx_r_th_ph(ix,it,ip)] *= amp / max_val;
-   }
-   }
+   if (fabs(max_val)>1e-16) {
+      for (size_t ix=0; ix<nx;   ix++) {
+      for (size_t ip=0; ip<nphi; ip++) {
+      for (size_t it=0; it<nlat; it++) {
+         f[grid.indx_r_th_ph(ix,it,ip)] *= amp / max_val;
+         p[grid.indx_r_th_ph(ix,it,ip)] *= amp / max_val;
+      }
+      }
+      }
    }
    std::cout<<"Finished setting compact_pulse initial data"<<std::endl;
 }

@@ -16,8 +16,9 @@ class Sim:
       +  '_'+time_of_day[3].replace(':','_')
       +	'_m'+str(self.black_hole_mass)
       +	'_s'+str(self.black_hole_spin)
-      +	'_nx'+str(self.nx)
+      +	'_nx'+str(self.nxs[0])
       +	'_nl'+str(self.nl)
+      +	'_nm'+str(self.nm)
       )
       if (self.computer=='home'):
          self.output_dir= 'Output/'+self.output_stem

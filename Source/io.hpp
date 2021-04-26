@@ -20,18 +20,21 @@ namespace Csv
    void write_R_psl(
          const Grid &grid, 
          const std::string name, 
+         const bool save_coords, 
          const int itm, 
          const std::vector<double> &vals
       );
    void write_n_psl(
          const Grid &grid, 
          const std::string name, 
+         const bool save_coords, 
          const int itm, 
          const std::vector<double> &vals
       );
    void write_x_y_z(
          const Grid &grid, 
          const std::string name, 
+         const bool save_coords, 
          const int itm,
          const double vmin,
          const double vmax,

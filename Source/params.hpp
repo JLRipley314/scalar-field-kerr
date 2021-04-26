@@ -21,7 +21,6 @@ private:
     * see below under `public'
     */
    size_t _nt;
-   size_t _nx;
    size_t _nl;
    size_t _nm;
    size_t _nlat;
@@ -79,7 +78,6 @@ private:
 public:
 
    inline size_t nt() const {return _nt;}
-   inline size_t nx() const {return _nx;}
    inline size_t nl() const {return _nl;}
    inline size_t nm() const {return _nm;}
 
@@ -87,7 +85,6 @@ public:
    inline size_t Rvals(const size_t i) const {return _Rvals[i];}
    inline size_t nxs(const size_t i) const {return _nxs[i];}
 
-   inline size_t nx_nlat_nphi() const { return _nx*_nlat*_nphi; }
    inline size_t nxn() const {return _nl;}
 
    inline size_t nlat() const {return _nlat;}

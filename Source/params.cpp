@@ -12,7 +12,6 @@ Params::Params(const std::string param_file)
 {
    std::cout<<"Initializing Params"<<std::endl;
    _nt   = std::stoi(_read(param_file,"nt"));
-   _nx   = std::stoi(_read(param_file,"nx"));
    _nl   = std::stoi(_read(param_file,"nl"));
    _nm   = std::stoi(_read(param_file,"nm"));
    _nlat = std::stoi(_read(param_file,"nlat"));

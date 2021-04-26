@@ -205,8 +205,8 @@ void Scalar_eom::set_k(
 
       -  (1.0/_pre[i])*vprime
       ;
-      f_k[i] *= _not_at_spat_infty[i];
-      p_k[i] *= _not_at_spat_infty[i];
+//      f_k[i] *= _not_at_spat_infty[i];
+//      p_k[i] *= _not_at_spat_infty[i];
    }
 }
 /*==========================================================================*/

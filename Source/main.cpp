@@ -24,6 +24,7 @@ int main(int argc, char **argv)
    Unit_manager::init(params);
    Unit_manager::set_initial_data(params);
    Unit_manager::write_time_stdout(0, params);
+   Unit_manager::write_to_file(save_indx, output_dir, params); 
 
    std::cout<<"Beginning evolution"<<std::endl;
 

@@ -18,19 +18,16 @@ sim.black_hole_mass= float(1)
 sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
 sim.compactification_length= float(10)
 
-sim.evolve_time= float(0.5) ## units of black hole mass
-sim.num_saved_times= int(5)
+sim.evolve_time= float(5.0) ## units of black hole mass
+sim.num_saved_times= int(50)
 
-sim.nx= 64 ## Number of radial pts 
 sim.nl= 16 ## Number of angular l values
-sim.nm= 12 ## Number of angular m values
+sim.nm= 10 ## Number of angular m values
 sim.nlat = 32 ## Number of theta collocation points 
-sim.nphi = 28 ## Number of phi collocation points; must be a multiple of 4 
+sim.nphi = 24 ## Number of phi collocation points; must be a multiple of 4 
 
-#sim.nxs=   [32, 32] ## Number of radial pts on each domain 
-#sim.rvals= [1,  10] ## Radial boundary of each domain (multiples of r_h) 
-sim.nxs=   [32] ## Number of radial pts on each domain 
-sim.rvals= [1] ## Radial boundary of each domain (multiples of r_h) 
+sim.nxs=   [48]#, 16] ## Number of radial pts on each domain 
+sim.rvals= [1]#,   6] ## Radial boundary of each domain (multiples of r_h) 
 #-----------------------------------------------------------------------------
 ## Prefactor to kinetric term.
 ## In the action:
