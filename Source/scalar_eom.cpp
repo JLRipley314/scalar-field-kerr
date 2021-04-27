@@ -37,9 +37,7 @@ Scalar_eom::Scalar_eom(
    _rho_vr(     _n,0),
    _rho_rr(     _n,0),
    _rho_rphi(   _n,0),
-   _rho_sphereX(_n,0),
-
-   _not_at_spat_infty(_n,0)
+   _rho_sphereX(_n,0)
 {
    std::cout<<"Initializing Scalar_eom"<<std::endl;
    const size_t nx   = grid.nx();
@@ -114,14 +112,6 @@ Scalar_eom::Scalar_eom(
       _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
    }
    }
-   }
-   for (size_t i=0; i<_n; i++) {
-      std::vector<double> R_th_ph = grid.R_th_ph(i); 
-      if (fabs(R_th_ph[0]-cl)<1e-16) {
-         _not_at_spat_infty[i] = 0.0;
-      } else {
-         _not_at_spat_infty[i] = 1.0;
-      }
    }
    std::cout<<"Finished initializing Scalar_eom"<<std::endl;
 }
@@ -205,8 +195,6 @@ void Scalar_eom::set_k(
 
       -  (1.0/_pre[i])*vprime
       ;
-//      f_k[i] *= _not_at_spat_infty[i];
-//      p_k[i] *= _not_at_spat_infty[i];
    }
 }
 /*==========================================================================*/

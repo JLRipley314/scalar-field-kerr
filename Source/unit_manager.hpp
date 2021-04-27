@@ -17,11 +17,7 @@ public:
       const Params &params,
       const double Rmin,
       const double Rmax,
-      const size_t nx,
-      const size_t nl,
-      const size_t nm,
-      const size_t nlat,
-      const size_t nphi
+      const size_t nx
       );
    ~Unit();
 
@@ -49,7 +45,7 @@ namespace Unit_manager
 
    extern std::vector<Unit*> units;
 
-   void time_step();
+   void time_step(const size_t itm);
    void shift();
 
    void set_initial_data(const Params &params);

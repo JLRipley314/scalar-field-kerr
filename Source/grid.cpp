@@ -392,7 +392,8 @@ void Grid::set_n_l_coef(const std::vector<double> &v, std::vector<double> &p) co
    }
 }
 /*==========================================================================*/
-/* Low pass filter in spectral space */
+/* Low pass filter in spectral space, but keep the boundaries
+ * of the radial points fixed. */
 /*==========================================================================*/
 void Grid::filter(std::vector<double> &v) const
 {
@@ -410,7 +411,11 @@ void Grid::filter(std::vector<double> &v) const
    for (size_t ip=0; ip<_nphi; ip++) {
       std::vector<double> inter_radial(_nx);
       get_row_R(it, ip, v, inter_radial); 
+      const double lwr = inter_radial[0    ];
+      const double upr = inter_radial[_nx-1];
       _cheb.filter(inter_radial);
+      inter_radial[0    ] = lwr;
+      inter_radial[_nx-1] = upr;
       set_row_R(it, ip, inter_radial, v); 
    }
    }

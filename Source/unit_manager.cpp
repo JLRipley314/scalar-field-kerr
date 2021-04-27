@@ -10,28 +10,22 @@ Unit::Unit(
       const Params &params,
       const double Rmin,
       const double Rmax,
-      const size_t nx,
-      const size_t nl,
-      const size_t nm,
-      const size_t nlat,
-      const size_t nphi)
-:  f("f", nx*nlat*nphi, 0.0),
-   p("p", nx*nlat*nphi, 0.0),
-   rho(nx*nlat*nphi, 0.0),
+      const size_t nx)
+:  f("f", nx*params.nlat()*params.nphi(), 0.0),
+   p("p", nx*params.nlat()*params.nphi(), 0.0),
+   rho(nx*params.nlat()*params.nphi(), 0.0),
    grid(
       params.cl(),
       Rmin,
       Rmax,
       nx,
-      nl,
-      nm,
-      nlat,
-      nphi 
+      params.nl(),
+      params.nm(),
+      params.nlat(),
+      params.nphi() 
    ),
    scalar_eom(grid, params)
 {
-   std::cout<<"Initializing Unit"<<std::endl;
-   std::cout<<"Finished initializing Unit"<<std::endl;
 }
 /*=========================================================================*/
 Unit::~Unit()
@@ -96,11 +90,7 @@ void init(const Params &params)
             params,
             params.Rvals(i),
             params.Rvals(i+1),
-            params.nxs(i),
-            params.nl(),
-            params.nm(),
-            params.nlat(),
-            params.nphi()
+            params.nxs(i)
             );
       assert(unit!=nullptr);
       units.push_back(unit);
@@ -135,88 +125,60 @@ inline double average(const double a, const double b)
 /*===========================================================================*/
 void _set_boundaries(const int level, Unit *left, Unit *right)
 {
-   return;
+   assert(left !=nullptr);
+   assert(right!=nullptr);
+
    const size_t nx = right->grid.nx();
 
    if (level==1) { 
       for (size_t ip=0; ip<_nphi; ip++) {
       for (size_t it=0; it<_nlat; it++) {
-         const double f = average(
-               left->f.n[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->f.n[right->grid.indx_r_th_ph(nx-1, it, ip)]
-            );
          const double p = average(
-               left->p.n[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.n[right->grid.indx_r_th_ph(nx-1, it, ip)]
+               left->p.k1[  left->grid.indx_r_th_ph(   0, it, ip)], 
+            +  right->p.k1[right->grid.indx_r_th_ph(nx-1, it, ip)]
             );
 
-         left->f.n[  left->grid.indx_r_th_ph(   0, it, ip)] = f; 
-         right->f.n[right->grid.indx_r_th_ph(nx-1, it, ip)] = f;
-
-         left->p.n[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.n[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
+         left->p.k1[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
+         right->p.k1[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
       }
       }
    } else
    if (level==2) { 
       for (size_t ip=0; ip<_nphi; ip++) {
       for (size_t it=0; it<_nlat; it++) {
-         const double f = average(
-               left->f.l2[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->f.l2[right->grid.indx_r_th_ph(nx-1, it, ip)]
-            );
          const double p = average(
-               left->p.l2[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.l2[right->grid.indx_r_th_ph(nx-1, it, ip)]
+               left->p.k2[  left->grid.indx_r_th_ph(   0, it, ip)], 
+            +  right->p.k2[right->grid.indx_r_th_ph(nx-1, it, ip)]
             );
 
-         left->f.l2[  left->grid.indx_r_th_ph(   0, it, ip)] = f; 
-         right->f.l2[right->grid.indx_r_th_ph(nx-1, it, ip)] = f;
-
-         left->p.l2[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.l2[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
+         left->p.k2[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
+         right->p.k2[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
       }
       }
    } else
    if (level==3) { 
       for (size_t ip=0; ip<_nphi; ip++) {
       for (size_t it=0; it<_nlat; it++) {
-         const double f = average(
-               left->f.l3[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->f.l3[right->grid.indx_r_th_ph(nx-1, it, ip)]
-            );
-
          const double p = average(
-               left->p.l3[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.l3[right->grid.indx_r_th_ph(nx-1, it, ip)]
+               left->p.k3[  left->grid.indx_r_th_ph(   0, it, ip)], 
+            +  right->p.k3[right->grid.indx_r_th_ph(nx-1, it, ip)]
             );
 
-         left->f.l3[  left->grid.indx_r_th_ph(   0, it, ip)] = f; 
-         right->f.l3[right->grid.indx_r_th_ph(nx-1, it, ip)] = f;
-
-         left->p.l3[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.l3[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
+         left->p.k3[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
+         right->p.k3[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
       }
       }
    } else
    if (level==4) { 
       for (size_t ip=0; ip<_nphi; ip++) {
       for (size_t it=0; it<_nlat; it++) {
-         const double f = average(
-               left->f.l4[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->f.l4[right->grid.indx_r_th_ph(nx-1, it, ip)]
-            );
-
          const double p = average(
-               left->p.l4[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.l4[right->grid.indx_r_th_ph(nx-1, it, ip)]
+               left->p.k4[  left->grid.indx_r_th_ph(   0, it, ip)], 
+            +  right->p.k4[right->grid.indx_r_th_ph(nx-1, it, ip)]
             );
 
-         left->f.l4[  left->grid.indx_r_th_ph(   0, it, ip)] = f; 
-         right->f.l4[right->grid.indx_r_th_ph(nx-1, it, ip)] = f;
-
-         left->p.l4[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.l4[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
+         left->p.k4[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
+         right->p.k4[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
       }
       }
    } else {
@@ -226,70 +188,83 @@ void _set_boundaries(const int level, Unit *left, Unit *right)
 /*===========================================================================*/
 /* RK4 time integration */
 /*===========================================================================*/
-void time_step()
+void time_step(const size_t itm)
 {
-/*
+   #pragma omp parallel for
+   for (Unit *u: units) {
+      u->grid.filter(u->f.n);
+      u->grid.filter(u->p.n);
+   }
+   /*--------------------------------------*/
+   #pragma omp parallel for
+   for (Unit *u: units) {
+      u->set_k(1);
+   }
    for (size_t i=0; i<_ngrids-1; i++) {
+      _set_boundaries(1, units[i], units[i+1]);
+   }
+   /*--------------------------------------*/
+   #pragma omp parallel for
+   for (Unit *u: units) {
+      u->set_level(2);
+      u->set_k(2);
+   }
+   for (size_t i=0; i<_ngrids-1; i++) {
+      _set_boundaries(2, units[i], units[i+1]);
+   }
+   /*--------------------------------------*/
+   #pragma omp parallel for
+   for (Unit *u: units) {
+      u->set_level(3);
+      u->set_k(3);
+   }
+   for (size_t i=0; i<_ngrids-1; i++) {
+      _set_boundaries(3, units[i], units[i+1]);
+   }
+   /*--------------------------------------*/
+   #pragma omp parallel for
+   for (Unit *u: units) {
+      u->set_level(4);
+      u->set_k(4);
+   }
+   for (size_t i=0; i<_ngrids-1; i++) {
+      _set_boundaries(4, units[i], units[i+1]);
+   }
+   /*--------------------------------------*/
+   #pragma omp parallel for
+   for (Unit *u: units) {
+      u->set_level(5);
+   }
+/*   for (size_t i=0; i<_ngrids-1; i++) {
       const size_t nx = units[i+1]->grid.nx();
       for (size_t ip=0; ip<_nphi; ip++) {
       for (size_t it=0; it<_nlat; it++) {
-         std::cout
-            <<std::setw(16)<<
-               units[i  ]->p.n[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
-            -  units[i+1]->p.n[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
-            <<std::setw(16)<<
-               units[i  ]->f.n[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
-            -  units[i+1]->f.n[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
-            <<std::endl;
+         if (fabs(
+            units[i  ]->p.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
+         -  units[i+1]->p.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+         )>1e-16 ||
+         fabs(
+            units[i  ]->f.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
+         -  units[i+1]->f.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+         )>1e-16) {
+            std::cout
+               <<itm<<"\t"
+               <<ip<<"\t"
+               <<it<<"\t" 
+               <<
+                  units[i  ]->p.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
+               -  units[i+1]->p.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+               <<"\t"
+               <<
+                  units[i  ]->f.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
+               -  units[i+1]->f.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+               <<std::endl;
+            std::quick_exit(EXIT_FAILURE); 
+         }
       }
       }
    }
 */
-   #pragma omp parallel
-   {
-      #pragma omp for
-      for (Unit *u: units) {
-         u->grid.filter(u->f.n);
-         u->grid.filter(u->p.n);
-      }
-      for (size_t i=0; i<_ngrids-1; i++) {
-         _set_boundaries(1, units[i], units[i+1]);
-      }
-      /*--------------------------------------*/
-      #pragma omp for
-      for (Unit *u: units) {
-         u->set_k(1);
-         u->set_level(2);
-      }
-      for (size_t i=0; i<_ngrids-1; i++) {
-         _set_boundaries(2, units[i], units[i+1]);
-      }
-      /*--------------------------------------*/
-      #pragma omp for
-      for (Unit *u: units) {
-         u->set_k(2);
-         u->set_level(3);
-      }
-      for (size_t i=0; i<_ngrids-1; i++) {
-         _set_boundaries(3, units[i], units[i+1]);
-      }
-      /*--------------------------------------*/
-      #pragma omp for
-      for (Unit *u: units) {
-         u->set_k(3);
-         u->set_level(4);
-      }
-      for (size_t i=0; i<_ngrids-1; i++) {
-         _set_boundaries(4, units[i], units[i+1]);
-      }
-      /*--------------------------------------*/
-      #pragma omp for
-      for (Unit *u: units) {
-         u->set_k(4);
-         u->set_level(5);
-      }
-      /*--------------------------------------*/
-   } /* end omp parallel */
 }
 /*===========================================================================*/
 /* Sets initial data*/ 
