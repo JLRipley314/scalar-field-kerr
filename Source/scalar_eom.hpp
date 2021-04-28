@@ -77,9 +77,10 @@ private:
    std::vector<double> _rho_rr;
    std::vector<double> _rho_rphi;
    std::vector<double> _rho_sphereX;
-   /* 
-    * no evolution at spatial infinity 
-    */
-   std::vector<double> _not_at_spat_infty;
+
+public:
+   /* characteristic speeds at the boundary */
+   std::vector<double> cs_M_R;
+   std::vector<double> cs_P_L;
 };
 #endif /* _SCALAR_EOM_HPP_ */

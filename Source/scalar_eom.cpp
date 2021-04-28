@@ -37,7 +37,10 @@ Scalar_eom::Scalar_eom(
    _rho_vr(     _n,0),
    _rho_rr(     _n,0),
    _rho_rphi(   _n,0),
-   _rho_sphereX(_n,0)
+   _rho_sphereX(_n,0),
+
+   cs_M_R(grid.nlat()*grid.nphi(),0),
+   cs_P_L(grid.nlat()*grid.nphi(),0)
 {
    std::cout<<"Initializing Scalar_eom"<<std::endl;
    const size_t nx   = grid.nx();
@@ -110,6 +113,35 @@ Scalar_eom::Scalar_eom(
          );
       _rho_rphi[indx]    = a*pow(inv_r,2)/Sigma;
       _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
+
+      const size_t indx_sphere = grid.indx_th_ph(it,ip);
+
+      /* Right boundary */
+      if (ix==0) {
+         const double inter = 2.0*m*inv_r/Sigma;
+
+         cs_M_R[indx_sphere] = 
+            pow(1.0 + inter, -1)*(
+            -  inter
+            -  pow(
+                  pow(inter,2)
+               +  (1.0 + inter)*(Delta/Sigma)
+            , 0.5)
+            );
+      }
+      /* Left boundary */
+      if (ix==nx-1) {
+         const double inter = 2.0*m*inv_r/Sigma;
+
+         cs_P_L[indx_sphere] = 
+            pow(1.0 + inter, -1)*(
+            -  inter
+            +  pow(
+                  pow(inter,2)
+               +  (1.0 + inter)*(Delta/Sigma)
+            , 0.5)
+            );
+      }
    }
    }
    }

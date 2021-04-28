@@ -5,7 +5,7 @@ BIN = ../Bin
 SHTNS_INC = -I$(HOME)/shtns/Library/include
 SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
-CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
+CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp -fbounds-check\
 	 -lshtns -lfftw3 -lm
 #=============================================================================
 OBJ = params.o \

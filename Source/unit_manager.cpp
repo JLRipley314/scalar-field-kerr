@@ -115,7 +115,7 @@ void shift()
    }
 }
 /*===========================================================================*/
-inline double average(const double a, const double b)
+inline double _average(const double a, const double b)
 {
    return (a+b)/2.0;
 }
@@ -123,64 +123,92 @@ inline double average(const double a, const double b)
 /* At the boundary of the grid cells we need to set boundary
  * conditions for the fields */
 /*===========================================================================*/
+void _partial_t_p( 
+      const Grid &grid_L,
+      const Grid &grid_R,
+      const std::vector<double> &p_L,
+      const std::vector<double> &p_R,
+      const std::vector<double> &cs_M_L,
+      const std::vector<double> &cs_P_R,
+      std::vector<double> &dt_p_L,
+      std::vector<double> &dt_p_R
+      )
+{
+   assert(p_L.size()==grid_L.nx()*_nphi*_nlat);
+   assert(p_R.size()==grid_R.nx()*_nphi*_nlat);
+
+   assert(cs_M_L.size()==_nphi*_nlat);
+   assert(cs_P_R.size()==_nphi*_nlat);
+
+   assert(dt_p_L.size()==grid_L.nx()*_nphi*_nlat);
+   assert(dt_p_R.size()==grid_R.nx()*_nphi*_nlat);
+
+   std::vector<double> dr_p_L(p_L.size(),0);
+   std::vector<double> dr_p_R(p_R.size(),0);
+
+   grid_L.set_partial_r(p_L, dr_p_L);
+   grid_R.set_partial_r(p_R, dr_p_R);
+
+   const size_t ix_L = 0;
+   const size_t ix_R = grid_R.nx()-1;
+
+   for (size_t ip=0; ip<_nphi; ip++) {
+   for (size_t it=0; it<_nlat; it++) {
+      const size_t indx_L = grid_L.indx_r_th_ph(ix_L, it, ip);
+      const size_t indx_R = grid_R.indx_r_th_ph(ix_R, it, ip);
+
+      const size_t indx_S = grid_R.indx_th_ph(it, ip);
+
+      const double dt_p = (
+            cs_P_R[indx_S]*dt_p_L[indx_L]
+         +  cs_M_L[indx_S]*dt_p_R[indx_R]
+         +  cs_P_R[indx_S]*cs_M_L[indx_S]*(dr_p_L[indx_L] - dr_p_R[indx_R])
+         )/(
+            cs_P_R[indx_S] - cs_M_L[indx_S]
+         );
+
+      dt_p_L[indx_L] = dt_p;
+      dt_p_R[indx_R] = dt_p;
+   }
+   }
+}
+/*===========================================================================*/
 void _set_boundaries(const int level, Unit *left, Unit *right)
 {
    assert(left !=nullptr);
    assert(right!=nullptr);
 
-   const size_t nx = right->grid.nx();
-
    if (level==1) { 
-      for (size_t ip=0; ip<_nphi; ip++) {
-      for (size_t it=0; it<_nlat; it++) {
-         const double p = average(
-               left->p.k1[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.k1[right->grid.indx_r_th_ph(nx-1, it, ip)]
+      _partial_t_p( 
+            left->grid,              right->grid,
+            left->p.n,               right->p.n,
+            left->scalar_eom.cs_M_R, right->scalar_eom.cs_P_L,
+            left->p.k1,              right->p.k1
             );
-
-         left->p.k1[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.k1[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
-      }
-      }
    } else
    if (level==2) { 
-      for (size_t ip=0; ip<_nphi; ip++) {
-      for (size_t it=0; it<_nlat; it++) {
-         const double p = average(
-               left->p.k2[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.k2[right->grid.indx_r_th_ph(nx-1, it, ip)]
+      _partial_t_p( 
+            left->grid,              right->grid,
+            left->p.l2,              right->p.l2,
+            left->scalar_eom.cs_M_R, right->scalar_eom.cs_P_L,
+            left->p.k2,              right->p.k2
             );
-
-         left->p.k2[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.k2[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
-      }
-      }
    } else
    if (level==3) { 
-      for (size_t ip=0; ip<_nphi; ip++) {
-      for (size_t it=0; it<_nlat; it++) {
-         const double p = average(
-               left->p.k3[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.k3[right->grid.indx_r_th_ph(nx-1, it, ip)]
+      _partial_t_p( 
+            left->grid,              right->grid,
+            left->p.l3,              right->p.l3,
+            left->scalar_eom.cs_M_R, right->scalar_eom.cs_P_L,
+            left->p.k3,              right->p.k3
             );
-
-         left->p.k3[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.k3[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
-      }
-      }
    } else
    if (level==4) { 
-      for (size_t ip=0; ip<_nphi; ip++) {
-      for (size_t it=0; it<_nlat; it++) {
-         const double p = average(
-               left->p.k4[  left->grid.indx_r_th_ph(   0, it, ip)], 
-            +  right->p.k4[right->grid.indx_r_th_ph(nx-1, it, ip)]
+      _partial_t_p( 
+            left->grid,              right->grid,
+            left->p.l4,              right->p.l4,
+            left->scalar_eom.cs_M_R, right->scalar_eom.cs_P_L,
+            left->p.k4,              right->p.k4
             );
-
-         left->p.k4[  left->grid.indx_r_th_ph(   0, it, ip)] = p; 
-         right->p.k4[right->grid.indx_r_th_ph(nx-1, it, ip)] = p;
-      }
-      }
    } else {
       std::cout<<"ERROR(_set_boundaries): level = "<<level<<std::endl;
    }
@@ -235,7 +263,7 @@ void time_step(const size_t itm)
    for (Unit *u: units) {
       u->set_level(5);
    }
-/*   for (size_t i=0; i<_ngrids-1; i++) {
+   for (size_t i=0; i<_ngrids-1; i++) {
       const size_t nx = units[i+1]->grid.nx();
       for (size_t ip=0; ip<_nphi; ip++) {
       for (size_t it=0; it<_nlat; it++) {
@@ -264,7 +292,6 @@ void time_step(const size_t itm)
       }
       }
    }
-*/
 }
 /*===========================================================================*/
 /* Sets initial data*/ 
@@ -309,6 +336,7 @@ void write_to_file(
 
    bool save_coords = true;
 
+   size_t indx=1;
    for (Unit *u: units) {
       u->scalar_eom.set_rho(u->grid, u->f.np1, u->p.np1, u->rho);
 
@@ -318,8 +346,9 @@ void write_to_file(
       Csv::write_R_psl(u->grid, output_dir+"/"+u->f.name, save_coords, save_indx, u->f.np1);
       Csv::write_R_psl(u->grid, output_dir+"/rho",        save_coords, save_indx, u->rho);
 
-      Csv::write_n_psl(u->grid, output_dir+"/"+u->f.name, save_coords, save_indx, u->f.np1);
-      Csv::write_n_psl(u->grid, output_dir+"/rho",        save_coords, save_indx, u->rho);
+      Csv::write_n_psl(u->grid, output_dir+"/"+std::to_string(indx)+"_"+u->f.name, true, save_indx, u->f.np1);
+      Csv::write_n_psl(u->grid, output_dir+"/"+std::to_string(indx)+"_rho",        true, save_indx, u->rho);
+      indx += 1;
 
       save_coords = false;
    }

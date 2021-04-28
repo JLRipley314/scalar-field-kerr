@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
+#include <iomanip>
 #include "cheb.hpp"
 /*==========================================================================*/
 Cheb::Cheb(const size_t n, const double lower, const double upper)
