@@ -159,14 +159,25 @@ void _partial_t_p(
 
       const size_t indx_S = grid_R.indx_th_ph(it, ip);
 
-      const double dt_p = (
-            cs_P_R[indx_S]*dt_p_L[indx_L]
-         +  cs_M_L[indx_S]*dt_p_R[indx_R]
-         +  cs_P_R[indx_S]*cs_M_L[indx_S]*(dr_p_L[indx_L] - dr_p_R[indx_R])
-         )/(
-            cs_P_R[indx_S] - cs_M_L[indx_S]
-         );
+      const double cs_M = cs_M_L[indx_S];
+      const double cs_P = cs_P_R[indx_S];
 
+      const double dt_psi_P = dt_p_L[indx_L] + cs_M*dr_p_L[indx_L];
+      const double dt_psi_M = dt_p_R[indx_R] + cs_P*dr_p_R[indx_R];
+
+      const double dt_p = (
+            cs_P*dt_psi_P - cs_M*dt_psi_M
+         )/(
+            cs_P - cs_M
+         );
+/*      std::cout
+         <<std::setw(16)<<cs_M
+         <<std::setw(16)<<cs_P
+         <<std::setw(16)<<dt_p_L[indx_L] 
+         <<std::setw(16)<<dt_p_R[indx_R] 
+         <<std::setw(16)<<dt_p 
+         <<std::endl;
+*/
       dt_p_L[indx_L] = dt_p;
       dt_p_R[indx_R] = dt_p;
    }

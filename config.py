@@ -15,19 +15,19 @@ sim.run_type= 'basic_run'
 sim.debug= False
 
 sim.black_hole_mass= float(1)
-sim.black_hole_spin= round(0.9*sim.black_hole_mass,16)
+sim.black_hole_spin= round(0.0*sim.black_hole_mass,16)
 sim.compactification_length= float(10)
 
-sim.evolve_time= float(2.0) ## units of black hole mass
+sim.evolve_time= float(5.0) ## units of black hole mass
 sim.num_saved_times= int(20)
 
 sim.nl= 16 ## Number of angular l values
-sim.nm= 10 ## Number of angular m values
+sim.nm= 4 ## Number of angular m values
 sim.nlat = 32 ## Number of theta collocation points 
-sim.nphi = 24 ## Number of phi collocation points; must be a multiple of 4 
+sim.nphi = 10 ## Number of phi collocation points; must be a multiple of 4 
 
 sim.nxs=   [48, 16] ## Number of radial pts on each domain 
-sim.rvals= [1,  16] ## Radial boundary of each domain (multiples of r_h) 
+sim.rvals= [1,   4] ## Radial boundary of each domain (multiples of r_h) 
 #-----------------------------------------------------------------------------
 ## Prefactor to kinetric term.
 ## In the action:
@@ -49,8 +49,8 @@ sim.V4 = 0.0
 sim.l_ang=  1 ## Initial data is a particular swal function.
 sim.m_ang=  0 ## Must have m_ang >= 0.
 sim.amp= 0.01 ## Initial amplitude of pulse 
-sim.rl_0= -2 ## Lower(upper) bounds of initial data as a multiple
-sim.ru_0=  2 ## of the black hole horizon.
+sim.rl_0= -1.0 ## Lower(upper) bounds of initial data as a multiple
+sim.ru_0= 2.0 ## of the black hole horizon.
 sim.initial_data_type= 'compact_pulse'
 sim.initial_data_direction= 'ingoing' 
 #-----------------------------------------------------------------------------

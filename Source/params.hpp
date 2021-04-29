@@ -82,7 +82,6 @@ public:
    inline size_t nm() const {return _nm;}
 
    inline size_t ngrids() const {return _ngrids;}
-   inline size_t Rvals(const size_t i) const {return _Rvals[i];}
    inline size_t nxs(const size_t i) const {return _nxs[i];}
 
    inline size_t nxn() const {return _nl;}
@@ -97,6 +96,7 @@ public:
 
    inline double Rmax() const {return _Rmax;}
    inline double Rmin() const {return _Rmin;}
+   inline double Rvals(const size_t i) const {return _Rvals[i];}
 
    inline double bh_mass() const {return _bh_mass;}
    inline double bh_spin() const {return _bh_spin;}

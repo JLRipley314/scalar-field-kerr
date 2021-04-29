@@ -32,17 +32,12 @@ class Sim:
 #=============================================================================
    def set_derived_params(self)->None:
 #-----------------------------------------------------------------------------
-## Rmin: location of black hole horizon
-## Rmax: location of spatial infinity
       sqrt_term= pow(
          (self.black_hole_mass - self.black_hole_spin)
       *  (self.black_hole_mass + self.black_hole_spin)
       ,0.5)
 
       self.horizon= self.black_hole_mass+sqrt_term
-
-      self.Rmin= self.compactification(self.horizon)
-      self.Rmax= self.compactification_length
 
       self.rl= self.horizon*self.rl_0
       self.ru= self.horizon*self.ru_0
@@ -52,6 +47,9 @@ class Sim:
          self.Rvals.append(self.horizon*self.compactification(r))
       self.ngrids = len(self.Rvals)
       self.Rvals.append(self.compactification_length) ## last point at infty
+
+      self.Rmin= min(self.Rvals)
+      self.Rmax= max(self.Rvals)
 #-----------------------------------------------------------------------------
       self.dt= float(
          9.*pow(max([max(self.nxs),self.nlat,self.nphi]),-2)

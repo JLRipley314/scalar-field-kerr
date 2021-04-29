@@ -10,6 +10,8 @@ CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp -fbounds-check\
 #=============================================================================
 OBJ = params.o \
       cheb.o \
+      finite_diff.o \
+      finite_diff.o \
       sphere.o \
       grid.o \
       io.o \
@@ -21,6 +23,8 @@ OBJ = params.o \
 
 DEPS = params.hpp \
        cheb.hpp \
+       finite_diff.hpp \
+       finite_diff.hpp \
        sphere.hpp \
        grid.hpp \
        io.hpp \
