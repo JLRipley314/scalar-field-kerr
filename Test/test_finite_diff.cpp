@@ -37,7 +37,7 @@ TEST(test_finite_diff, derivatives) {
  * when acting on ``rough'' data. 
  */
 TEST(test_finite_diff, filter_is_TVD) {
-   const size_t nr = pow(2,5);
+   const size_t nr = pow(2,7);
    FD fd(nr, 0.0, 1.0);
 
    std::vector<double> po1(nr,0);
