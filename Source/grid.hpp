@@ -5,9 +5,6 @@
  * the sphere and the full three dimensional space,
  * and taking derivatives over the grid.
  */
-#define SHTNS_CONTIGUOUS_LONGITUDES true
-#define USE_CHEB false
-
 #include <vector>
 
 #include "cheb.hpp"

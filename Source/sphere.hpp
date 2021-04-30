@@ -22,7 +22,6 @@
  * which matches the usual notation (theta,phi) in spherical
  * polar coordinates. 
  */
-#define SHTNS_CONTIGUOUS_LONGITUDES true
 
 #include <vector>
 #include <complex>

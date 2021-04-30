@@ -61,7 +61,7 @@ class Sim:
                   9.*pow(max([self.nlat,self.nphi]),-2)
                )
             ,
-            0.5/(max(self.nxs)-1.0)
+            self.cfl/(max(self.nxs)-1.0)
          )
 #-----------------------------------------------------------------------------
       self.nt= int(
