@@ -25,14 +25,14 @@ sim.nm= 10 ## Number of angular m values
 sim.nlat = 32 ## Number of theta collocation points 
 sim.nphi = 24 ## Number of phi collocation points; must be a multiple of 4 
 
-sim.nxs=   [129]#, 16] ## Number of radial pts on each domain 
+sim.nxs=   [193]#, 16] ## Number of radial pts on each domain 
 sim.rvals= [1]#,   4] ## Radial boundary of each domain (multiples of r_h) 
 
-sim.use_cheb=False
+sim.use_cheb=False ## Radial derivatives: Chebyshev vs. finite differences
 if (sim.use_cheb):
-   sim.cfl= 0.5 ## CFL number
    sim.bin_name= 'default_cheb.run'
 else:
+   sim.cfl= 0.5 ## CFL number
    sim.bin_name= 'default_fd.run'
 #-----------------------------------------------------------------------------
 ## Prefactor to kinetric term.

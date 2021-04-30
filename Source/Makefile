@@ -7,8 +7,12 @@ SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp -fbounds-check \
 	 -lshtns -lfftw3 -lm \
-	-DSHTNS_CONTIGUOUS_LONGITUDES #\ # For spherical grid
-	#-DUSE_CHEB # For radial derivatives
+	-DSHTNS_CONTIGUOUS_LONGITUDES #\ ## Preprocessor directive for spherical grid
+	#-DUSE_CHEB ## Preprocessor directive for radial derivatives
+#=============================================================================
+.PHONY: all
+#all: default_cheb.run
+all: default_fd.run
 #=============================================================================
 OBJ = params.o \
       cheb.o \
@@ -35,10 +39,6 @@ DEPS = params.hpp \
        scalar_eom.hpp \
        unit_manager.hpp
 #=============================================================================
-.PHONY: all
-
-all: default.run
-
 %.run: $(OBJ) 
 	$(CC) -o $(BIN)/$@ $^ $(SHTNS_INC) $(SHTNS_LIB) $(CFLAGS)
 
