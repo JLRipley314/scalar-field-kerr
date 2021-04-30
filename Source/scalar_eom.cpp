@@ -81,7 +81,7 @@ Scalar_eom::Scalar_eom(
       _p_dr_f[indx]      = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
       _p_dr_p[indx]      = 4.0*m*inv_r/Sigma;
       _p_dr_dr_f[indx]   = (Delta/Sigma);
-/*      _p_dphi_dr_f[indx] = (2.0*a/Sigma)*pow(inv_r,2);
+      _p_dphi_dr_f[indx] = (2.0*a/Sigma)*pow(inv_r,2);
       _p_lap_f[indx]     = (1.0/Sigma)*pow(inv_r,2);
 
       _p_p_p[indx]         = -(1.0 + (2.0*m*inv_r/Sigma));
@@ -89,7 +89,7 @@ Scalar_eom::Scalar_eom(
       _p_dr_f_dr_f[indx]   = Delta/Sigma;
       _p_dr_f_dphi_f[indx] = 2.0*a*pow(inv_r,2)/Sigma;
       _p_sphereX_f[indx]   = pow(inv_r,2)/Sigma;
-*/
+
       _pre[indx] = 1.0 + (2.0*m*inv_r/Sigma);
 
       _p_p[indx]         /= _pre[indx];
@@ -113,30 +113,6 @@ Scalar_eom::Scalar_eom(
          );
       _rho_rphi[indx]    = a*pow(inv_r,2)/Sigma;
       _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
-
-      const double inter = 2.0*m*inv_r/Sigma;
-
-      std::cout
-         <<std::setw(16)<<ix 
-         <<std::setw(16)<<r_th_ph[0] 
-         <<std::setw(16)<<Delta/Sigma 
-         <<std::setw(16)<< 
-            pow(1.0 + inter, -1)*(
-            -  inter
-            -  pow(
-                  pow(inter,2)
-               +  (1.0 + inter)*(Delta/Sigma)
-            , 0.5)
-            )
-         <<std::setw(16)<< 
-            pow(1.0 + inter, -1)*(
-            -  inter
-            +  pow(
-                  pow(inter,2)
-               +  (1.0 + inter)*(Delta/Sigma)
-            , 0.5)
-            )
-         <<std::endl;
 
       const size_t indx_sphere = grid.indx_th_ph(it,ip);
 

@@ -24,6 +24,7 @@ namespace Csv
          const int itm, 
          const std::vector<double> &vals
       );
+#if USE_CHEB
    void write_n_psl(
          const Grid &grid, 
          const std::string name, 
@@ -31,6 +32,7 @@ namespace Csv
          const int itm, 
          const std::vector<double> &vals
       );
+#endif
    void write_x_y_z(
          const Grid &grid, 
          const std::string name, 

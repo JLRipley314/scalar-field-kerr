@@ -227,15 +227,15 @@ void _set_boundaries(const int level, Unit *left, Unit *right)
 /*===========================================================================*/
 /* RK4 time integration */
 /*===========================================================================*/
-void time_step(const size_t itm)
+void time_step(/*const size_t itm*/)
 {
-   #pragma omp parallel for
+//   #pragma omp parallel for
    for (Unit *u: units) {
       u->grid.filter(u->f.n);
       u->grid.filter(u->p.n);
    }
    /*--------------------------------------*/
-   #pragma omp parallel for
+//   #pragma omp parallel for
    for (Unit *u: units) {
       u->set_k(1);
    }
@@ -243,7 +243,7 @@ void time_step(const size_t itm)
       _set_boundaries(1, units[i], units[i+1]);
    }
    /*--------------------------------------*/
-   #pragma omp parallel for
+//   #pragma omp parallel for
    for (Unit *u: units) {
       u->set_level(2);
       u->set_k(2);
@@ -252,7 +252,7 @@ void time_step(const size_t itm)
       _set_boundaries(2, units[i], units[i+1]);
    }
    /*--------------------------------------*/
-   #pragma omp parallel for
+//   #pragma omp parallel for
    for (Unit *u: units) {
       u->set_level(3);
       u->set_k(3);
@@ -261,7 +261,7 @@ void time_step(const size_t itm)
       _set_boundaries(3, units[i], units[i+1]);
    }
    /*--------------------------------------*/
-   #pragma omp parallel for
+//   #pragma omp parallel for
    for (Unit *u: units) {
       u->set_level(4);
       u->set_k(4);
@@ -270,10 +270,11 @@ void time_step(const size_t itm)
       _set_boundaries(4, units[i], units[i+1]);
    }
    /*--------------------------------------*/
-   #pragma omp parallel for
+//   #pragma omp parallel for
    for (Unit *u: units) {
       u->set_level(5);
    }
+/*
    for (size_t i=0; i<_ngrids-1; i++) {
       const size_t nx = units[i+1]->grid.nx();
       for (size_t ip=0; ip<_nphi; ip++) {
@@ -303,6 +304,7 @@ void time_step(const size_t itm)
       }
       }
    }
+*/
 }
 /*===========================================================================*/
 /* Sets initial data*/ 
@@ -356,9 +358,6 @@ void write_to_file(
 
       Csv::write_R_psl(u->grid, output_dir+"/"+u->f.name, save_coords, save_indx, u->f.np1);
       Csv::write_R_psl(u->grid, output_dir+"/rho",        save_coords, save_indx, u->rho);
-
-      Csv::write_n_psl(u->grid, output_dir+"/"+std::to_string(indx)+"_"+u->f.name, true, save_indx, u->f.np1);
-      Csv::write_n_psl(u->grid, output_dir+"/"+std::to_string(indx)+"_rho",        true, save_indx, u->rho);
       indx += 1;
 
       save_coords = false;

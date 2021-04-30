@@ -23,7 +23,7 @@ Grid::Grid(
    _nlat{nlat},
    _nphi{nphi},
    _sphere(_nl, _nm, _nlat, _nphi),
-   _cheb(_nx, _Rmin, _Rmax)
+   _radial(_nx, _Rmin, _Rmax)
 {
    std::cout<<"Initializing Grid"<<std::endl;
 
@@ -33,7 +33,7 @@ Grid::Grid(
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      double R     = _cheb.pt(ix);
+      double R     = _radial.pt(ix);
       double theta = _sphere.theta(it);  
       double phi   = _sphere.phi(  ip);
 
@@ -64,7 +64,7 @@ Grid::Grid(
    _R_th.resize(_nx*_nlat, std::vector<double>(2,0));
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      double R     = _cheb.pt(ix);
+      double R     = _radial.pt(ix);
       double theta = _sphere.theta(it);  
       _R_th[indx_r_th(ix,it)][0] = R;
       _R_th[indx_r_th(ix,it)][1] = theta;
@@ -76,7 +76,7 @@ Grid::Grid(
    _R_l.resize(_nx*_nl, std::vector<double>(2,0));
    for (size_t ix=0; ix<_nx; ix++) {
    for (size_t il=0; il<_nl; il++) {
-      double R = _cheb.pt(ix);
+      double R = _radial.pt(ix);
       double l = il;  
       _R_l[indx_r_l(ix,il)][0] = R;
       _R_l[indx_r_l(ix,il)][1] = l;
@@ -86,7 +86,7 @@ Grid::Grid(
    }
    _partial_R_to_partial_r.resize(_nx,0); 
    for (size_t ix=0; ix<_nx; ix++) {
-      _partial_R_to_partial_r[ix] = pow(1.0 - (_cheb.pt(ix)/cl),2);
+      _partial_R_to_partial_r[ix] = pow(1.0 - (_radial.pt(ix)/cl),2);
    }
    std::cout<<"Finished initializing Grid"<<std::endl;
 }
@@ -338,7 +338,7 @@ void Grid::set_partial_r(const std::vector<double> &v, std::vector<double> &dv) 
 
       get_row_R(it, ip, v, inter); 
 
-      _cheb.der(inter, inter_dv);
+      _radial.der(inter, inter_dv);
 
       for (size_t ix=0; ix<_nx; ix++) {
          inter_dv[ix] *= _partial_R_to_partial_r[ix];
@@ -366,6 +366,7 @@ void Grid::set_angular_power_spectrum(const std::vector<double> &v, std::vector<
       set_row_l(ix, inter__sphere_p, p); 
    }
 }
+#if USE_CHEB
 /*==========================================================================*/
 void Grid::set_n_l_coef(const std::vector<double> &v, std::vector<double> &p) const
 {
@@ -386,11 +387,12 @@ void Grid::set_n_l_coef(const std::vector<double> &v, std::vector<double> &p) co
          inter_v[ix] = pow(inter_v[ix],0.5);
       } 
       /* compute power spectrum */
-      _cheb.to_ch(inter_v, inter_p);
+      _radial.to_ch(inter_v, inter_p);
 
       set_row_n(il, inter_p, p); 
    }
 }
+#endif
 /*==========================================================================*/
 /* Low pass filter in spectral space, but keep the boundaries
  * of the radial points fixed. */
@@ -413,10 +415,10 @@ void Grid::filter(std::vector<double> &v) const
       get_row_R(it, ip, v, inter_radial); 
       const double lwr = inter_radial[0    ];
       const double upr = inter_radial[_nx-1];
-      _cheb.filter(inter_radial);
+      _radial.filter(inter_radial);
       inter_radial[0    ] = lwr;
       inter_radial[_nx-1] = upr;
-      _cheb.filter(inter_radial);
+      _radial.filter(inter_radial);
       inter_radial[0    ] = lwr;
       inter_radial[_nx-1] = upr;
       set_row_R(it, ip, inter_radial, v); 

@@ -45,7 +45,7 @@ namespace Unit_manager
 
    extern std::vector<Unit*> units;
 
-   void time_step(const size_t itm);
+   void time_step(/*const size_t itm*/);
    void shift();
 
    void set_initial_data(const Params &params);

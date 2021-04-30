@@ -51,9 +51,18 @@ class Sim:
       self.Rmin= min(self.Rvals)
       self.Rmax= max(self.Rvals)
 #-----------------------------------------------------------------------------
-      self.dt= float(
-         9.*pow(max([max(self.nxs),self.nlat,self.nphi]),-2)
-      )
+      if (self.use_cheb==True):
+         self.dt= float(
+            9.*pow(max([max(self.nxs),self.nlat,self.nphi]),-2)
+         )
+      else:
+         self.dt= min(
+               float(
+                  9.*pow(max([self.nlat,self.nphi]),-2)
+               )
+            ,
+            0.5/(max(self.nxs)-1.0)
+         )
 #-----------------------------------------------------------------------------
       self.nt= int(
          self.evolve_time*self.black_hole_mass/self.dt

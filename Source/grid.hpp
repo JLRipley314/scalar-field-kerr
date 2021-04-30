@@ -6,10 +6,12 @@
  * and taking derivatives over the grid.
  */
 #define SHTNS_CONTIGUOUS_LONGITUDES true
+#define USE_CHEB false
 
 #include <vector>
 
 #include "cheb.hpp"
+#include "finite_diff.hpp"
 #include "sphere.hpp"
 
 class Grid
@@ -35,7 +37,9 @@ public:
    void set_sphereX(      const std::vector<double> &v, std::vector<double> &vX) const;
    void set_partial_r(    const std::vector<double> &v, std::vector<double> &dv) const;
    void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p) const;
+#if USE_CHEB
    void set_n_l_coef(              const std::vector<double> &v, std::vector<double> &p) const;
+#endif
    /* \partial_t f - p 
     * */
    double norm_indep_res(
@@ -129,8 +133,11 @@ private:
    const size_t _nphi;
 
    Sphere _sphere;
-   Cheb _cheb;
-
+#if USE_CHEB
+   Cheb _radial;
+#else
+   FD _radial;
+#endif
    std::vector<std::vector<double>> _r_th_ph;
    std::vector<std::vector<double>> _R_th_ph;
    std::vector<std::vector<double>> _x_y_z;

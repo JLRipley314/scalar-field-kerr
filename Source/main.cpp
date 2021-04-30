@@ -29,7 +29,7 @@ int main(int argc, char **argv)
    std::cout<<"Beginning evolution"<<std::endl;
 
    for (size_t itm=1; itm<params.nt(); itm++) {
-      Unit_manager::time_step(itm);
+      Unit_manager::time_step(/*itm*/);
       /* 
        * save to file 
        * */
