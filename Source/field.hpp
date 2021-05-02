@@ -1,8 +1,8 @@
 /*
  * contains all levels for time integration
  */
-#ifndef _FIELD_HPP_
-#define _FIELD_HPP_
+#ifndef FIELD_HPP__
+#define FIELD_HPP__
 
 #include <string>
 #include <vector>

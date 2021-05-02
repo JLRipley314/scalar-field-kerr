@@ -2,8 +2,8 @@
  * utility routines for reading from parameter file
  * and accessing parameters in code
  */
-#ifndef _PARAMS_HPP_
-#define _PARAMS_HPP_
+#ifndef PARAMS_HPP__
+#define PARAMS_HPP__
 
 #include <string>
 #include <vector>

@@ -2,8 +2,8 @@
  * Stores Chebyshev points over interval [lower,upper]
  * and computes Chebyshev derivatives 
  */
-#ifndef _CHEB_HPP_
-#define _CHEB_HPP_
+#ifndef CHEB_HPP__
+#define CHEB_HPP__
 
 #include <vector>
 #include <fftw3.h>
@@ -40,4 +40,4 @@ private:
    fftw_plan _plan_dct;
 };
 /*===========================================================================*/
-#endif /* _CHEB_HPP_ */
+#endif /* CHEB_HPP__ */

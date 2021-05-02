@@ -28,17 +28,19 @@ std::vector<double> get_norm_diff(
    const double cl = Rmax;
 
    const double rl    = 0.1*(Rmax-Rmin) + Rmin;
-   const double ru    = 0.2*(Rmax-Rmin) + Rmin;
+   const double ru    = 0.5*(Rmax-Rmin) + Rmin;
    const double width = ru-rl;
 
    Grid grid(cl, Rmin, Rmax, nx, nl, nm, nlat, nphi);
 
    std::vector<double> v(n,0);
-   std::vector<double> dr_v1(n,0);
+   std::vector<double> dr_v1( n,0);
+   std::vector<double> d2r_v1(n,0);
    std::vector<double> dphi_v1(n,0);
    std::vector<double> X_v1(n,0);
    std::vector<double> lap_v1(n,0);
    std::vector<double> dr_v2(n,0);
+   std::vector<double> d2r_v2(n,0);
    std::vector<double> dphi_v2(n,0); 
    std::vector<double> X_v2(n,0);
    std::vector<double> lap_v2(n,0); 
@@ -52,17 +54,17 @@ std::vector<double> get_norm_diff(
       double bump = 0.0;
 
       if ((r<ru) && (r>rl)) {
-         bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
+         bump = 10*exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
       }
 
-      double rval = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump;
+      double rval = pow((r-rl)/width,4)*pow((ru-r)/width,4)*bump;
 
-      double der_rval = (
-         (2.0*((  (r-rl)/width) )*pow(((ru-r)/width),2))
-      -  (2.0*pow((r-rl)/width,2)*(    (ru-r)/width   ))
-      +  (1.0*(1.0              )*pow(((ru-r)/width),2))
-      -  (2.0*pow((r-rl)/width,2)*(1.0                ))
-      )*bump/width;
+      const double der_rval = (
+            4.0*pow((r-rl)/width,3)*pow((ru-r)/width,4) 
+         -  4.0*pow((r-rl)/width,4)*pow((ru-r)/width,3)
+         +      pow((r-rl)/width,2)*pow((ru-r)/width,4)
+         -  2.0*pow((r-rl)/width,4)*pow((ru-r)/width,2)  
+         )*(bump/width);
 
       v[i] = rval*(
             1.0 
@@ -88,33 +90,39 @@ std::vector<double> get_norm_diff(
          )/pow(3.0 + cos(2*phi),3)
          ;
    }
-   grid.set_partial_r(    v,   dr_v2);
-   grid.set_partial_phi(  v, dphi_v2);
-   grid.set_sphereX(      v,    X_v2);
-   grid.set_spherical_lap(v,  lap_v2);
+   grid.set_partial_r(     v,    dr_v2);
+   grid.set_partial_r( dr_v1,   d2r_v1);
+   grid.set_partial2_r(    v,   d2r_v2);
+   grid.set_partial_phi(   v,  dphi_v2);
+   grid.set_sphereX(       v,     X_v2);
+   grid.set_spherical_lap( v,   lap_v2);
 
    double norm_dr   = 0;
+   double norm_d2r  = 0;
    double norm_dphi = 0;
    double norm_X    = 0;
    double norm_lap  = 0;
    for (size_t i=0; i<n; i++) {
       norm_dr   += fabs(dr_v1[i]   - dr_v2[i]);
+      norm_d2r  += fabs(d2r_v1[i]  - d2r_v2[i]);
       norm_dphi += fabs(dphi_v1[i] - dphi_v2[i]);
       norm_X    += fabs(X_v1[i]    - X_v2[i]);
       norm_lap  += fabs(lap_v1[i]  - lap_v2[i]);
 
    }
    norm_dr   /= n;
+   norm_d2r  /= n;
    norm_dphi /= n;
    norm_X    /= n;
    norm_lap  /= n;
 
-   std::vector<double> norms(4,0);
+   std::vector<double> norms(5,0);
 
    norms[0] = norm_dr;
-   norms[1] = norm_dphi;
-   norms[2] = norm_X;
-   norms[3] = norm_lap;
+   norms[1] = norm_d2r;
+   norms[2] = norm_dphi;
+   norms[3] = norm_X;
+   norms[4] = norm_lap;
 
    return norms;
 }
@@ -238,6 +246,7 @@ TEST(test_grid, test_dr_dphi_lap) {
    const size_t nx2   = 64;
    std::vector<double> norms2 = get_norm_diff(nx2, nl1, nm1, nlat1, nphi1, Rmin, Rmax);
    EXPECT_LT(norms2[0], norms1[0]);
+   EXPECT_LT(norms2[1], norms1[1]);
    /* 
     * test convergence of the angular derivatives 
     */
@@ -246,9 +255,9 @@ TEST(test_grid, test_dr_dphi_lap) {
    const size_t nlat2 = 2*nl2 + 4;
    const size_t nphi2 = nlat2;
    std::vector<double> norms3 = get_norm_diff(nx1, nl2, nm2, nlat2, nphi2, Rmin, Rmax);
-   EXPECT_LT(norms3[1], norms1[1]);
    EXPECT_LT(norms3[2], norms1[2]);
    EXPECT_LT(norms3[3], norms1[3]);
+   EXPECT_LT(norms3[4], norms1[4]);
 }
 /*==========================================================================*/
 /* Testing grid filter is TVD 

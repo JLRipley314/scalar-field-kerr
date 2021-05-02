@@ -1,8 +1,8 @@
 /*
  * Spherical harmonics and derivatives 
  */
-#ifndef _SPHERE_HPP_
-#define _SPHERE_HPP_
+#ifndef SPHERE_HPP__
+#define SPHERE_HPP__
 
 #include <stdbool.h>
 /*

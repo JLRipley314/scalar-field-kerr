@@ -48,13 +48,6 @@ TEST(test_finite_diff, derivatives) {
    std::vector<double> norms_n1 = norm_derivatives(33);
    std::vector<double> norms_n2 = norm_derivatives(65);
 
-   std::cout
-      <<std::setw(16)<<norms_n1[0]
-      <<std::setw(16)<<norms_n2[0]
-      <<std::setw(16)<<norms_n1[1]
-      <<std::setw(16)<<norms_n2[1]
-      <<std::endl;
-
    EXPECT_LT(norms_n2[0], (1./64.)*norms_n1[0]);
    EXPECT_LT(norms_n2[1], (1./64.)*norms_n1[1]);
 }

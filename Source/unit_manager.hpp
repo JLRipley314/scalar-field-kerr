@@ -1,5 +1,5 @@
-#ifndef _UNIT_MANAGER_
-#define _UNIT_MANAGER_
+#ifndef UNIT_MANAGER__
+#define UNIT_MANAGER__
 
 #include <vector>
 #include <string>

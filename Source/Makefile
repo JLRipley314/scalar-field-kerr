@@ -7,8 +7,8 @@ SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp -fbounds-check \
 	 -lshtns -lfftw3 -lm \
-	-DSHTNS_CONTIGUOUS_LONGITUDES #\ ## Preprocessor directive for spherical grid
-	#-DUSE_CHEB ## Preprocessor directive for radial derivatives
+	-DSHTNS_CONTIGUOUS_LONGITUDES \
+	-DUSE_CHEB 
 #=============================================================================
 .PHONY: all
 #all: default_cheb.run

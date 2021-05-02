@@ -1,8 +1,8 @@
 /*
  * Field equations for scalar field about a Kerr black hole.
  */
-#ifndef _SCALAR_EOM_HPP_ 
-#define _SCALAR_EOM_HPP_
+#ifndef SCALAR_EOM_HPP__ 
+#define SCALAR_EOM_HPP__
 
 #include <vector>
 

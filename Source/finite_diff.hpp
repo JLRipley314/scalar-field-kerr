@@ -1,8 +1,8 @@
 /*
  * Computes finite differences 
  */
-#ifndef _FD_HPP_
-#define _FD_HPP_
+#ifndef FD_HPP__
+#define FD_HPP__
 
 #include <vector>
 

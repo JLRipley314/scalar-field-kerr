@@ -47,13 +47,13 @@ void compact_pulse(
       if ((r<ru) && (r>rl)) {
          bump = exp(-1.0*width/(r-rl))*exp(-2.0*width/(ru-r));
       }
-      f[grid.indx_r_th_ph(ix,it,ip)] = pow((r-rl)/width,2)*pow((ru-r)/width,2)*bump; 
+      f[grid.indx_r_th_ph(ix,it,ip)] = pow((r-rl)/width,4)*pow((ru-r)/width,4)*bump; 
 
       const double partial_r_f = (
-            2.0*   ((r-rl)/width  )*pow((ru-r)/width,2) 
-         -  2.0*pow((r-rl)/width,2)*   ((ru-r)/width  )
-         +                          pow((ru-r)/width,2)
-         -  2.0*pow((r-rl)/width,2) 
+            4.0*pow((r-rl)/width,3)*pow((ru-r)/width,4) 
+         -  4.0*pow((r-rl)/width,4)*pow((ru-r)/width,3)
+         +      pow((r-rl)/width,2)*pow((ru-r)/width,4)
+         -  2.0*pow((r-rl)/width,4)*pow((ru-r)/width,2)  
          )*(bump/width)
          ;
       if (initial_data_direction=="ingoing") {

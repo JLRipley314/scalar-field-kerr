@@ -12,7 +12,10 @@ SHTNS_INC = -I$(HOME)/shtns/Library/include
 SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
-	 -lshtns -lfftw3 -lm #-D_GLIBCXX_DEBUG
+	 -lshtns -lfftw3 -lm \
+        -DSHTNS_CONTIGUOUS_LONGITUDES \
+	-DUSE_CHEB 
+#-D_GLIBCXX_DEBUG
 #=============================================================================
 OBJ = main.o \
       test_finite_diff.o $(SRC)/finite_diff.o \

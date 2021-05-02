@@ -1,8 +1,8 @@
 /*
  * writes initial data for scalar field variables 
  */
-#ifndef _ID_HPP_
-#define _ID_HPP_
+#ifndef ID_HPP__
+#define ID_HPP__
 
 #include <string>
 #include <vector>

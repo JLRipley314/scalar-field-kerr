@@ -1,5 +1,5 @@
-#ifndef _IO_HPP_
-#define _IO_HPP_
+#ifndef IO_HPP__
+#define IO_HPP__
 /*
  * Utility functions for writing data to file.
  */

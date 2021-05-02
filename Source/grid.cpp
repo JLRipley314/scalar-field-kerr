@@ -72,7 +72,9 @@ Grid::Grid(
       _x_z[ indx_r_th(ix,it)][1] = R*cos(theta);
    }
    }
+#if USE_CHEB
    _n_l.resize(_nx*_nl, std::vector<double>(2,0));
+#endif
    _R_l.resize(_nx*_nl, std::vector<double>(2,0));
    for (size_t ix=0; ix<_nx; ix++) {
    for (size_t il=0; il<_nl; il++) {
@@ -80,13 +82,17 @@ Grid::Grid(
       double l = il;  
       _R_l[indx_r_l(ix,il)][0] = R;
       _R_l[indx_r_l(ix,il)][1] = l;
+#if USE_CHEB
       _n_l[indx_r_l(ix,il)][0] = double(ix);
       _n_l[indx_r_l(ix,il)][1] = l;
+#endif
    }
    }
-   _partial_R_to_partial_r.resize(_nx,0); 
+   _dR_over_dr.resize(  _nx,0); 
+   _d2R_over_dr2.resize(_nx,0); 
    for (size_t ix=0; ix<_nx; ix++) {
-      _partial_R_to_partial_r[ix] = pow(1.0 - (_radial.pt(ix)/cl),2);
+      _dR_over_dr[  ix] =           pow(1.0 - (_radial.pt(ix)/cl),2);
+      _d2R_over_dr2[ix] = (-2.0/cl)*pow(1.0 - (_radial.pt(ix)/cl),3);
    }
    std::cout<<"Finished initializing Grid"<<std::endl;
 }
@@ -341,10 +347,41 @@ void Grid::set_partial_r(const std::vector<double> &v, std::vector<double> &dv) 
       _radial.der(inter, inter_dv);
 
       for (size_t ix=0; ix<_nx; ix++) {
-         inter_dv[ix] *= _partial_R_to_partial_r[ix];
+         inter_dv[ix] *= _dR_over_dr[ix];
       }
 
       set_row_R(it, ip, inter_dv, dv); 
+   }
+   }
+}
+/*==========================================================================*/
+void Grid::set_partial2_r(const std::vector<double> &v, std::vector<double> &ddv) const
+{
+   assert(v.size()  ==_nx*_nlat*_nphi);
+   assert(ddv.size()==_nx*_nlat*_nphi);
+
+#pragma omp parallel for
+   for (size_t it=0; it<_nlat; it++) {
+   for (size_t ip=0; ip<_nphi; ip++) {
+      std::vector<double> inter(    _nx);
+      std::vector<double> inter_dv( _nx);
+      std::vector<double> inter_ddv(_nx);
+
+      get_row_R(it, ip, v, inter); 
+#if USE_CHEB
+      _radial.der(inter,    inter_dv);
+      _radial.der(inter_dv, inter_ddv);
+#else
+      _radial.der(inter,  inter_dv);
+      _radial.der2(inter, inter_ddv);
+#endif
+      for (size_t ix=0; ix<_nx; ix++) {
+         inter_ddv[ix] = (
+                _d2R_over_dr2[ix] *inter_dv[ ix]
+         +  pow(_dR_over_dr[ix],2)*inter_ddv[ix] 
+         );
+      }
+      set_row_R(it, ip, inter_ddv, ddv); 
    }
    }
 }
@@ -366,8 +403,8 @@ void Grid::set_angular_power_spectrum(const std::vector<double> &v, std::vector<
       set_row_l(ix, inter__sphere_p, p); 
    }
 }
-#if USE_CHEB
 /*==========================================================================*/
+#if USE_CHEB
 void Grid::set_n_l_coef(const std::vector<double> &v, std::vector<double> &p) const
 {
    assert(v.size()==_nx*_nlat*_nphi);

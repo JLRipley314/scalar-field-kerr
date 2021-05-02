@@ -1,5 +1,5 @@
-#ifndef _GRID_HPP_
-#define _GRID_HPP_
+#ifndef GRID_HPP__
+#define GRID_HPP__
 /*
  * Utility functions for accessing array elements over
  * the sphere and the full three dimensional space,
@@ -33,9 +33,10 @@ public:
    void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv) const;
    void set_sphereX(      const std::vector<double> &v, std::vector<double> &vX) const;
    void set_partial_r(    const std::vector<double> &v, std::vector<double> &dv) const;
+   void set_partial2_r(   const std::vector<double> &v, std::vector<double> &ddv) const;
    void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p) const;
 #if USE_CHEB
-   void set_n_l_coef(              const std::vector<double> &v, std::vector<double> &p) const;
+   void set_n_l_coef(const std::vector<double> &v, std::vector<double> &p) const;
 #endif
    /* \partial_t f - p 
     * */
@@ -142,9 +143,11 @@ private:
    std::vector<std::vector<double>> _th_ph;
    std::vector<std::vector<double>> _R_th;
    std::vector<std::vector<double>> _R_l;
+#if USE_CHEB
    std::vector<std::vector<double>> _n_l;
-
-   std::vector<double> _partial_R_to_partial_r;
+#endif
+   std::vector<double> _dR_over_dr;
+   std::vector<double> _d2R_over_dr2;
 
 public:
    inline double cl() const {return _cl;}
@@ -227,6 +230,7 @@ public:
    {
       return _R_l[i];
    }
+#if USE_CHEB
    inline std::vector<double> n_l(const size_t ix, const size_t il) const 
    {
       return _n_l[indx_r_l(ix, il)];
@@ -235,5 +239,6 @@ public:
    {
       return _n_l[i];
    }
+#endif
 };
 #endif /* _GRID_HPP */
