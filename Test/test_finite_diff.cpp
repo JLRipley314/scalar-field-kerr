@@ -11,26 +11,52 @@
 /*==========================================================================*/
 /* Testing we can compute derivatives of simple functions 
  */
-TEST(test_finite_diff, derivatives) {
-   const double eps = 7e-14;
-   const size_t nr = pow(2,7);
-   FD fd(nr, 0.0, 1.0);
+std::vector<double> norm_derivatives(const size_t n) {
+   FD fd(n, 0.0, 1.0);
 
-   std::vector<double> v(  nr,0);
-   std::vector<double> dv1(nr,0);
-   std::vector<double> dv2(nr,0);
+   std::vector<double> v(n,0);
+   std::vector<double> dv1(n,0);
+   std::vector<double> dv2(n,0);
+   std::vector<double> ddv1(n,0);
+   std::vector<double> ddv2(n,0);
    /* 
     * fill in values
     */
-   for (size_t i=0; i<nr; i++) {
-      v[i]   = fd.pt(i)*sin(fd.pt(i));
-      dv1[i] = fd.pt(i)*cos(fd.pt(i)) + sin(fd.pt(i));
+   for (size_t i=0; i<n; i++) {
+      v[i]    =   fd.pt(i)*sin(fd.pt(i));
+      dv1[i]  =   fd.pt(i)*cos(fd.pt(i)) +     sin(fd.pt(i));
+      ddv1[i] = - fd.pt(i)*sin(fd.pt(i)) + 2.0*cos(fd.pt(i));
    }
-   fd.der(v, dv2);
+   fd.der( v,  dv2);
+   fd.der2(v, ddv2);
 
-   for (size_t i=0; i<nr; i++) {
-      EXPECT_LT(fabs(dv1[i] - dv2[i]), eps);
+   double norm_der1 = 0;
+   double norm_der2 = 0;
+   for (size_t i=0; i<n; i++) {
+      norm_der1 += fabs(dv1[i]  -  dv2[i]);
+      norm_der2 += fabs(ddv1[i] - ddv2[i]);
    }
+   norm_der1 /= n;
+   norm_der2 /= n;
+   std::vector<double> out = {norm_der1, norm_der2};
+   return out;
+}
+/*==========================================================================*/
+/* Testing convergence of derivatives to true answer (6th order convergence) 
+ */
+TEST(test_finite_diff, derivatives) {
+   std::vector<double> norms_n1 = norm_derivatives(33);
+   std::vector<double> norms_n2 = norm_derivatives(65);
+
+   std::cout
+      <<std::setw(16)<<norms_n1[0]
+      <<std::setw(16)<<norms_n2[0]
+      <<std::setw(16)<<norms_n1[1]
+      <<std::setw(16)<<norms_n2[1]
+      <<std::endl;
+
+   EXPECT_LT(norms_n2[0], (1./64.)*norms_n1[0]);
+   EXPECT_LT(norms_n2[1], (1./64.)*norms_n1[1]);
 }
 /*==========================================================================*/
 /* Testing Kreiss-Oliger filter is total variation diminishing
