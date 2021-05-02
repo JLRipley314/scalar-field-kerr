@@ -173,9 +173,9 @@ void Scalar_eom::set_k(
    std::vector<double> _dphi_dr_f(_n);
    std::vector<double> _sphereX_f(_n);
 
-   grid.set_partial_r(    f,    _dr_f);
-   grid.set_partial_r(    p,    _dr_p);
-   grid.set_partial_r(_dr_f, _dr_dr_f);
+   grid.set_partial_r( f,    _dr_f);
+   grid.set_partial_r( p,    _dr_p);
+   grid.set_partial2_r(f, _dr_dr_f);
 
    grid.set_partial_phi(    f, _dphi_f);
    grid.set_partial_phi(_dr_f, _dphi_dr_f);
