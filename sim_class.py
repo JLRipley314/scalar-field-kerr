@@ -10,7 +10,7 @@ class Sim:
 #=============================================================================
    def make_output_dir(self)->None:
       time_of_day= time.asctime().split()
-      self.output_stem= str(
+      self.output_stem= '/'+str(
          time_of_day[1]
       +  '_'+time_of_day[2]
       +  '_'+time_of_day[3].replace(':','_')
@@ -21,9 +21,9 @@ class Sim:
       +	'_nm'+str(self.nm)
       )
       if (self.computer=='home'):
-         self.output_dir= 'Output/'+self.output_stem
+         self.output_dir= self.home_dir+'/Output'+self.output_stem
       else:
-         self.output_dir=self.out_stem+'/'+self.output_stem
+         self.output_dir=self.out_stem+self.output_stem
       os.makedirs(self.output_dir)
 #=============================================================================
 ## stereographic projection
@@ -75,8 +75,8 @@ class Sim:
          self.t_step_save= 1
 #=============================================================================
    def write_sim_params(self)->None:
-      self.parameter_file = self.output_dir+'/params.txt'
-      with open(self.parameter_file,'w') as f:
+      self.parameter_file = 'params.txt'
+      with open(self.output_dir+'/'+self.parameter_file,'w') as f:
          attrs= vars(self)
          for param in attrs:
             if type(attrs[param])==list:
@@ -87,8 +87,8 @@ class Sim:
             else:
                f.write('{} {}\n'.format(param,attrs[param]))	
 #=============================================================================
-   def write_slurm_script(self, run_str:str):
-      with open('{}/run.slurm'.format(self.home_dir), 'w') as f:
+   def write_slurm_script(self):
+      with open('{}/run.slurm'.format(self.output_dir), 'w') as f:
          f.write('#!/bin/sh\n')
          f.write('#SBATCH -J scalar\t\t# job name\n')
          f.write('#SBATCH -t {}\t\t# walltime (dd:hh:mm:ss)\n'.format(self.walltime))
@@ -106,12 +106,8 @@ class Sim:
          #------------
          ## executable
          #------------
-         f.write('\n'+run_str)
-
-      shutil.copyfile(
-      '{}/run.slurm'.format(self.home_dir),
-      '{}/run.slurm'.format(self.output_dir)
-      )
+         f.write('chmod 755 '+self.bin_name) ## make sure binary is executable
+         f.write('\n'+self.run_str)
 #=============================================================================
    def launch_run(self)->None:
       self.set_derived_params()
@@ -124,21 +120,28 @@ class Sim:
 
       self.write_sim_params()
 
-      self.output_file= self.output_dir+'/out.txt'
-      run_str= (
-         './Bin/'+self.bin_name
-         +' '+self.parameter_file
-         +' '+self.output_dir
-         +' | tee '+self.output_file#+' 2>&1 &'
+      shutil.copyfile(
+         'Bin/{}'.format(self.bin_name),
+         '{}/{}'.format(self.output_dir, self.bin_name)
       )
-      if (self.debug):
-         run_str= 'valgrind -v --track-origins=yes --leak-check=full --gen-suppressions=yes '+run_str
+
+      self.output_file= 'out.txt'
+      self.run_str= (
+         './'+self.bin_name
+         +' '+self.parameter_file
+         +' .'
+         +' | tee '+self.output_file
+      )
       if (self.computer=='home'):
          os.environ['OMP_NUM_THREADS']= str(self.num_threads)
-         subprocess.call(run_str,shell=True) 
+         os.chdir(self.output_dir)
+         subprocess.call(self.run_str, shell=True) 
+         os.chdir(self.home_dir)
       else:
-         self.write_slurm_script(run_str)
-         subprocess.call('sbatch run.slurm', shell='True')		
+         self.write_slurm_script()
+         os.chdir(self.output_dir)
+         subprocess.call('sbatch {}/run.slurm'.format(self.output_dir), shell='True')
+         os.chdir(self.home_dir)
 #=============================================================================
    def then_recompile(self)->None:
       subprocess.call('make clean_obj'+self.bin_name,shell=True)

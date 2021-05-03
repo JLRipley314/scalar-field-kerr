@@ -11,7 +11,6 @@ sim.output_dir = None
 sim.recompile= False
 
 sim.run_type= 'basic_run'
-sim.debug= False
 
 sim.black_hole_mass= float(1)
 sim.black_hole_spin= round(1.0*sim.black_hole_mass,16)
@@ -62,14 +61,14 @@ sim.initial_data_direction= 'outgoing'
 #-----------------------------------------------------------------------------
 ## Details of computer setup 
 
-sim.computer= 'home'#'della'#
-sim.out_stem= '/tigress/jripley/sf/highres'
+sim.computer= 'della'#'home'#
+sim.out_stem= '/tigress/jripley/sf/test'
 
 sim.num_threads= 2 ## sets number of threads if using OpenMP 
 #-----------------------------------------------------------------------------
 ## For writing slurm script
 
-sim.walltime= '72:00:00' ## (hh:mm:ss)
+sim.walltime= '30:00' ## (hh:mm:ss)
 sim.memory=   '2048' ## MB 
 sim.email=    'lloydripley@gmail.com' ## For slurm notification
 #=============================================================================
