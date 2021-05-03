@@ -5,7 +5,7 @@ BIN = ../Bin
 SHTNS_INC = -I$(HOME)/shtns/Library/include
 SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
-CFLAGS = -g -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -fbounds-check \
+CFLAGS = -pg -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -fbounds-check \
 	 -lshtns -lfftw3 -lm \
 	-DSHTNS_CONTIGUOUS_LONGITUDES \
 	-DUSE_CHEB 

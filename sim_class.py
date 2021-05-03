@@ -135,6 +135,7 @@ class Sim:
       if (self.computer=='home'):
          os.environ['OMP_NUM_THREADS']= str(self.num_threads)
          os.chdir(self.output_dir)
+         subprocess.call('chmod 755 '+self.bin_name, shell=True) ## make sure binary is executable
          subprocess.call(self.run_str, shell=True) 
          os.chdir(self.home_dir)
       else:
