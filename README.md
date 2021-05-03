@@ -1,6 +1,6 @@
 # Scalar field dynamics around a Kerr black hole
 
-A C++ (version C++11 onwards) and code that solves the equations of 
+A C++ (version C++11 onwards) code that solves the equations of 
 motion for a real scalar field around a Kerr black hole.
 
 Runtime parameters are configured in the `config_template.py` file
