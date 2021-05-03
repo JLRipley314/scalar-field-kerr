@@ -44,7 +44,11 @@ The following stackoverflow Q&A may be useful as well.
 
 https://stackoverflow.com/questions/13513905/how-to-set-up-googletest-as-a-shared-library-on-linux
 
-## Making scalar-field-kerr binary
+## Making scalar-field-kerr exeutable 
 
-Once all the above libraries are installed, you should be able to simply
-type `make` to compile a binary `default.run` in `Bin/`.	
+There are two options for the executable: with either
+Chebyshev psuedopsectral methods for computing the radial
+derivatives, or a finite difference emthod.
+There are flags for this in `Source/Makefile`.
+Then in the main directory, typing `Make` should compile the executable
+to `Bin`.
