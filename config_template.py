@@ -13,18 +13,18 @@ sim.recompile= False
 sim.run_type= 'basic_run'
 
 sim.black_hole_mass= float(1)
-sim.black_hole_spin= round(1.0*sim.black_hole_mass,16)
+sim.black_hole_spin= round(0.9999*sim.black_hole_mass,16)
 sim.compactification_length= float(20)
 
-sim.evolve_time= float(500.0) ## units of black hole mass
-sim.num_saved_times= int(1000)
+sim.evolve_time= float(600.0) ## units of black hole mass
+sim.num_saved_times= int(1200)
 
 sim.nl= 20 ## Number of angular l values
-sim.nm= 16 ## Number of angular m values
-sim.nlat = 32 ## Number of theta collocation points 
-sim.nphi = 32 ## Number of phi collocation points; must be a multiple of 4 
+sim.nm= 18 ## Number of angular m values
+sim.nlat = 40 ## Number of theta collocation points 
+sim.nphi = 40 ## Number of phi collocation points; must be a multiple of 4 
 
-sim.nxs=   [128]#, 33] ## Number of radial pts on each domain 
+sim.nxs=   [8193]#, 33] ## Number of radial pts on each domain 
 sim.rvals= [1]#,   4] ## Radial boundary of each domain (multiples of r_h) 
 
 sim.use_cheb=False ## Radial derivatives: Chebyshev vs. finite differences
@@ -64,12 +64,12 @@ sim.initial_data_direction= 'outgoing'
 sim.computer= 'della'#'home'#
 sim.out_stem= '/tigress/jripley/sf/fd'
 
-sim.num_threads= 2 ## sets number of threads if using OpenMP 
+sim.num_threads= 4 ## sets number of threads if using OpenMP 
 #-----------------------------------------------------------------------------
 ## For writing slurm script
 
-sim.walltime= '30:00' ## (hh:mm:ss)
-sim.memory=   '2048' ## MB 
+sim.walltime= '24:00:00' ## (hh:mm:ss)
+sim.memory=   '8192'#'4096'#'2048' ## MB 
 sim.email=    'lloydripley@gmail.com' ## For slurm notification
 #=============================================================================
 ## Different scripts for making convergence tests, etc.
