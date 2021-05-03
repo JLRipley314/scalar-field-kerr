@@ -14,17 +14,17 @@ sim.run_type= 'basic_run'
 
 sim.black_hole_mass= float(1)
 sim.black_hole_spin= round(1.0*sim.black_hole_mass,16)
-sim.compactification_length= float(10)
+sim.compactification_length= float(20)
 
-sim.evolve_time= float(20.0) ## units of black hole mass
-sim.num_saved_times= int(40)
+sim.evolve_time= float(500.0) ## units of black hole mass
+sim.num_saved_times= int(1000)
 
-sim.nl= 16 ## Number of angular l values
-sim.nm= 8 ## Number of angular m values
+sim.nl= 20 ## Number of angular l values
+sim.nm= 16 ## Number of angular m values
 sim.nlat = 32 ## Number of theta collocation points 
-sim.nphi = 20 ## Number of phi collocation points; must be a multiple of 4 
+sim.nphi = 32 ## Number of phi collocation points; must be a multiple of 4 
 
-sim.nxs=   [80]#, 33] ## Number of radial pts on each domain 
+sim.nxs=   [128]#, 33] ## Number of radial pts on each domain 
 sim.rvals= [1]#,   4] ## Radial boundary of each domain (multiples of r_h) 
 
 sim.use_cheb=False ## Radial derivatives: Chebyshev vs. finite differences
@@ -47,13 +47,13 @@ sim.k2  = 0.0
 
 sim.V2 = 1.0
 sim.V3 = 0.0
-sim.V4 = 0.0
+sim.V4 = 100.0
 #-----------------------------------------------------------------------------
 ## Initial data
 
 sim.l_ang=  0 ## Initial data is a particular swal function.
 sim.m_ang=  0 ## Must have m_ang >= 0.
-sim.amp= 0.1 ## Initial amplitude of pulse 
+sim.amp= 0.5 ## Initial amplitude of pulse 
 sim.rl_0= -1.0 ## Lower(upper) bounds of initial data as a multiple
 sim.ru_0= 3.0 ## of the black hole horizon.
 sim.initial_data_type= 'compact_pulse'
@@ -62,7 +62,7 @@ sim.initial_data_direction= 'outgoing'
 ## Details of computer setup 
 
 sim.computer= 'della'#'home'#
-sim.out_stem= '/tigress/jripley/sf/test'
+sim.out_stem= '/tigress/jripley/sf/fd'
 
 sim.num_threads= 2 ## sets number of threads if using OpenMP 
 #-----------------------------------------------------------------------------
