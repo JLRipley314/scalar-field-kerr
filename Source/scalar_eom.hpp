@@ -60,6 +60,7 @@ private:
    std::vector<double> _p_dr_f;
    std::vector<double> _p_dr_p;
    std::vector<double> _p_dr_dr_f;
+   std::vector<double> _p_dphi_f;
    std::vector<double> _p_dphi_dr_f;
    std::vector<double> _p_lap_f;
 

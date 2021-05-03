@@ -24,6 +24,7 @@ Scalar_eom::Scalar_eom(
    _p_dr_f(     _n,0),
    _p_dr_p(     _n,0),
    _p_dr_dr_f(  _n,0),
+   _p_dphi_f(   _n,0),
    _p_dphi_dr_f(_n,0),
    _p_lap_f(    _n,0),
 
@@ -81,6 +82,7 @@ Scalar_eom::Scalar_eom(
       _p_dr_f[indx]      = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
       _p_dr_p[indx]      = 4.0*m*inv_r/Sigma;
       _p_dr_dr_f[indx]   = (Delta/Sigma);
+      _p_dphi_f[indx]    = -2.0*a*pow(inv_r,3)/Sigma;
       _p_dphi_dr_f[indx] = (2.0*a/Sigma)*pow(inv_r,2);
       _p_lap_f[indx]     = (1.0/Sigma)*pow(inv_r,2);
 
@@ -145,6 +147,108 @@ Scalar_eom::Scalar_eom(
    }
    }
    }
+/* 
+ * working on eom for hyperboloidal compactification 
+ */
+#if 1==0
+   for (size_t ix=0; ix<nx;   ix++) {
+   for (size_t ip=0; ip<nphi; ip++) {
+   for (size_t it=0; it<nlat; it++) {
+      const size_t indx = grid.indx_r_th_ph(ix,it,ip);
+      
+      std::vector<double> R_th_ph = grid.R_th_ph(ix, it, ip); 
+
+      const double R  = R_th_ph[0];
+      const double Th = R_th_ph[1];
+      const double Om = 1. - (R/cl);
+
+      const double Sigma = pow(R,2) + pow(a*cos(Th)*Om,2); 
+
+      _p_p[indx] = (
+         -  4.*m*pow(R,2)*(cl+R)
+         +  2.*Om*(
+               R*(
+                  pow(a,2)*cl
+               +  2.*m*(2.*m*R+cl*(-2.*m+R))
+               )
+            +  2.*m*Om*(
+                  pow(a,2)*(2.*cl-R)
+               -  2.*cl*m*R
+               +  pow(a,2)*cl*Om
+               )
+            )
+         )/(cl*Sigma)
+         ;
+      _p_dr_f[indx] = 2.*R*Om*(
+            pow(R,3)
+         +  m*(cl - 2.*R)*R*Om
+         +  pow(a,2)*(-cl + R)*pow(Om,2) 
+         )/(cl*Sigma) 
+         ;
+      _p_dr_p[indx] = -R*(
+            pow(R,3)
+         +  Om*(
+            -  2.*m*R
+            +  pow(a,2)*Om
+            )*(
+               R
+            +  4.*m*Om
+            )
+         )/Sigma
+         ;
+      _p_dr_dr_f[indx] = pow(R*Om,2)*(
+            pow(R,2)
+         -  2.*m*R*Om
+         +  pow(a*Om,2)
+         )/Sigma
+         ;
+      _p_dphi_dr_f[indx] = (
+           2.*a*pow(R*Om,2) 
+         )/Sigma
+         ;
+      _p_dphi_p[indx] = -(
+            2.*a*R*(R + 4.*m*Om)
+         )/Sigma
+         ;
+      _p_lap_f[indx] = (1.0/Sigma)*pow(inv_r,2);
+
+      _p_p_p[indx]         = -(1.0 + (2.0*m*inv_r/Sigma));
+      _p_p_dr_f[indx]      = 4.0*m*inv_r/Sigma;
+      _p_dr_f_dr_f[indx]   = Delta/Sigma;
+      _p_dr_f_dphi_f[indx] = 2.0*a*pow(inv_r,2)/Sigma;
+      _p_sphereX_f[indx]   = pow(inv_r,2)/Sigma;
+
+      _pre[indx] = -(
+            pow(R,2)*(-16.0*pow(m,2) + pow(a*cos(Th),2))
+         +  8*m*Om*((pow(a,2) - 4.0*pow(m,2))*R + 2.0*pow(a,2)*m*Om)
+         )/Sigma;
+
+      _p_p[indx]         /= _pre[indx];
+      _p_dr_f[indx]      /= _pre[indx];
+      _p_dr_p[indx]      /= _pre[indx];
+      _p_dr_dr_f[indx]   /= _pre[indx];
+      _p_dphi_dr_f[indx] /= _pre[indx];
+      _p_lap_f[indx]     /= _pre[indx];
+
+      _p_p_p[indx]         /= _pre[indx];
+      _p_p_dr_f[indx]      /= _pre[indx];
+      _p_dr_f_dr_f[indx]   /= _pre[indx];
+      _p_dr_f_dphi_f[indx] /= _pre[indx]; 
+      _p_sphereX_f[indx]   /= _pre[indx];
+
+      _rho_vv[indx]      = 0.5*(1.0 + 2.0*m*inv_r/Sigma);
+      _rho_vr[indx]      = 2.0*m*inv_r/Sigma;
+      _rho_rr[indx]      = 0.5*( 
+            ((1.0+(2*m*inv_r)+pow(a*inv_r,2))/Sigma)
+         -  (4.0*m*inv_r/(2.0*m*inv_r + Sigma))     
+         );
+      _rho_rphi[indx]    = a*pow(inv_r,2)/Sigma;
+      _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
+   }
+   }
+   }
+#endif
+
    std::cout<<"Finished initializing Scalar_eom"<<std::endl;
 }
 /*==========================================================================*/
@@ -212,6 +316,8 @@ void Scalar_eom::set_k(
       +  _p_dr_p[i]*_dr_p[i] 
 
       +  _p_dr_dr_f[i]*_dr_dr_f[i]
+
+      +  _p_dphi_f[i]*_dphi_f[i]
 
       +  _p_dphi_dr_f[i]*_dphi_dr_f[i]
 
