@@ -24,7 +24,6 @@ Scalar_eom::Scalar_eom(
    _p_dr_f(     _n,0),
    _p_dr_p(     _n,0),
    _p_dr_dr_f(  _n,0),
-   _p_dphi_f(   _n,0),
    _p_dphi_dr_f(_n,0),
    _p_lap_f(    _n,0),
 
@@ -78,21 +77,20 @@ Scalar_eom::Scalar_eom(
          ;
       const double Delta = (1.0 - rp*inv_r)*(1.0 - rm*inv_r); 
 
-      _p_p[indx]         = (2.0*m/Sigma)*pow(inv_r,2);
-      _p_dr_f[indx]      = 2.0*(inv_r - (m*pow(inv_r,2)))/Sigma;
-      _p_dr_p[indx]      = 4.0*m*inv_r/Sigma;
-      _p_dr_dr_f[indx]   = (Delta/Sigma);
-      _p_dphi_f[indx]    = -2.0*a*pow(inv_r,3)/Sigma;
-      _p_dphi_dr_f[indx] = (2.0*a/Sigma)*pow(inv_r,2);
-      _p_lap_f[indx]     = (1.0/Sigma)*pow(inv_r,2);
+      _p_p[indx]         = 2.*m*pow(inv_r,2)/Sigma;
+      _p_dr_f[indx]      = 2.*(inv_r - (m*pow(inv_r,2)))/Sigma;
+      _p_dr_p[indx]      = 4.*m*inv_r/Sigma;
+      _p_dr_dr_f[indx]   = Delta/Sigma;
+      _p_dphi_dr_f[indx] = 2.*a*pow(inv_r,2)/Sigma;
+      _p_lap_f[indx]     = pow(inv_r,2)/Sigma;
 
-      _p_p_p[indx]         = -(1.0 + (2.0*m*inv_r/Sigma));
-      _p_p_dr_f[indx]      = 4.0*m*inv_r/Sigma;
+      _p_p_p[indx]         = -(1. + (2.*m*inv_r/Sigma));
+      _p_p_dr_f[indx]      = 4.*m*inv_r/Sigma;
       _p_dr_f_dr_f[indx]   = Delta/Sigma;
-      _p_dr_f_dphi_f[indx] = 2.0*a*pow(inv_r,2)/Sigma;
+      _p_dr_f_dphi_f[indx] = 2.*a*pow(inv_r,2)/Sigma;
       _p_sphereX_f[indx]   = pow(inv_r,2)/Sigma;
 
-      _pre[indx] = 1.0 + (2.0*m*inv_r/Sigma);
+      _pre[indx] = 1. + (2.*m*inv_r/Sigma);
 
       _p_p[indx]         /= _pre[indx];
       _p_dr_f[indx]      /= _pre[indx];
@@ -107,13 +105,13 @@ Scalar_eom::Scalar_eom(
       _p_dr_f_dphi_f[indx] /= _pre[indx]; 
       _p_sphereX_f[indx]   /= _pre[indx];
 
-      _rho_vv[indx]      = 0.5*(1.0 + 2.0*m*inv_r/Sigma);
-      _rho_vr[indx]      = 2.0*m*inv_r/Sigma;
+      _rho_vv[indx]      = 0.5*(1. + 2.*m*inv_r/Sigma);
+      _rho_vr[indx]      = 2. *m*inv_r/Sigma;
       _rho_rr[indx]      = 0.5*( 
-            ((1.0+(2*m*inv_r)+pow(a*inv_r,2))/Sigma)
-         -  (4.0*m*inv_r/(2.0*m*inv_r + Sigma))     
+            ((1. + (2.*m*inv_r)+pow(a*inv_r,2))/Sigma)
+         -  (4.*m*inv_r/(2.*m*inv_r + Sigma))     
          );
-      _rho_rphi[indx]    = a*pow(inv_r,2)/Sigma;
+      _rho_rphi[indx]    =   a*pow(inv_r,2)/Sigma;
       _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
 
       const size_t indx_sphere = grid.indx_th_ph(it,ip);
@@ -169,10 +167,10 @@ Scalar_eom::Scalar_eom(
          +  2.*Om*(
                R*(
                   pow(a,2)*cl
-               +  2.*m*(2.*m*R+cl*(-2.*m+R))
+               +  2.*m*(2.*m*R + cl*(-2.*m + R))
                )
             +  2.*m*Om*(
-                  pow(a,2)*(2.*cl-R)
+                  pow(a,2)*(2.*cl - R)
                -  2.*cl*m*R
                +  pow(a,2)*cl*Om
                )
@@ -202,15 +200,15 @@ Scalar_eom::Scalar_eom(
          +  pow(a*Om,2)
          )/Sigma
          ;
-      _p_dphi_dr_f[indx] = (
-           2.*a*pow(R*Om,2) 
-         )/Sigma
-         ;
-      _p_dphi_p[indx] = -(
-            2.*a*R*(R + 4.*m*Om)
-         )/Sigma
-         ;
-      _p_lap_f[indx] = (1.0/Sigma)*pow(inv_r,2);
+      _p_dphi_dr_f[indx] =  2.*a*pow(R*Om,2)/Sigma;
+
+      _p_dphi_p[indx] = -2.*a*R*(R + 4.*m*Om)/Sigma;
+
+      _p_dphi_f[indx] = -2.*a*R*Om/Sigma;
+
+      _p_lap_f[indx] = pow(R,2)/Sigma;
+
+      _p_f[indx] = 2.*Om*(-m*R + pow(a,2)*Om)/Sigma;
 
       _p_p_p[indx]         = -(1.0 + (2.0*m*inv_r/Sigma));
       _p_p_dr_f[indx]      = 4.0*m*inv_r/Sigma;
@@ -229,6 +227,7 @@ Scalar_eom::Scalar_eom(
       _p_dr_dr_f[indx]   /= _pre[indx];
       _p_dphi_dr_f[indx] /= _pre[indx];
       _p_lap_f[indx]     /= _pre[indx];
+      _p_f[indx]         /= _pre[indx];
 
       _p_p_p[indx]         /= _pre[indx];
       _p_p_dr_f[indx]      /= _pre[indx];
@@ -316,8 +315,6 @@ void Scalar_eom::set_k(
       +  _p_dr_p[i]*_dr_p[i] 
 
       +  _p_dr_dr_f[i]*_dr_dr_f[i]
-
-      +  _p_dphi_f[i]*_dphi_f[i]
 
       +  _p_dphi_dr_f[i]*_dphi_dr_f[i]
 
