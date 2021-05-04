@@ -231,8 +231,17 @@ void time_step(/*const size_t itm*/)
 {
 //   #pragma omp parallel for
    for (Unit *u: units) {
-      u->grid.filter(u->f.n);
-      u->grid.filter(u->p.n);
+      #pragma omp parallel sections
+      {
+         #pragma omp section
+         {
+            u->grid.filter(u->f.n);
+         }
+         #pragma omp section
+         {
+            u->grid.filter(u->p.n);
+         }
+      }
    }
    /*--------------------------------------*/
 //   #pragma omp parallel for

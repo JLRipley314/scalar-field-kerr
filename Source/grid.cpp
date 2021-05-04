@@ -452,10 +452,9 @@ void Grid::filter(std::vector<double> &v) const
       get_row_R(it, ip, v, inter_radial); 
       const double lwr = inter_radial[0    ];
       const double upr = inter_radial[_nx-1];
-      _radial.filter(inter_radial);
+      set_row_R(it, ip, inter_radial, v); 
       inter_radial[0    ] = lwr;
       inter_radial[_nx-1] = upr;
-      set_row_R(it, ip, inter_radial, v); 
    }
    }
 }

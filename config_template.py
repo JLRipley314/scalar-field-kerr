@@ -64,6 +64,7 @@ sim.initial_data_direction= 'outgoing'
 sim.computer= 'della'#'home'#
 sim.out_stem= '/tigress/jripley/sf/fd'
 
+sim.num_omp_levels= 1 ## for nested OpenMP parallelism
 sim.num_threads= 4 ## sets number of threads if using OpenMP 
 #-----------------------------------------------------------------------------
 ## For writing slurm script

@@ -102,6 +102,7 @@ class Sim:
          f.write('#SBATCH --nodes=1\n')
          f.write('#SBATCH --ntasks-per-node=1\n')
          f.write('#SBATCH --cpus-per-task={}\n'.format(self.num_threads))
+         f.write('\nexport OMP_MAX_ACTIVE_LEVELS={}\n'.format(self.num_omp_levels))
          f.write('\nexport OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK\n')
          #------------
          ## executable
@@ -133,6 +134,7 @@ class Sim:
          +' | tee '+self.output_file
       )
       if (self.computer=='home'):
+         os.environ['OMP_MAX_ACTIVE_LEVELS']= str(self.num_omp_levels)
          os.environ['OMP_NUM_THREADS']= str(self.num_threads)
          os.chdir(self.output_dir)
          subprocess.call('chmod 755 '+self.bin_name, shell=True) ## make sure binary is executable

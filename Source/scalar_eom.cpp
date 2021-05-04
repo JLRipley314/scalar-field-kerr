@@ -275,18 +275,34 @@ void Scalar_eom::set_k(
    std::vector<double> _dphi_f(   _n);
    std::vector<double> _dphi_dr_f(_n);
    std::vector<double> _sphereX_f(_n);
-
-   grid.set_partial_r( f,    _dr_f);
-   grid.set_partial_r( p,    _dr_p);
-   grid.set_partial2_r(f, _dr_dr_f);
-
-   grid.set_partial_phi(    f, _dphi_f);
-   grid.set_partial_phi(_dr_f, _dphi_dr_f);
-
-   grid.set_sphereX(f, _sphereX_f);
-
-   grid.set_spherical_lap(f, _lap_f);
-
+   #pragma omp parallel sections
+   {
+      #pragma omp section
+      {
+         grid.set_partial_r(f, _dr_f);
+      }
+      #pragma omp section
+      {
+         grid.set_partial_r( p, _dr_p);
+      }
+      #pragma omp section
+      {
+         grid.set_partial2_r(f, _dr_dr_f);
+      }
+      #pragma omp section
+      {
+         grid.set_partial_phi(    f, _dphi_f);
+         grid.set_partial_r(_dphi_f, _dphi_dr_f);
+      }
+      #pragma omp section
+      {
+         grid.set_sphereX(f, _sphereX_f);
+      }
+      #pragma omp section
+      {
+         grid.set_spherical_lap(f, _lap_f);
+      }
+   }
    for (size_t i=0; i<_n; i++) {
       const double inverse_k = 1.0/( 
             _k0 
@@ -373,9 +389,17 @@ void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
    assert(f.size==_n);
    assert(p.size==_n);
 
-   grid.filter(f.n);
-   grid.filter(p.n);
-
+   #pragma omp parallel sections
+   {
+      #pragma omp section
+      {
+         grid.filter(f.n);
+      }
+      #pragma omp section
+      {
+         grid.filter(p.n);
+      }
+   }
    set_k(grid, f.n, p.n, f.k1, p.k1);
    set_level(2, f, p);
 
@@ -404,25 +428,36 @@ void Scalar_eom::set_rho(
    std::vector<double> _dphi_f(_n);
    std::vector<double> _sphereX_f(_n);
 
-   grid.set_partial_r(  f,      _dr_f);
-   grid.set_partial_phi(f,    _dphi_f);
-   grid.set_sphereX(    f, _sphereX_f);
-
+   #pragma omp parallel sections
+   {
+      #pragma omp section
+      {
+         grid.set_partial_r(f, _dr_f);
+      }
+      #pragma omp section
+      {
+         grid.set_partial_phi(f, _dphi_f);
+      }
+      #pragma omp section
+      {
+         grid.set_sphereX(f, _sphereX_f);
+      }
+   }
    for (size_t i=0; i<_n; i++) {
       const double k = ( 
             _k0 
          +  _km1/(f[i]+1)
          +  _k1*f[i]
-         +  (_k2/2.0)*pow(f[i],2)
+         +  (_k2/2.)*pow(f[i],2)
          );
       const double v = (
-            (_v2/2.0) *pow(f[i],2)
-         +  (_v3/6.0 )*pow(f[i],3)
-         +  (_v4/24.0)*pow(f[i],4)
+            (_v2/2.) *pow(f[i],2)
+         +  (_v3/6. )*pow(f[i],3)
+         +  (_v4/24.)*pow(f[i],4)
          );
          
       rho[i] = 
-      +  k*(
+      +  k*(1./2.)*(
             _rho_vv[i]*pow(p[i],2) 
          +  _rho_vr[i]*p[i]*_dr_f[i]
          +  _rho_rr[i]*pow(_dr_f[i],2)
