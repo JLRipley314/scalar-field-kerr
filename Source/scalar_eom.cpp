@@ -90,20 +90,20 @@ Scalar_eom::Scalar_eom(
       _p_dr_f_dphi_f[indx] = 2.*a*pow(inv_r,2)/Sigma;
       _p_sphereX_f[indx]   = pow(inv_r,2)/Sigma;
 
-      _pre[indx] = 1. + (2.*m*inv_r/Sigma);
+      _pre[indx] = 1./(1. + (2.*m*inv_r/Sigma));
 
-      _p_p[indx]         /= _pre[indx];
-      _p_dr_f[indx]      /= _pre[indx];
-      _p_dr_p[indx]      /= _pre[indx];
-      _p_dr_dr_f[indx]   /= _pre[indx];
-      _p_dphi_dr_f[indx] /= _pre[indx];
-      _p_lap_f[indx]     /= _pre[indx];
+      _p_p[indx]         *= _pre[indx];
+      _p_dr_f[indx]      *= _pre[indx];
+      _p_dr_p[indx]      *= _pre[indx];
+      _p_dr_dr_f[indx]   *= _pre[indx];
+      _p_dphi_dr_f[indx] *= _pre[indx];
+      _p_lap_f[indx]     *= _pre[indx];
 
-      _p_p_p[indx]         /= _pre[indx];
-      _p_p_dr_f[indx]      /= _pre[indx];
-      _p_dr_f_dr_f[indx]   /= _pre[indx];
-      _p_dr_f_dphi_f[indx] /= _pre[indx]; 
-      _p_sphereX_f[indx]   /= _pre[indx];
+      _p_p_p[indx]         *= _pre[indx];
+      _p_p_dr_f[indx]      *= _pre[indx];
+      _p_dr_f_dr_f[indx]   *= _pre[indx];
+      _p_dr_f_dphi_f[indx] *= _pre[indx]; 
+      _p_sphereX_f[indx]   *= _pre[indx];
 
       _rho_vv[indx]      = 0.5*(1. + 2.*m*inv_r/Sigma);
       _rho_vr[indx]      = 2. *m*inv_r/Sigma;
@@ -145,10 +145,7 @@ Scalar_eom::Scalar_eom(
    }
    }
    }
-/* 
- * working on eom for hyperboloidal compactification 
- */
-#if 1==0
+#if USE_HYPERBOLOIDAL 
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
@@ -158,7 +155,8 @@ Scalar_eom::Scalar_eom(
 
       const double R  = R_th_ph[0];
       const double Th = R_th_ph[1];
-      const double Om = 1. - (R/cl);
+      const double Om[i] = 1. - (R/cl);
+      _inv_r[i] = Om/R;
 
       const double Sigma = pow(R,2) + pow(a*cos(Th)*Om,2); 
 
@@ -200,7 +198,7 @@ Scalar_eom::Scalar_eom(
          +  pow(a*Om,2)
          )/Sigma
          ;
-      _p_dphi_dr_f[indx] =  2.*a*pow(R*Om,2)/Sigma;
+      _p_dphi_dr_f[indx] = 2.*a*pow(R*Om,2)/Sigma;
 
       _p_dphi_p[indx] = -2.*a*R*(R + 4.*m*Om)/Sigma;
 
@@ -216,24 +214,33 @@ Scalar_eom::Scalar_eom(
       _p_dr_f_dphi_f[indx] = 2.0*a*pow(inv_r,2)/Sigma;
       _p_sphereX_f[indx]   = pow(inv_r,2)/Sigma;
 
-      _pre[indx] = -(
-            pow(R,2)*(-16.0*pow(m,2) + pow(a*cos(Th),2))
-         +  8*m*Om*((pow(a,2) - 4.0*pow(m,2))*R + 2.0*pow(a,2)*m*Om)
-         )/Sigma;
+      if ((fabs(_v2)>0) 
+      &&  (fabs(Om)<1e-16)
+      ) {
+         _pre[indx] = 0.;
+      } else {
+         _pre[indx] = 1./(
+            -(
+               pow(R,2)*(-16.*pow(m,2) + pow(a*cos(Th),2))
+            +  8*m*Om*((pow(a,2) - 4.*pow(m,2))*R + 2.*pow(a,2)*m*Om)
+            )/Sigma
+         );
+      }
+      _p_p[indx]         *= _pre[indx];
+      _p_dr_f[indx]      *= _pre[indx];
+      _p_dr_p[indx]      *= _pre[indx];
+      _p_dphi_p[indx]    *= _pre[indx];
+      _p_dphi_f[indx]    *= _pre[indx];
+      _p_dr_dr_f[indx]   *= _pre[indx];
+      _p_dphi_dr_f[indx] *= _pre[indx];
+      _p_lap_f[indx]     *= _pre[indx];
+      _p_f[indx]         *= _pre[indx];
 
-      _p_p[indx]         /= _pre[indx];
-      _p_dr_f[indx]      /= _pre[indx];
-      _p_dr_p[indx]      /= _pre[indx];
-      _p_dr_dr_f[indx]   /= _pre[indx];
-      _p_dphi_dr_f[indx] /= _pre[indx];
-      _p_lap_f[indx]     /= _pre[indx];
-      _p_f[indx]         /= _pre[indx];
-
-      _p_p_p[indx]         /= _pre[indx];
-      _p_p_dr_f[indx]      /= _pre[indx];
-      _p_dr_f_dr_f[indx]   /= _pre[indx];
-      _p_dr_f_dphi_f[indx] /= _pre[indx]; 
-      _p_sphereX_f[indx]   /= _pre[indx];
+      _p_p_p[indx]         *= _pre[indx];
+      _p_p_dr_f[indx]      *= _pre[indx];
+      _p_dr_f_dr_f[indx]   *= _pre[indx];
+      _p_dr_f_dphi_f[indx] *= _pre[indx]; 
+      _p_sphereX_f[indx]   *= _pre[indx];
 
       _rho_vv[indx]      = 0.5*(1.0 + 2.0*m*inv_r/Sigma);
       _rho_vr[indx]      = 2.0*m*inv_r/Sigma;
@@ -344,8 +351,42 @@ void Scalar_eom::set_k(
          +  _p_sphereX_f[i]*_sphereX_f[i]
          )
 
-      -  (1.0/_pre[i])*vprime
+      -  _pre[i]*vprime
       ;
+#if USE_HYPERBOLOIDAL
+      if (fabs(_pre[i])<1e-16) {
+         p_k[i] = 0;
+      } else {
+         const double vprime = inverse_k*(
+               (_v2    /_inv_r[i])   *f[i]
+            +  (_v3/2.0)         *pow(f[i],2)
+            +  (_v4/6.0)*inv_r[i]*pow(f[i],3)
+            );
+
+         p_k[i] = 
+         +  _p_p[i]*p[i] 
+
+         +  _p_dr_f[i]*_dr_f[i]
+         +  _p_dr_p[i]*_dr_p[i] 
+
+         +  _p_dr_dr_f[i]*_dr_dr_f[i]
+
+         +  _p_dphi_dr_f[i]*_dphi_dr_f[i]
+
+         +  _p_lap_f[i]*_lap_f[i]
+
+         +  0.5*(kprime*inverse_k)*(
+               _p_p_p[i]*pow(p[i],2)
+            +  _p_p_dr_f[i]*p[i]*_dr_f[i]
+            +  _p_dr_f_dr_f[i]*pow(_dr_f[i],2)
+            +  _p_dr_f_dphi_f[i]*_dr_f[i]*_dphi_f[i]
+            +  _p_sphereX_f[i]*_sphereX_f[i]
+            )
+
+         -  _pre[i]*vprime
+         ;
+      }
+#endif
    }
 }
 /*==========================================================================*/

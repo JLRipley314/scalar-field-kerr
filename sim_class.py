@@ -107,8 +107,8 @@ class Sim:
          #------------
          ## executable
          #------------
-         f.write('chmod 755 '+self.bin_name) ## make sure binary is executable
-         f.write('\n'+self.run_str)
+         f.write('chmod 755 '+self.bin_name+'\n') ## make sure binary is executable
+         f.write('\n'+self.run_str+'\n')
 #=============================================================================
    def launch_run(self)->None:
       self.set_derived_params()
@@ -131,8 +131,10 @@ class Sim:
          './'+self.bin_name
          +' '+self.parameter_file
          +' .'
-         +' | tee '+self.output_file
+         +' 2>&1 | tee '+self.output_file
       )
+      if (self.time_it):
+         self.run_str = 'time '+self.run_str
       if (self.computer=='home'):
          os.environ['OMP_MAX_ACTIVE_LEVELS']= str(self.num_omp_levels)
          os.environ['OMP_NUM_THREADS']= str(self.num_threads)
@@ -143,7 +145,7 @@ class Sim:
       else:
          self.write_slurm_script()
          os.chdir(self.output_dir)
-         subprocess.call('sbatch {}/run.slurm'.format(self.output_dir), shell='True')
+         subprocess.call('sbatch {}/run.slurm'.format(self.output_dir), shell=True)
          os.chdir(self.home_dir)
 #=============================================================================
    def then_recompile(self)->None:
