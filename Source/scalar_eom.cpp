@@ -161,71 +161,121 @@ Scalar_eom::Scalar_eom(
       const double Sigma = pow(R,2) + pow(a*cos(Th)*Om,2); 
 
       _p_p[indx] = (
-         -  4.*m*pow(R,2)*(cl+R)
-         +  2.*Om*(
-               R*(
-                  pow(a,2)*cl
-               +  2.*m*(2.*m*R + cl*(-2.*m + R))
-               )
-            +  2.*m*Om*(
-                  pow(a,2)*(2.*cl - R)
-               -  2.*cl*m*R
-               +  pow(a,2)*cl*Om
-               )
-            )
-         )/(cl*Sigma)
+            (2*pow(a,2)*Om*(
+               -  2*m*Om*R 
+               + cl*(2*m*Om*(2 + Om) + R)
+               ) 
+             - 4*m*R*(
+                  R*(-2*m*Om + R) 
+                + cl*(2*m*Om*(1 + Om) + R - Om*R)
+                )
+             )/cl
+         )/Sigma 
          ;
-      _p_dr_f[indx] = 2.*R*Om*(
-            pow(R,3)
-         +  m*(cl - 2.*R)*R*Om
-         +  pow(a,2)*(-cl + R)*pow(Om,2) 
-         )/(cl*Sigma) 
+      _p_dr_f[indx] = (
+            (2*Om*R*(
+                  pow(a,2)*pow(Om,2)*(-cl + R) 
+               +  R*(cl*m*Om + R*(-2*m*Om + R))
+               ))/cl
+         )/Sigma 
          ;
-      _p_dr_p[indx] = -R*(
-            pow(R,3)
-         +  Om*(
-            -  2.*m*R
-            +  pow(a,2)*Om
-            )*(
-               R
-            +  4.*m*Om
+      _p_dr_p[indx] = ( 
+            R*(
+                 (4*m*Om - R)*R*(2*m*Om + R) 
+               - pow(a,2)*pow(Om,2)*(4*m*Om + R)
             )
          )/Sigma
          ;
-      _p_dr_dr_f[indx] = pow(R*Om,2)*(
-            pow(R,2)
-         -  2.*m*R*Om
-         +  pow(a*Om,2)
+      _p_dr_dr_f[indx] = ( 
+            pow(Om,2)*pow(R,2)*(pow(a,2)*pow(Om,2) + R*(-2*m*Om + R))  
          )/Sigma
          ;
-      _p_dphi_dr_f[indx] = 2.*a*pow(R*Om,2)/Sigma;
-
-      _p_dphi_p[indx] = -2.*a*R*(R + 4.*m*Om)/Sigma;
-
-      _p_dphi_f[indx] = -2.*a*R*Om/Sigma;
-
-      _p_lap_f[indx] = pow(R,2)/Sigma;
-
-      _p_f[indx] = 2.*Om*(-m*R + pow(a,2)*Om)/Sigma;
-
-      _p_p_p[indx]         = -(1.0 + (2.0*m*inv_r/Sigma));
-      _p_p_dr_f[indx]      = 4.0*m*inv_r/Sigma;
-      _p_dr_f_dr_f[indx]   = Delta/Sigma;
-      _p_dr_f_dphi_f[indx] = 2.0*a*pow(inv_r,2)/Sigma;
-      _p_sphereX_f[indx]   = pow(inv_r,2)/Sigma;
-
-      if ((fabs(_v2)>0) 
-      &&  (fabs(Om)<1e-16)
-      ) {
-         _pre[indx] = 0.;
-      } else {
-         _pre[indx] = 1./(
-            -(
-               pow(R,2)*(-16.*pow(m,2) + pow(a*cos(Th),2))
-            +  8*m*Om*((pow(a,2) - 4.*pow(m,2))*R + 2.*pow(a,2)*m*Om)
-            )/Sigma
-         );
-      }
+      _p_dphi_dr_f[indx] = (
+            2*a*pow(Om,2)*pow(R,2)
+         )/Sigma
+         ;
+      _p_dphi_p[indx] = ( 
+            -2*a*R*(4*m*Om + R)
+         )/Sigma
+         ;
+      _p_dphi_f[indx] = (
+            -2*a*Om*R
+         )/Sigma  
+         ;
+      _p_lap_f[indx] = 
+            pow(R,2)/Sigma 
+         ;
+      _p_f[indx] = ( 
+            2*Om*(pow(a,2)*Om - m*R)
+         )/Sigma 
+         ;
+      /*---------------------------------*/
+      _p_p_p[indx] = (
+            (pow(Om,2)*(
+               pow(a,2) - 32*pow(m,2) 
+            +  (16*m*Om*(-4*pow(m,2)*R + pow(a,2)*(2*m*Om + R)))/pow(R,2) 
+            -  pow(a,2)*cos(2*th)
+            ))/2.
+         )/Sigma         
+         ;
+      _p_p_dr_f[indx] = (
+            (-2*pow(Om,2)*(
+            -  8*pow(m,2)*pow(Om,2)*R 
+            +  pow(R,3) 
+            +  pow(a,2)*pow(Om,2)*(4*m*Om + R))
+            )/R 
+         )/Sigma 
+         ;
+      _p_p_dphi_f[indx] = (
+            (-2*a*pow(Om,2)*(4*m*Om + R))/R 
+         )/Sigma
+         ;
+      _p_dr_f_dr_f[indx] = (
+            pow(a,2)*pow(Om,6) + pow(Om,4)*R*(-2*m*Om + R)
+         )/Sigma 
+         ;
+      _p_dr_f_dphi_f[indx] = (
+            2*a*pow(Om,4)
+         )/Sigma 
+         ;
+      _p_sphereX_f[indx] =
+            pow(Om,2)/Sigma 
+         ;
+      _p_dr_f_f[indx] = (
+            (
+            -  2*pow(Om,3)*(pow(a,2)*pow(Om,2) 
+            +  R*(-2*m*Om + R))
+            )/R
+         )/Sigma
+         ;
+      _p_dphi_f_f[indx] = (
+            (-2*a*pow(Om,3))/R
+         )/Sigma
+         ;
+      _p_dphi_f_f[indx] = (
+            (
+               pow(a,2)*pow(Om,4) 
+            +  pow(Om,2)*R*(-2*m*Om + R)
+            )/pow(R,2)
+         )/Sigma
+         ;
+      _p_p_f[indx] = (
+            (2*Om*(
+            -  8*pow(m,2)*pow(Om,2)*R 
+            +  pow(R,3) 
+            +  pow(a,2)*pow(Om,2)*(4*m*Om + R)
+            ))/pow(R,2)
+         )/Sigma
+         ;
+      /*---------------------------------*/
+      _pre[indx] = (-1.)*( 
+            (-32*pow(m,2)*R*(2*m*Om + R) 
+             + pow(a,2)*(32*pow(m,2)*pow(Om,2) + 16*m*Om*R + pow(R,2)) 
+             - pow(a,2)*pow(R,2)*cos(2*th)
+             )/2.
+         )/Sigma
+         ;
+      /*---------------------------------*/
       _p_p[indx]         *= _pre[indx];
       _p_dr_f[indx]      *= _pre[indx];
       _p_dr_p[indx]      *= _pre[indx];
@@ -290,7 +340,7 @@ void Scalar_eom::set_k(
       }
       #pragma omp section
       {
-         grid.set_partial_r( p, _dr_p);
+         grid.set_partial_r(p, _dr_p);
       }
       #pragma omp section
       {
@@ -354,15 +404,30 @@ void Scalar_eom::set_k(
       -  _pre[i]*vprime
       ;
 #if USE_HYPERBOLOIDAL
-      if (fabs(_pre[i])<1e-16) {
+      if (fabs(_inv_r[i])<1e-16) {
+         f_k[i] = 0;
          p_k[i] = 0;
       } else {
+         const double inverse_k = 1.0/( 
+               _k0 
+            +  _km1/(f[i]+1)
+            +  _k1*f[i]
+            +  (_k2/2.0)*pow(f[i],2)
+            );
+         const double kprime = 
+         -  _km1/pow(f[i]+1,2)
+         +  _k1
+         +  _k2*f[i]
+         ;
          const double vprime = inverse_k*(
                (_v2    /_inv_r[i])   *f[i]
             +  (_v3/2.0)         *pow(f[i],2)
-            +  (_v4/6.0)*inv_r[i]*pow(f[i],3)
+            +  (_v4/6.0)*_inv_r[i]*pow(f[i],3)
             );
 
+         f_k[i] = 
+            p[i]
+         ;
          p_k[i] = 
          +  _p_p[i]*p[i] 
 
