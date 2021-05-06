@@ -32,6 +32,7 @@ public:
    void set_partial_phi(  const std::vector<double> &v, std::vector<double> &dv) const;
    void set_spherical_lap(const std::vector<double> &v, std::vector<double> &ddv) const;
    void set_sphereX(      const std::vector<double> &v, std::vector<double> &vX) const;
+   void set_partial_R(    const std::vector<double> &v, std::vector<double> &dv) const;
    void set_partial_r(    const std::vector<double> &v, std::vector<double> &dv) const;
    void set_partial2_r(   const std::vector<double> &v, std::vector<double> &ddv) const;
    void set_angular_power_spectrum(const std::vector<double> &v, std::vector<double> &p) const;

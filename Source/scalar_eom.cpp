@@ -409,7 +409,44 @@ void Scalar_eom::set_k(
 
       -  _pre[i]*vprime
       ;
+   }
 #if USE_HYPERBOLOIDAL
+   std::vector<double> _dR_f(     _n);
+   std::vector<double> _lap_f(    _n);
+   std::vector<double> _dR_p(     _n);
+   std::vector<double> _dR_dR_f(  _n);
+   std::vector<double> _dphi_f(   _n);
+   std::vector<double> _dphi_dR_f(_n);
+   std::vector<double> _sphereX_f(_n);
+   #pragma omp parallel sections
+   {
+      #pragma omp section
+      {
+         grid.set_partial_R(f, _dR_f);
+      }
+      #pragma omp section
+      {
+         grid.set_partial_R(p, _dR_p);
+      }
+      #pragma omp section
+      {
+         grid.set_partial2_R(f, _dR_dR_f);
+      }
+      #pragma omp section
+      {
+         grid.set_partial_phi(    f, _dphi_f);
+         grid.set_partial_R(_dphi_f, _dphi_dR_f);
+      }
+      #pragma omp section
+      {
+         grid.set_sphereX(f, _sphereX_f);
+      }
+      #pragma omp section
+      {
+         grid.set_spherical_lap(f, _lap_f);
+      }
+   }
+   for (size_t i=0; i<_n; i++) {
       if (fabs(_inv_r[i])<1e-16) {
          f_k[i] = 0;
          p_k[i] = 0;
@@ -437,13 +474,13 @@ void Scalar_eom::set_k(
          p_k[i] = 
             _p_p[i]*p[i] 
 
-         +  _p_dr_f[i]*_dr_f[i]
+         +  _p_dR_f[i]*_dR_f[i]
 
-         +  _p_dr_p[i]*_dr_p[i]
+         +  _p_dR_p[i]*_dR_p[i]
 
-         +  _p_dr_dr_f[i]*_dr_dr_f[i]
+         +  _p_dR_dR_f[i]*_dR_dR_f[i]
 
-         +  _p_dphi_dr_f[i]*_dphi_dr_f[i]
+         +  _p_dphi_dR_f[i]*_dphi_dR_f[i]
 
          +  _p_dphi_p[i]*_dphi[i]
 
@@ -456,17 +493,17 @@ void Scalar_eom::set_k(
          +  0.5*(kprime*inverse_k)*(
                _p_p_p[i]*p[i]*p[i]
 
-               _p_p_dr_f[i]*p[i]*_dr_f[i]
+               _p_p_dR_f[i]*p[i]*_dR_f[i]
 
                _p_p_dphi_f[i]*p[i]*_dphi_f[i]
 
-               _p_dr_f_dr_f[i]*_dr_f[i]*_dr_f[i] 
+               _p_dR_f_dR_f[i]*_dR_f[i]*_dR_f[i] 
 
-               _p_dr_f_dphi_f[i]*_dr_f[i]*_dphi_f[i]  
+               _p_dR_f_dphi_f[i]*_dR_f[i]*_dphi_f[i]  
 
                _p_sphereX_f[i]*_sphereX_f[i]
 
-               _p_dr_f_f[i]*_dr_f[i]*f[i]
+               _p_dR_f_f[i]*_dR_f[i]*f[i]
 
                _p_dphi_f_f[i]*_dphi_f[i]*f[i] 
 

@@ -326,6 +326,26 @@ void Grid::set_sphereX(const std::vector<double> &v, std::vector<double> &vX) co
    }
 }
 /*==========================================================================*/
+void Grid::set_partial_R(const std::vector<double> &v, std::vector<double> &dv) const
+{
+   assert(v.size() ==_nx*_nlat*_nphi);
+   assert(dv.size()==_nx*_nlat*_nphi);
+
+#pragma omp parallel for
+   for (size_t it=0; it<_nlat; it++) {
+   for (size_t ip=0; ip<_nphi; ip++) {
+      std::vector<double> inter(   _nx);
+      std::vector<double> inter_dv(_nx);
+
+      get_row_R(it, ip, v, inter); 
+
+      _radial.der(inter, inter_dv);
+
+      set_row_R(it, ip, inter_dv, dv); 
+   }
+   }
+}
+/*==========================================================================*/
 void Grid::set_partial_r(const std::vector<double> &v, std::vector<double> &dv) const
 {
    assert(v.size() ==_nx*_nlat*_nphi);

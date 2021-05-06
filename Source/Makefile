@@ -30,6 +30,10 @@ endif
 ifeq ($(use_contiguous_longitudes),true) 
 CFLAGS += -DSHTNS_CONTIGUOUS_LONGITUDES
 endif
+
+ifeq ($(use_hyperboloidal),true) 
+CFLAGS += -DSHTNS_CONTIGUOUS_LONGITUDES
+endif
 #=============================================================================
 .PHONY: all
 all: $(BIN_NAME) 
