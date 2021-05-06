@@ -154,8 +154,8 @@ void _partial_t_p(
 
    for (size_t ip=0; ip<_nphi; ip++) {
    for (size_t it=0; it<_nlat; it++) {
-      const size_t indx_L = grid_L.indx_r_th_ph(ix_L, it, ip);
-      const size_t indx_R = grid_R.indx_r_th_ph(ix_R, it, ip);
+      const size_t indx_L = grid_L.indx_R_th_ph(ix_L, it, ip);
+      const size_t indx_R = grid_R.indx_R_th_ph(ix_R, it, ip);
 
       const size_t indx_S = grid_R.indx_th_ph(it, ip);
 
@@ -289,24 +289,24 @@ void time_step(/*const size_t itm*/)
       for (size_t ip=0; ip<_nphi; ip++) {
       for (size_t it=0; it<_nlat; it++) {
          if (fabs(
-            units[i  ]->p.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
-         -  units[i+1]->p.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+            units[i  ]->p.np1[units[i  ]->grid.indx_R_th_ph(   0, it, ip)] 
+         -  units[i+1]->p.np1[units[i+1]->grid.indx_R_th_ph(nx-1, it, ip)]
          )>1e-16 ||
          fabs(
-            units[i  ]->f.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
-         -  units[i+1]->f.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+            units[i  ]->f.np1[units[i  ]->grid.indx_R_th_ph(   0, it, ip)] 
+         -  units[i+1]->f.np1[units[i+1]->grid.indx_R_th_ph(nx-1, it, ip)]
          )>1e-16) {
             std::cout
                <<itm<<"\t"
                <<ip<<"\t"
                <<it<<"\t" 
                <<
-                  units[i  ]->p.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
-               -  units[i+1]->p.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+                  units[i  ]->p.np1[units[i  ]->grid.indx_R_th_ph(   0, it, ip)] 
+               -  units[i+1]->p.np1[units[i+1]->grid.indx_R_th_ph(nx-1, it, ip)]
                <<"\t"
                <<
-                  units[i  ]->f.np1[units[i  ]->grid.indx_r_th_ph(   0, it, ip)] 
-               -  units[i+1]->f.np1[units[i+1]->grid.indx_r_th_ph(nx-1, it, ip)]
+                  units[i  ]->f.np1[units[i  ]->grid.indx_R_th_ph(   0, it, ip)] 
+               -  units[i+1]->f.np1[units[i+1]->grid.indx_R_th_ph(nx-1, it, ip)]
                <<std::endl;
             std::quick_exit(EXIT_FAILURE); 
          }

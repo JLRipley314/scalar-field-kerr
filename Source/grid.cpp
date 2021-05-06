@@ -27,7 +27,6 @@ Grid::Grid(
 {
    std::cout<<"Initializing Grid"<<std::endl;
 
-   _r_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _R_th_ph.resize(_nx*_nphi*_nlat, std::vector<double>(3,0));
    _x_y_z.resize(  _nx*_nphi*_nlat, std::vector<double>(3,0));
    for (size_t ix=0; ix<_nx;   ix++) {
@@ -37,17 +36,13 @@ Grid::Grid(
       double theta = _sphere.theta(it);  
       double phi   = _sphere.phi(  ip);
 
-      _r_th_ph[indx_r_th_ph(ix,it,ip)][0] = (fabs(R-cl)>1e-16) ? (R/(1.0 - (R/cl))) : 1e12; 
-      _r_th_ph[indx_r_th_ph(ix,it,ip)][1] = theta; 
-      _r_th_ph[indx_r_th_ph(ix,it,ip)][2] = phi; 
+      _R_th_ph[indx_R_th_ph(ix,it,ip)][0] = R;
+      _R_th_ph[indx_R_th_ph(ix,it,ip)][1] = theta;
+      _R_th_ph[indx_R_th_ph(ix,it,ip)][2] = phi;
 
-      _R_th_ph[indx_r_th_ph(ix,it,ip)][0] = R;
-      _R_th_ph[indx_r_th_ph(ix,it,ip)][1] = theta;
-      _R_th_ph[indx_r_th_ph(ix,it,ip)][2] = phi;
-
-      _x_y_z[indx_r_th_ph(ix,it,ip)][0] = R*cos(phi)*sin(theta); 
-      _x_y_z[indx_r_th_ph(ix,it,ip)][1] = R*sin(phi)*sin(theta);
-      _x_y_z[indx_r_th_ph(ix,it,ip)][2] = R*cos(theta);
+      _x_y_z[indx_R_th_ph(ix,it,ip)][0] = R*cos(phi)*sin(theta); 
+      _x_y_z[indx_R_th_ph(ix,it,ip)][1] = R*sin(phi)*sin(theta);
+      _x_y_z[indx_R_th_ph(ix,it,ip)][2] = R*cos(theta);
    }
    }
    }
@@ -113,7 +108,7 @@ void Grid::get_row_R(const size_t it, const size_t ip,
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nx);
    for (size_t ix=0; ix<_nx; ix++) {
-      out[ix] = in[indx_r_th_ph(ix,it,ip)];
+      out[ix] = in[indx_R_th_ph(ix,it,ip)];
    }
 } 
 void Grid::set_row_R(const size_t it, const size_t ip, 
@@ -123,7 +118,7 @@ void Grid::set_row_R(const size_t it, const size_t ip,
    assert(in.size() ==_nx);
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ix=0; ix<_nx; ix++) {
-      out[indx_r_th_ph(ix,it,ip)] = in[ix];
+      out[indx_R_th_ph(ix,it,ip)] = in[ix];
    }
 } 
 /*=========================================================================*/
@@ -134,7 +129,7 @@ void Grid::get_row_th(const size_t ix, const size_t ip,
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nlat);
    for (size_t it=0; it<_nlat; it++) {
-      out[it] = in[indx_r_th_ph(ix,it,ip)];
+      out[it] = in[indx_R_th_ph(ix,it,ip)];
    }
 } 
 void Grid::set_row_th(const size_t ix, const size_t ip, 
@@ -144,7 +139,7 @@ void Grid::set_row_th(const size_t ix, const size_t ip,
    assert(in.size() ==_nlat);
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t it=0; it<_nlat; it++) {
-      out[indx_r_th_ph(ix,it,ip)] = in[it];
+      out[indx_R_th_ph(ix,it,ip)] = in[it];
    }
 } 
 /*=========================================================================*/
@@ -155,7 +150,7 @@ void Grid::get_row_ph(const size_t ix, const size_t it,
    assert(in.size() ==_nx*_nphi*_nlat);
    assert(out.size()==_nphi);
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[ip] = in[indx_r_th_ph(ix,it,ip)];
+      out[ip] = in[indx_R_th_ph(ix,it,ip)];
    }
 } 
 void Grid::set_row_ph(const size_t ix, const size_t it, 
@@ -165,7 +160,7 @@ void Grid::set_row_ph(const size_t ix, const size_t it,
    assert(in.size() ==_nphi);
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ip=0; ip<_nlat; ip++) {
-      out[indx_r_th_ph(ix,it,ip)] = in[ip];
+      out[indx_R_th_ph(ix,it,ip)] = in[ip];
    }
 } 
 /*=========================================================================*/
@@ -198,7 +193,7 @@ void Grid::get_row_R_th(const size_t ip,
    assert(out.size()==_nx*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      out[indx_r_th(ix,it)] = in[indx_r_th_ph(ix,it,ip)];
+      out[indx_r_th(ix,it)] = in[indx_R_th_ph(ix,it,ip)];
    }
    }
 }
@@ -210,7 +205,7 @@ void Grid::set_row_R_th(const size_t ip,
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t it=0; it<_nlat; it++) {
-      out[indx_r_th_ph(ix,it,ip)] = in[indx_r_th(ix,it)];
+      out[indx_R_th_ph(ix,it,ip)] = in[indx_r_th(ix,it)];
    }
    }
 }
@@ -223,7 +218,7 @@ void Grid::get_row_R_ph(const size_t it,
    assert(out.size()==_nx*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_r_ph(ix,ip)] = in[indx_r_th_ph(ix,it,ip)];
+      out[indx_r_ph(ix,ip)] = in[indx_R_th_ph(ix,it,ip)];
    }
    }
 }
@@ -235,7 +230,7 @@ void Grid::set_row_R_ph(const size_t it,
    assert(out.size()==_nx*_nphi*_nlat);
    for (size_t ix=0; ix<_nx;   ix++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_r_th_ph(ix,it,ip)] = in[indx_r_ph(ix,ip)];
+      out[indx_R_th_ph(ix,it,ip)] = in[indx_r_ph(ix,ip)];
    }
    }
 }
@@ -248,7 +243,7 @@ void Grid::get_row_th_ph(const size_t ix,
    assert(out.size()==_nphi*_nlat);
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_th_ph(it,ip)] = in[indx_r_th_ph(ix,it,ip)];
+      out[indx_th_ph(it,ip)] = in[indx_R_th_ph(ix,it,ip)];
    }
    }
 }
@@ -261,7 +256,7 @@ void Grid::set_row_th_ph(const size_t ix,
 
    for (size_t it=0; it<_nlat; it++) {
    for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_r_th_ph(ix,it,ip)] = in[indx_th_ph(it,ip)];
+      out[indx_R_th_ph(ix,it,ip)] = in[indx_th_ph(it,ip)];
    }
    }
 }
@@ -489,16 +484,16 @@ double Grid::total_variation(const std::vector<double> &v) const
    for (size_t ip=0; ip<_nphi-1; ip++) {
       tv += pow(
                pow(
-                  v[indx_r_th_ph(ix+1, it, ip)] 
-               -  v[indx_r_th_ph(ix,   it, ip)]
+                  v[indx_R_th_ph(ix+1, it, ip)] 
+               -  v[indx_R_th_ph(ix,   it, ip)]
                ,2)
             +  pow(
-                  v[indx_r_th_ph(ix, it+1, ip)] 
-               -  v[indx_r_th_ph(ix, it,   ip)]
+                  v[indx_R_th_ph(ix, it+1, ip)] 
+               -  v[indx_R_th_ph(ix, it,   ip)]
                ,2)
             +  pow(
-                  v[indx_r_th_ph(ix, it, ip+1)] 
-               -  v[indx_r_th_ph(ix, it, ip)]
+                  v[indx_R_th_ph(ix, it, ip+1)] 
+               -  v[indx_R_th_ph(ix, it, ip)]
                ,2)
             ,
             0.5); 

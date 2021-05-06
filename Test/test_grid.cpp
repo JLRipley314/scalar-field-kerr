@@ -46,10 +46,10 @@ std::vector<double> get_norm_diff(
    std::vector<double> lap_v2(n,0); 
 
    for (size_t i=0; i<n; i++) {
-      const std::vector<double> r_th_ph = grid.r_th_ph(i);
-      const double r     = r_th_ph[0];
-      const double theta = r_th_ph[1];
-      const double phi   = r_th_ph[2];
+      const std::vector<double> R_th_ph = grid.R_th_ph(i);
+      const double r     = grid.R_to_r(R_th_ph[0]);
+      const double theta = R_th_ph[1];
+      const double phi   = R_th_ph[2];
 
       double bump = 0.0;
 
@@ -155,10 +155,10 @@ std::vector<double> get_total_variation(
    std::vector<double> filter_v(n,0);
 
    for (size_t i=0; i<n; i++) {
-      const std::vector<double> loc_r = grid.r_th_ph(i);
-      const double r     = loc_r[0];
-      const double theta = loc_r[1];
-      const double phi   = loc_r[2];
+      const std::vector<double> loc = grid.R_th_ph(i);
+      const double r     = grid.R_to_r(loc[0]);
+      const double theta = loc[1];
+      const double phi   = loc[2];
 
       double bump = 0.0;
 
@@ -187,32 +187,32 @@ std::vector<double> get_total_variation(
    for (size_t ip=0; ip<nphi-1; ip++) {
       tv_v += pow(
                pow(
-                  v[grid.indx_r_th_ph(ix+1, it, ip)] 
-               -  v[grid.indx_r_th_ph(ix,   it, ip)]
+                  v[grid.indx_R_th_ph(ix+1, it, ip)] 
+               -  v[grid.indx_R_th_ph(ix,   it, ip)]
                ,2)
             +  pow(
-                  v[grid.indx_r_th_ph(ix, it+1, ip)] 
-               -  v[grid.indx_r_th_ph(ix, it,   ip)]
+                  v[grid.indx_R_th_ph(ix, it+1, ip)] 
+               -  v[grid.indx_R_th_ph(ix, it,   ip)]
                ,2)
             +  pow(
-                  v[grid.indx_r_th_ph(ix, it, ip+1)] 
-               -  v[grid.indx_r_th_ph(ix, it, ip)]
+                  v[grid.indx_R_th_ph(ix, it, ip+1)] 
+               -  v[grid.indx_R_th_ph(ix, it, ip)]
                ,2)
             ,
             0.5); 
 
       tv_filter_v += pow(
                pow(
-                  filter_v[grid.indx_r_th_ph(ix+1, it, ip)] 
-               -  filter_v[grid.indx_r_th_ph(ix,   it, ip)]
+                  filter_v[grid.indx_R_th_ph(ix+1, it, ip)] 
+               -  filter_v[grid.indx_R_th_ph(ix,   it, ip)]
                ,2)
             +  pow(
-                  filter_v[grid.indx_r_th_ph(ix, it+1, ip)] 
-               -  filter_v[grid.indx_r_th_ph(ix, it,   ip)]
+                  filter_v[grid.indx_R_th_ph(ix, it+1, ip)] 
+               -  filter_v[grid.indx_R_th_ph(ix, it,   ip)]
                ,2)
             +  pow(
-                  filter_v[grid.indx_r_th_ph(ix, it, ip+1)] 
-               -  filter_v[grid.indx_r_th_ph(ix, it, ip)]
+                  filter_v[grid.indx_R_th_ph(ix, it, ip+1)] 
+               -  filter_v[grid.indx_R_th_ph(ix, it, ip)]
                ,2)
             ,
             0.5); 

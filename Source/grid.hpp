@@ -136,7 +136,6 @@ private:
 #else
    FD _radial;
 #endif
-   std::vector<std::vector<double>> _r_th_ph;
    std::vector<std::vector<double>> _R_th_ph;
    std::vector<std::vector<double>> _x_y_z;
    std::vector<std::vector<double>> _x_z;
@@ -174,7 +173,7 @@ public:
    {
          return (_nl)*(ix) + (il);
    } 
-   inline size_t indx_r_th_ph(const size_t ix, const size_t it, const size_t ip) const 
+   inline size_t indx_R_th_ph(const size_t ix, const size_t it, const size_t ip) const 
    {
       #if SHTNS_CONTIGUOUS_LONGITUDES
       return (_nphi)*(_nlat)*(ix) + (_nlat)*(ip) + (it);
@@ -190,17 +189,13 @@ public:
       return (_nphi)*(it) + (ip);
       #endif
    }
-   inline std::vector<double> r_th_ph(const size_t ix, const size_t it, const size_t ip) const 
+   inline double R_to_r(const double R) const
    {
-      return _r_th_ph[indx_r_th_ph(ix, it, ip)];
-   }
-   inline std::vector<double> r_th_ph(const size_t i) const 
-   {
-      return _r_th_ph[i];
+      return (fabs(R-_cl)>1e-16) ? (R/(1.0 - (R/_cl))) : 1e12; 
    }
    inline std::vector<double> R_th_ph(const size_t ix, const size_t it, const size_t ip) const 
    {
-      return _R_th_ph[indx_r_th_ph(ix, it, ip)];
+      return _R_th_ph[indx_R_th_ph(ix, it, ip)];
    }
    inline std::vector<double> R_th_ph(const size_t i) const 
    {
@@ -208,7 +203,7 @@ public:
    }
    inline std::vector<double> x_y_z(const size_t ix, const size_t it, const size_t ip) const 
    {
-      return _x_y_z[indx_r_th_ph(ix, it, ip)];
+      return _x_y_z[indx_R_th_ph(ix, it, ip)];
    }
    inline std::vector<double> x_y_z(const size_t i) const 
    {

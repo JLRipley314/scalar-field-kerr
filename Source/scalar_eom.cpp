@@ -55,13 +55,14 @@ Scalar_eom::Scalar_eom(
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
-      const size_t indx = grid.indx_r_th_ph(ix,it,ip);
+      const size_t indx = grid.indx_R_th_ph(ix,it,ip);
       
       std::vector<double> R_th_ph = grid.R_th_ph(ix, it, ip); 
-      std::vector<double> r_th_ph = grid.r_th_ph(ix, it, ip); 
+  
+      const double r = grid.R_to_r(R_th_ph[0]);
 
-      const double inv_r = (fabs(R_th_ph[0]-cl)<1e-16) ? 0 : (1.0/r_th_ph[0]);
-      const double th = r_th_ph[1];
+      const double inv_r = (fabs(R_th_ph[0]-cl)<1e-16) ? 0 : (1.0/r);
+      const double th = R_th_ph[1];
 
       /* Sigma and Delta:
        * Divide by r^2 to reduce infty/infy type errors 
@@ -149,7 +150,7 @@ Scalar_eom::Scalar_eom(
    for (size_t ix=0; ix<nx;   ix++) {
    for (size_t ip=0; ip<nphi; ip++) {
    for (size_t it=0; it<nlat; it++) {
-      const size_t indx = grid.indx_r_th_ph(ix,it,ip);
+      const size_t indx = grid.indx_R_th_ph(ix,it,ip);
       
       std::vector<double> R_th_ph = grid.R_th_ph(ix, it, ip); 
 
