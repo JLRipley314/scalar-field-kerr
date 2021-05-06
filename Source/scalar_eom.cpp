@@ -252,7 +252,7 @@ Scalar_eom::Scalar_eom(
             (-2*a*pow(Om,3))/R
          )/Sigma
          ;
-      _p_dphi_f_f[indx] = (
+      _p_f_f[indx] = (
             (
                pow(a,2)*pow(Om,4) 
             +  pow(Om,2)*R*(-2*m*Om + R)
@@ -286,12 +286,17 @@ Scalar_eom::Scalar_eom(
       _p_lap_f[indx]     *= _pre[indx];
       _p_f[indx]         *= _pre[indx];
 
-      _p_p_p[indx]         *= _pre[indx];
-      _p_p_dr_f[indx]      *= _pre[indx];
-      _p_dr_f_dr_f[indx]   *= _pre[indx];
+      _p_p_p[indx]         *= _pre[indx]; 
+      _p_p_dr_f[indx]      *= _pre[indx]; 
+      _p_p_dphi_f[indx]    *= _pre[indx]; 
+      _p_dr_f_dr_f[indx]   *= _pre[indx]; 
       _p_dr_f_dphi_f[indx] *= _pre[indx]; 
       _p_sphereX_f[indx]   *= _pre[indx];
-
+      _p_dr_f_f[indx]      *= _pre[indx];
+      _p_dphi_f_f[indx]    *= _pre[indx];
+      _p_f_f[indx]         *= _pre[indx]; 
+      _p_p_f[indx]         *= _pre[indx];
+      /*---------------------------------*/
       _rho_vv[indx]      = 0.5*(1.0 + 2.0*m*inv_r/Sigma);
       _rho_vr[indx]      = 2.0*m*inv_r/Sigma;
       _rho_rr[indx]      = 0.5*( 
@@ -429,26 +434,47 @@ void Scalar_eom::set_k(
             p[i]
          ;
          p_k[i] = 
-         +  _p_p[i]*p[i] 
+            _p_p[i]*p[i] 
 
          +  _p_dr_f[i]*_dr_f[i]
-         +  _p_dr_p[i]*_dr_p[i] 
+
+         +  _p_dr_p[i]*_dr_p[i]
 
          +  _p_dr_dr_f[i]*_dr_dr_f[i]
 
          +  _p_dphi_dr_f[i]*_dphi_dr_f[i]
 
+         +  _p_dphi_p[i]*_dphi[i]
+
+         +  _p_dphi_f[indx]*_dphi_f[i]
+
          +  _p_lap_f[i]*_lap_f[i]
 
+         +  _p_f[i]*f[i]
+ 
          +  0.5*(kprime*inverse_k)*(
-               _p_p_p[i]*pow(p[i],2)
-            +  _p_p_dr_f[i]*p[i]*_dr_f[i]
-            +  _p_dr_f_dr_f[i]*pow(_dr_f[i],2)
-            +  _p_dr_f_dphi_f[i]*_dr_f[i]*_dphi_f[i]
-            +  _p_sphereX_f[i]*_sphereX_f[i]
+               _p_p_p[i]*p[i]*p[i]
+
+               _p_p_dr_f[i]*p[i]*_dr_f[i]
+
+               _p_p_dphi_f[i]*p[i]*_dphi_f[i]
+
+               _p_dr_f_dr_f[i]*_dr_f[i]*_dr_f[i] 
+
+               _p_dr_f_dphi_f[i]*_dr_f[i]*_dphi_f[i]  
+
+               _p_sphereX_f[i]*_sphereX_f[i]
+
+               _p_dr_f_f[i]*_dr_f[i]*f[i]
+
+               _p_dphi_f_f[i]*_dphi_f[i]*f[i] 
+
+               _p_f_f[i]*f[i]*f[i] 
+
+               _p_p_f[i]*p[i]*f[i]
             )
 
-         -  _pre[i]*vprime
+         +  _pre[i]*vprime
          ;
       }
 #endif

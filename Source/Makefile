@@ -5,14 +5,29 @@ BIN = ../Bin
 SHTNS_INC = -I$(HOME)/shtns/Library/include
 SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
-CFLAGS = -g -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -fbounds-check \
-	 -lshtns -lfftw3 -lm \
-	-DSHTNS_CONTIGUOUS_LONGITUDES \
-	-DUSE_CHEB 
+CFLAGS = 
+
+ifeq ($(debug),true) 
+CFLAGS = -pg -fbounds-check
+else
+CFLAGS = -g
+endif
+
+CFLAGS += -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -lshtns -lfftw3 -lm
+
+ifeq ($(use_cheb),true) 
+CFLAGS += -DUSE_CHEB 
+BIN_NAME = default_cheb.run
+else
+BIN_NAME = default_fd.run
+endif
+
+ifeq ($(use_contiguous_longitudes),true) 
+CFLAGS += -DSHTNS_CONTIGUOUS_LONGITUDES
+endif
 #=============================================================================
 .PHONY: all
-all: default_cheb.run
-#all: default_fd.run
+all: $(BIN_NAME) 
 #=============================================================================
 OBJ = params.o \
       cheb.o \
