@@ -5,12 +5,17 @@ BIN = ../Bin
 SHTNS_INC = -I$(HOME)/shtns/Library/include
 SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
-CFLAGS = 
+CFLAGS =  
+
+ifeq ($(profile),true) 
+CFLAGS += -pg
+else
+CFLAGS += -g
+endif
+
 
 ifeq ($(debug),true) 
-CFLAGS = -pg -fbounds-check
-else
-CFLAGS = -g
+CFLAGS += -fbounds-check
 endif
 
 CFLAGS += -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -lshtns -lfftw3 -lm
