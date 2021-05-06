@@ -515,8 +515,8 @@ void Scalar_eom::set_k(
          +  _pre[i]*vprime
          ;
       }
-#endif
    }
+#endif
 }
 /*==========================================================================*/
 void Scalar_eom::set_level(
