@@ -2,4 +2,5 @@
 *.slurm
 *.o
 *.run
+runscript.py
 __pycache__
