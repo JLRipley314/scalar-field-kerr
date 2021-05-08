@@ -3,8 +3,11 @@
 A C++ (version C++11 onwards) code that solves the equations of 
 motion for a real scalar field around a Kerr black hole.
 
-Runtime parameters are configured in the `config_template.py` file
+Runtime parameters are configured in the `runscript.py` file
 (with some preprocessing done in `sim_params.py`).
+
+To compile all the different executables I recommend using
+`config.py`.
 
 ## Libraries
 
