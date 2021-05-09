@@ -236,14 +236,14 @@ void Grid::set_angular_power_spectrum(const std::vector<double> &v, std::vector<
 
 #pragma omp parallel for
    for (size_t ix=0; ix<_nx; ix++) {
-      std::vector<double> inter__sphere(_nlat*_nphi, 0);
-      std::vector<double> inter__sphere_p(_nl, 0);
+      std::vector<double> inter_sphere(_nlat*_nphi, 0);
+      std::vector<double> inter_sphere_p(_nl, 0);
 
-      get_row_th_ph(ix, v, inter__sphere); 
+      get_row_th_ph(ix, v, inter_sphere); 
 
-      _sphere.power_spectrum(inter__sphere, inter__sphere_p);
+      _sphere.power_spectrum(inter_sphere, inter_sphere_p);
 
-      set_row_l(ix, inter__sphere_p, p); 
+      set_row_l(ix, inter_sphere_p, p); 
    }
 }
 /*==========================================================================*/
@@ -283,10 +283,10 @@ void Grid::filter(std::vector<double> &v) const
 
 #pragma omp parallel for
    for (size_t ix=0; ix<_nx; ix++) {
-      std::vector<double> inter__sphere(_nlat*_nphi);
-      get_row_th_ph(ix, v, inter__sphere); 
-      _sphere.filter(inter__sphere);
-      set_row_th_ph(ix, inter__sphere, v); 
+      std::vector<double> inter_sphere(_nlat*_nphi);
+      get_row_th_ph(ix, v, inter_sphere); 
+      _sphere.filter(inter_sphere);
+      set_row_th_ph(ix, inter_sphere, v); 
    }
 #pragma omp parallel for
    for (size_t it=0; it<_nlat; it++) {
