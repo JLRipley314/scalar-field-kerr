@@ -13,12 +13,13 @@ else
 CFLAGS += -g
 endif
 
+CFLAGS += -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -lshtns -lfftw3 -lm
 
 ifeq ($(debug),true) 
 CFLAGS += -fbounds-check
+else
+CFLAGS += -DNDEBUG
 endif
-
-CFLAGS += -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -lshtns -lfftw3 -lm
 
 ifeq ($(use_cheb),true) 
 CFLAGS += -DUSE_CHEB 

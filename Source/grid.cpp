@@ -1,4 +1,3 @@
-#include <cassert>
 #include <iostream>
 #include <iomanip>
 
@@ -100,177 +99,6 @@ std::vector<double> Grid::compute_ylm(const size_t l_ang, const size_t m_ang) co
 {
    return _sphere.compute_ylm(l_ang, m_ang);
 }
-/*=========================================================================*/
-void Grid::get_row_R(const size_t it, const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const 
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nx);
-   for (size_t ix=0; ix<_nx; ix++) {
-      out[ix] = in[indx_R_th_ph(ix,it,ip)];
-   }
-} 
-void Grid::set_row_R(const size_t it, const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const 
-{
-   assert(in.size() ==_nx);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t ix=0; ix<_nx; ix++) {
-      out[indx_R_th_ph(ix,it,ip)] = in[ix];
-   }
-} 
-/*=========================================================================*/
-void Grid::get_row_th(const size_t ix, const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const 
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nlat);
-   for (size_t it=0; it<_nlat; it++) {
-      out[it] = in[indx_R_th_ph(ix,it,ip)];
-   }
-} 
-void Grid::set_row_th(const size_t ix, const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const 
-{
-   assert(in.size() ==_nlat);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t it=0; it<_nlat; it++) {
-      out[indx_R_th_ph(ix,it,ip)] = in[it];
-   }
-} 
-/*=========================================================================*/
-void Grid::get_row_ph(const size_t ix, const size_t it, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const 
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nphi);
-   for (size_t ip=0; ip<_nphi; ip++) {
-      out[ip] = in[indx_R_th_ph(ix,it,ip)];
-   }
-} 
-void Grid::set_row_ph(const size_t ix, const size_t it, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const 
-{
-   assert(in.size() ==_nphi);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t ip=0; ip<_nlat; ip++) {
-      out[indx_R_th_ph(ix,it,ip)] = in[ip];
-   }
-} 
-/*=========================================================================*/
-void Grid::get_row_n(const size_t il, 
-      const std::vector<double> &in, 
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nx*_nl);
-   assert(out.size()==_nx);
-   for (size_t ix=0; ix<_nx; ix++) {
-      out[ix] = in[indx_r_l(ix,il)];
-   }
-} 
-void Grid::set_row_n(const size_t il, 
-      const std::vector<double> &in, 
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nx);
-   assert(out.size()==_nx*_nl);
-   for (size_t ix=0; ix<_nx; ix++) {
-      out[indx_r_l(ix,il)] = in[ix];
-   }
-} 
-/*=========================================================================*/
-void Grid::get_row_R_th(const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nx*_nlat);
-   for (size_t ix=0; ix<_nx;   ix++) {
-   for (size_t it=0; it<_nlat; it++) {
-      out[indx_r_th(ix,it)] = in[indx_R_th_ph(ix,it,ip)];
-   }
-   }
-}
-void Grid::set_row_R_th(const size_t ip, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nx*_nlat);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t ix=0; ix<_nx;   ix++) {
-   for (size_t it=0; it<_nlat; it++) {
-      out[indx_R_th_ph(ix,it,ip)] = in[indx_r_th(ix,it)];
-   }
-   }
-}
-/*=========================================================================*/
-void Grid::get_row_R_ph(const size_t it, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nx*_nlat);
-   for (size_t ix=0; ix<_nx;   ix++) {
-   for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_r_ph(ix,ip)] = in[indx_R_th_ph(ix,it,ip)];
-   }
-   }
-}
-void Grid::set_row_R_ph(const size_t it, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nx*_nphi);
-   assert(out.size()==_nx*_nphi*_nlat);
-   for (size_t ix=0; ix<_nx;   ix++) {
-   for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_R_th_ph(ix,it,ip)] = in[indx_r_ph(ix,ip)];
-   }
-   }
-}
-/*=========================================================================*/
-void Grid::get_row_th_ph(const size_t ix, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nx*_nphi*_nlat);
-   assert(out.size()==_nphi*_nlat);
-   for (size_t it=0; it<_nlat; it++) {
-   for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_th_ph(it,ip)] = in[indx_R_th_ph(ix,it,ip)];
-   }
-   }
-}
-void Grid::set_row_th_ph(const size_t ix, 
-      const std::vector<double> &in,
-      std::vector<double> &out) const
-{
-   assert(in.size() ==_nphi*_nlat);
-   assert(out.size()==_nx*_nphi*_nlat);
-
-   for (size_t it=0; it<_nlat; it++) {
-   for (size_t ip=0; ip<_nphi; ip++) {
-      out[indx_R_th_ph(ix,it,ip)] = in[indx_th_ph(it,ip)];
-   }
-   }
-}
-/*=========================================================================*/
-void Grid::set_row_l(const size_t ix, 
-      const std::vector<double> &lvals, 
-      std::vector<double> &Rlvals) const
-{
-   assert(lvals.size() ==_nl);
-   assert(Rlvals.size()==_nx*_nl);
-   for (size_t il=0; il<_nl; il++) {
-      Rlvals[indx_r_l(ix,il)] = lvals[il];
-   }
-} 
 /*==========================================================================*/
 void Grid::set_partial_phi(const std::vector<double> &v, std::vector<double> &dv) const
 {
@@ -486,6 +314,7 @@ double Grid::norm_indep_res(
 
    double res = 0;
 
+#pragma omp parallel for
    for (size_t i=0; i<_nx*_nlat*_nphi; i++) {
       res += pow(p[i] - ((f_np1[i]-f_n[i])/dt),2);
    }
@@ -499,6 +328,7 @@ double Grid::total_variation(const std::vector<double> &v) const
    assert(v.size()==_nx*_nlat*_nphi);
 
    double tv = 0;
+#pragma omp parallel for
    for (size_t ix=0; ix<_nx-1;   ix++) {
    for (size_t it=0; it<_nlat-1; it++) {
    for (size_t ip=0; ip<_nphi-1; ip++) {

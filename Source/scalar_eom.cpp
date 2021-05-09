@@ -525,24 +525,28 @@ void Scalar_eom::set_level(
       Field &p) const
 {
    if (level==2) {
+#pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
          f.l2[i] = f.n[i] + 0.5*_dt*f.k1[i];
          p.l2[i] = p.n[i] + 0.5*_dt*p.k1[i];
       }
    } else
    if (level==3) {
+#pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
          f.l3[i] = f.n[i] + 0.5*_dt*f.k2[i];
          p.l3[i] = p.n[i] + 0.5*_dt*p.k2[i];
       }
    } else
    if (level==4) {
+#pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
          f.l4[i] = f.n[i] + _dt*f.k3[i];
          p.l4[i] = p.n[i] + _dt*p.k3[i];
       }
    } else
    if (level==5) {
+#pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
          f.np1[i] = f.n[i] + (_dt/6.0)*(f.k1[i] + 2.0*f.k2[i] + 2.0*f.k3[i] + f.k4[i]);
          p.np1[i] = p.n[i] + (_dt/6.0)*(p.k1[i] + 2.0*p.k2[i] + 2.0*p.k3[i] + p.k4[i]);

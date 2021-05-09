@@ -13,7 +13,7 @@ SHTNS_LIB = -L$(HOME)/shtns/Library/lib
 
 CFLAGS = -g -fmax-errors=5 -O2 -Wall -Wextra -fopenmp \
 	 -lshtns -lfftw3 -lm \
-        -DSHTNS_CONTIGUOUS_LONGITUDES \
+        -DSHTNS_CONTIGUOUS_LONGITUDES #\
 	-DUSE_CHEB 
 #-D_GLIBCXX_DEBUG
 #=============================================================================
