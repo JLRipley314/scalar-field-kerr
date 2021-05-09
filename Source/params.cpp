@@ -12,17 +12,11 @@ Params::Params(const std::string param_file)
 {
    std::cout<<"Initializing Params"<<std::endl;
    _nt   = std::stoi(_read(param_file,"nt"));
+   _nx   = std::stoi(_read(param_file,"nx"));
    _nl   = std::stoi(_read(param_file,"nl"));
    _nm   = std::stoi(_read(param_file,"nm"));
    _nlat = std::stoi(_read(param_file,"nlat"));
    _nphi = std::stoi(_read(param_file,"nphi"));
-
-   _ngrids = std::stoi(_read(param_file,"ngrids"));
-   _read_array(param_file,"nxs",     _nxs);
-   _read_array(param_file,"Rvals", _Rvals);
-
-   assert(_ngrids  ==  _nxs.size());
-   assert(_ngrids+1==_Rvals.size());
 
    _t_step_save = std::stoi(_read(param_file,"t_step_save"));
 

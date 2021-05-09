@@ -314,7 +314,7 @@ double Grid::norm_indep_res(
 
    double res = 0;
 
-#pragma omp parallel for
+#pragma omp parallel for reduction(+ : res)
    for (size_t i=0; i<_nx*_nlat*_nphi; i++) {
       res += pow(p[i] - ((f_np1[i]-f_n[i])/dt),2);
    }
@@ -328,7 +328,7 @@ double Grid::total_variation(const std::vector<double> &v) const
    assert(v.size()==_nx*_nlat*_nphi);
 
    double tv = 0;
-#pragma omp parallel for
+#pragma omp parallel for reduction(+ : tv)
    for (size_t ix=0; ix<_nx-1;   ix++) {
    for (size_t it=0; it<_nlat-1; it++) {
    for (size_t ip=0; ip<_nphi-1; ip++) {

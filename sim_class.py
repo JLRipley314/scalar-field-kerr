@@ -16,7 +16,7 @@ class Sim:
       +  '_'+time_of_day[3].replace(':','_')
       +	'_m'+str(self.black_hole_mass)
       +	'_s'+str(self.black_hole_spin)
-      +	'_nx'+str(self.nxs[0])
+      +	'_nx'+str(self.nx)
       +	'_nl'+str(self.nl)
       +	'_nm'+str(self.nm)
       )
@@ -42,18 +42,12 @@ class Sim:
       self.rl= self.horizon*self.rl_0
       self.ru= self.horizon*self.ru_0
 #-----------------------------------------------------------------------------
-      self.Rvals = []
-      for r in self.rvals:
-         self.Rvals.append(self.horizon*self.compactification(r))
-      self.ngrids = len(self.Rvals)
-      self.Rvals.append(self.compactification_length) ## last point at infty
-
-      self.Rmin= min(self.Rvals)
-      self.Rmax= max(self.Rvals)
+      self.Rmin= self.compactification(self.horizon)
+      self.Rmax= self.compactification_length
 #-----------------------------------------------------------------------------
       if (self.use_cheb==True):
          self.dt= float(
-            9.*pow(max([max(self.nxs),self.nlat,self.nphi]),-2)
+            9.*pow(max([self.nx,self.nlat,self.nphi]),-2)
          )
       else:
          self.dt= min(
@@ -61,7 +55,7 @@ class Sim:
                   9.*pow(max([self.nlat,self.nphi]),-2)
                )
             ,
-            self.cfl/(max(self.nxs)-1.0)
+            self.cfl/(self.nx-1.0)
          )
 #-----------------------------------------------------------------------------
       self.nt= int(

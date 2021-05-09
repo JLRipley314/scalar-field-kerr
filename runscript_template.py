@@ -19,13 +19,12 @@ sim.compactification_length= float(20)
 sim.evolve_time= float(600.0) ## units of black hole mass
 sim.num_saved_times= int(1200)
 
+sim.nx= 8193 ## Number of radial grid points 
 sim.nl= 20 ## Number of angular l values
 sim.nm= 18 ## Number of angular m values
 sim.nlat = 40 ## Number of theta collocation points 
 sim.nphi = 40 ## Number of phi collocation points; must be a multiple of 4 
 
-sim.nxs=   [8193]#, 33] ## Number of radial pts on each domain 
-sim.rvals= [1]#,   4] ## Radial boundary of each domain (multiples of r_h) 
 
 sim.use_cheb=False ## Radial derivatives: Chebyshev vs. finite differences
 if (sim.use_cheb):

@@ -18,7 +18,7 @@ CFLAGS += -fmax-errors=5 -O3 -Wall -Wextra -fopenmp -lshtns -lfftw3 -lm
 ifeq ($(debug),true) 
 CFLAGS += -fbounds-check
 else
-CFLAGS += -DNDEBUG
+CFLAGS += -DNDEBUG 
 endif
 
 ifeq ($(use_cheb),true) 
@@ -49,7 +49,6 @@ OBJ = params.o \
       field.o \
       initial_data.o \
       scalar_eom.o \
-      unit_manager.o \
       main.o
 
 DEPS = params.hpp \
@@ -61,8 +60,7 @@ DEPS = params.hpp \
        io.hpp \
        field.hpp \
        initial_data.hpp \
-       scalar_eom.hpp \
-       unit_manager.hpp
+       scalar_eom.hpp
 #=============================================================================
 %.run: $(OBJ) 
 	$(CC) -o $(BIN)/$@ $^ $(SHTNS_INC) $(SHTNS_LIB) $(CFLAGS)

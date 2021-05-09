@@ -21,6 +21,7 @@ private:
     * see below under `public'
     */
    size_t _nt;
+   size_t _nx;
    size_t _nl;
    size_t _nm;
    size_t _nlat;
@@ -28,8 +29,6 @@ private:
    size_t _t_step_save;
 
    size_t _ngrids;
-   std::vector<double> _Rvals;
-   std::vector<size_t> _nxs;
 
    double _dt;
 
@@ -78,11 +77,9 @@ private:
 public:
 
    inline size_t nt() const {return _nt;}
+   inline size_t nx() const {return _nx;}
    inline size_t nl() const {return _nl;}
    inline size_t nm() const {return _nm;}
-
-   inline size_t ngrids() const {return _ngrids;}
-   inline size_t nxs(const size_t i) const {return _nxs[i];}
 
    inline size_t nxn() const {return _nl;}
 
@@ -96,7 +93,6 @@ public:
 
    inline double Rmax() const {return _Rmax;}
    inline double Rmin() const {return _Rmin;}
-   inline double Rvals(const size_t i) const {return _Rvals[i];}
 
    inline double bh_mass() const {return _bh_mass;}
    inline double bh_spin() const {return _bh_spin;}

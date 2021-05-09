@@ -322,22 +322,29 @@ void Scalar_eom::set_k(
       const Grid &grid,
       const std::vector<double> &f,
       const std::vector<double> &p,
+      std::vector<double> &_dr_f,
+      std::vector<double> &_lap_f,
+      std::vector<double> &_dr_p,
+      std::vector<double> &_dr_dr_f,
+      std::vector<double> &_dphi_f,
+      std::vector<double> &_dphi_dr_f,
+      std::vector<double> &_sphereX_f,
       std::vector<double> &f_k,
       std::vector<double> &p_k
       ) const
 {
-   assert(f.size()  ==_n);
-   assert(p.size()  ==_n);
+   assert(f.size()==_n);
+   assert(p.size()==_n);
+   assert(_dr_f.size()     ==_n);
+   assert(_lap_f.size()    ==_n);
+   assert(_dr_p.size()     ==_n);
+   assert(_dr_dr_f.size()  ==_n);
+   assert(_dphi_f.size()   ==_n);
+   assert(_dphi_dr_f.size()==_n);
+   assert(_sphereX_f.size()==_n);
    assert(f_k.size()==_n);
    assert(p_k.size()==_n);
 
-   std::vector<double> _dr_f(     _n);
-   std::vector<double> _lap_f(    _n);
-   std::vector<double> _dr_p(     _n);
-   std::vector<double> _dr_dr_f(  _n);
-   std::vector<double> _dphi_f(   _n);
-   std::vector<double> _dphi_dr_f(_n);
-   std::vector<double> _sphereX_f(_n);
    #pragma omp parallel sections
    {
       #pragma omp section
@@ -411,13 +418,6 @@ void Scalar_eom::set_k(
       ;
    }
 #if USE_HYPERBOLOIDAL
-   std::vector<double> _dR_f(     _n);
-   std::vector<double> _lap_f(    _n);
-   std::vector<double> _dR_p(     _n);
-   std::vector<double> _dR_dR_f(  _n);
-   std::vector<double> _dphi_f(   _n);
-   std::vector<double> _dphi_dR_f(_n);
-   std::vector<double> _sphereX_f(_n);
    #pragma omp parallel sections
    {
       #pragma omp section
@@ -574,16 +574,57 @@ void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
          grid.filter(p.n);
       }
    }
-   set_k(grid, f.n, p.n, f.k1, p.k1);
+   std::vector<double> _dr_f(     _n);
+   std::vector<double> _lap_f(    _n);
+   std::vector<double> _dr_p(     _n);
+   std::vector<double> _dr_dr_f(  _n);
+   std::vector<double> _dphi_f(   _n);
+   std::vector<double> _dphi_dr_f(_n);
+   std::vector<double> _sphereX_f(_n);
+
+   set_k(grid, f.n, p.n, 
+         _dr_f,
+         _lap_f,
+         _dr_p,
+         _dr_dr_f,
+         _dphi_f,
+         _dphi_dr_f,
+         _sphereX_f,
+         f.k1, p.k1);
+
    set_level(2, f, p);
 
-   set_k(grid, f.l2, p.l2, f.k2, p.k2);
+   set_k(grid, f.l2, p.l2, 
+         _dr_f,
+         _lap_f,
+         _dr_p,
+         _dr_dr_f,
+         _dphi_f,
+         _dphi_dr_f,
+         _sphereX_f,
+         f.k2, p.k2);
    set_level(3, f, p);
 
-   set_k(grid, f.l3, p.l3, f.k3, p.k3);
+   set_k(grid, f.l3, p.l3, 
+         _dr_f,
+         _lap_f,
+         _dr_p,
+         _dr_dr_f,
+         _dphi_f,
+         _dphi_dr_f,
+         _sphereX_f,
+         f.k3, p.k3);
    set_level(4, f, p);
 
-   set_k(grid, f.l4, p.l4, f.k4, p.k4);
+   set_k(grid, f.l4, p.l4, 
+         _dr_f,
+         _lap_f,
+         _dr_p,
+         _dr_dr_f,
+         _dphi_f,
+         _dphi_dr_f,
+         _sphereX_f,
+         f.k4, p.k4);
    set_level(5, f, p);
 }
 /*==========================================================================*/

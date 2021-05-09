@@ -24,6 +24,13 @@ public:
          const Grid &grid,
          const std::vector<double> &f,
          const std::vector<double> &p,
+         std::vector<double> &_dr_f,
+         std::vector<double> &_lap_f,
+         std::vector<double> &_dr_p,
+         std::vector<double> &_dr_dr_f,
+         std::vector<double> &_dphi_f,
+         std::vector<double> &_dphi_dr_f,
+         std::vector<double> &_sphereX_f,
          std::vector<double> &f_k,
          std::vector<double> &p_k
          ) const;
