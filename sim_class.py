@@ -9,17 +9,20 @@ class Sim:
       self.home_dir= str(os.getcwd())
 #=============================================================================
    def make_output_dir(self)->None:
-      time_of_day= time.asctime().split()
-      self.output_stem= '/'+str(
-         time_of_day[1]
-      +  '_'+time_of_day[2]
-      +  '_'+time_of_day[3].replace(':','_')
-      +	'_m'+str(self.black_hole_mass)
-      +	'_s'+str(self.black_hole_spin)
-      +	'_nx'+str(self.nx)
-      +	'_nl'+str(self.nl)
-      +	'_nm'+str(self.nm)
-      )
+      if self.output_dir is None:
+         time_of_day= time.asctime().split()
+         self.output_stem= '/'+str(
+            time_of_day[1]
+         +  '_'+time_of_day[2]
+         +  '_'+time_of_day[3].replace(':','_')
+         +	'_m'+str(self.black_hole_mass)
+         +	'_s'+str(self.black_hole_spin)
+         +	'_nx'+str(self.nx)
+         +	'_nl'+str(self.nl)
+         +	'_nm'+str(self.nm)
+         )
+      else:
+         self.output_stem = self.output_dir
       if (self.computer=='home'):
          self.output_dir= self.home_dir+'/Output'+self.output_stem
       else:
@@ -107,8 +110,7 @@ class Sim:
    def launch_run(self)->None:
       self.set_derived_params()
       
-      if self.output_dir is None:
-         self.make_output_dir()
+      self.make_output_dir()
 
       if self.recompile==True:
          self.then_recompile()
