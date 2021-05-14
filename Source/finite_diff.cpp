@@ -192,7 +192,7 @@ void FD::filter(std::vector<double> &v) const
 {
    assert(v.size()==_n);
 
-   const double eps = 0.5;
+   const double eps = 1.0;
 
    std::vector<double> tmp(_n,0);
 

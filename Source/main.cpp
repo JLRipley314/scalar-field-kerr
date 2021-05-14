@@ -50,16 +50,16 @@ int main(int argc, char **argv)
       <<std::setw(16)<<tv
       <<std::endl;
 
-   const double save_rmin = params.Rmin();
-   const double save_rmax = params.Rmax();
-   const double val_min = 1e-4;
-   const double val_max = 1e4;
+//   const double save_rmin = params.Rmin();
+//   const double save_rmax = params.Rmax();
+//   const double val_min = 1e-4;
+//   const double val_max = 1e4;
 
    bool save_coords = true;
    scalar_eom.set_rho(grid, f.np1, p.np1, rho);
 
-   Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, f.np1);
-   Csv::write_x_y_z(grid, output_dir+"/rho",     save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, rho);
+//   Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, f.np1);
+//   Csv::write_x_y_z(grid, output_dir+"/rho",     save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, rho);
 
    Csv::write_R_psl(grid, output_dir+"/"+f.name, save_coords, save_indx, f.np1);
    Csv::write_R_psl(grid, output_dir+"/rho",     save_coords, save_indx, rho);
@@ -86,8 +86,8 @@ int main(int argc, char **argv)
 
             scalar_eom.set_rho(grid, f.np1, p.np1, rho);
 
-            Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, f.np1);
-            Csv::write_x_y_z(grid, output_dir+"/rho",     save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, rho);
+//            Csv::write_x_y_z(grid, output_dir+"/"+f.name, save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, f.np1);
+//            Csv::write_x_y_z(grid, output_dir+"/rho",     save_coords, save_indx, val_min, val_max, save_rmin, save_rmax, rho);
 
             Csv::write_R_psl(grid, output_dir+"/"+f.name, save_coords, save_indx, f.np1);
             Csv::write_R_psl(grid, output_dir+"/rho",     save_coords, save_indx, rho);
