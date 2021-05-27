@@ -18,22 +18,15 @@ public:
       );
    ~Scalar_eom();
 
-   void time_step(const Grid &grid, Field &f, Field &p) const;
+   void time_step(const Grid &grid, Field &f, Field &p);
 
    void set_k(
          const Grid &grid,
          const std::vector<double> &f,
          const std::vector<double> &p,
-         std::vector<double> &_dr_f,
-         std::vector<double> &_lap_f,
-         std::vector<double> &_dr_p,
-         std::vector<double> &_dr_dr_f,
-         std::vector<double> &_dphi_f,
-         std::vector<double> &_dphi_dr_f,
-         std::vector<double> &_sphereX_f,
          std::vector<double> &f_k,
          std::vector<double> &p_k
-         ) const;
+         );
 
    void set_level(
          const int level,
@@ -46,7 +39,7 @@ public:
          const std::vector<double> &f,
          const std::vector<double> &p,
          std::vector<double> &rho
-         ) const;
+         );
 
 private:
    const size_t _n;
@@ -85,9 +78,16 @@ private:
    std::vector<double> _rho_rphi;
    std::vector<double> _rho_sphereX;
 
-public:
-   /* characteristic speeds at the boundary */
-   std::vector<double> cs_M_R;
-   std::vector<double> cs_P_L;
+   /* 
+    * for computing time evolution of the
+    * scalar field 
+    */
+   std::vector<double> _dr_f;
+   std::vector<double> _lap_f;
+   std::vector<double> _dr_p;
+   std::vector<double> _dr_dr_f;
+   std::vector<double> _dphi_f;
+   std::vector<double> _dphi_dr_f;
+   std::vector<double> _sphereX_f;
 };
 #endif /* _SCALAR_EOM_HPP_ */

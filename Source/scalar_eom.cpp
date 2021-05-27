@@ -39,8 +39,13 @@ Scalar_eom::Scalar_eom(
    _rho_rphi(   _n,0),
    _rho_sphereX(_n,0),
 
-   cs_M_R(grid.nlat()*grid.nphi(),0),
-   cs_P_L(grid.nlat()*grid.nphi(),0)
+   _dr_f(     _n,0),
+   _lap_f(    _n,0),
+   _dr_p(     _n,0),
+   _dr_dr_f(  _n,0),
+   _dphi_f(   _n,0),
+   _dphi_dr_f(_n,0),
+   _sphereX_f(_n,0)
 {
    std::cout<<"Initializing Scalar_eom"<<std::endl;
    const size_t nx   = grid.nx();
@@ -114,35 +119,6 @@ Scalar_eom::Scalar_eom(
          );
       _rho_rphi[indx]    =   a*pow(inv_r,2)/Sigma;
       _rho_sphereX[indx] = 0.5*pow(inv_r,2)/Sigma;
-
-      const size_t indx_sphere = grid.indx_th_ph(it,ip);
-
-      /* Right boundary */
-      if (ix==0) {
-         const double inter = 2.0*m*inv_r/Sigma;
-
-         cs_M_R[indx_sphere] = 
-            pow(1.0 + inter, -1)*(
-            -  inter
-            -  pow(
-                  pow(inter,2)
-               +  (1.0 + inter)*(Delta/Sigma)
-            , 0.5)
-            );
-      }
-      /* Left boundary */
-      if (ix==nx-1) {
-         const double inter = 2.0*m*inv_r/Sigma;
-
-         cs_P_L[indx_sphere] = 
-            pow(1.0 + inter, -1)*(
-            -  inter
-            +  pow(
-                  pow(inter,2)
-               +  (1.0 + inter)*(Delta/Sigma)
-            , 0.5)
-            );
-      }
    }
    }
    }
@@ -322,26 +298,12 @@ void Scalar_eom::set_k(
       const Grid &grid,
       const std::vector<double> &f,
       const std::vector<double> &p,
-      std::vector<double> &_dr_f,
-      std::vector<double> &_lap_f,
-      std::vector<double> &_dr_p,
-      std::vector<double> &_dr_dr_f,
-      std::vector<double> &_dphi_f,
-      std::vector<double> &_dphi_dr_f,
-      std::vector<double> &_sphereX_f,
       std::vector<double> &f_k,
       std::vector<double> &p_k
-      ) const
+      )
 {
    assert(f.size()==_n);
    assert(p.size()==_n);
-   assert(_dr_f.size()     ==_n);
-   assert(_lap_f.size()    ==_n);
-   assert(_dr_p.size()     ==_n);
-   assert(_dr_dr_f.size()  ==_n);
-   assert(_dphi_f.size()   ==_n);
-   assert(_dphi_dr_f.size()==_n);
-   assert(_sphereX_f.size()==_n);
    assert(f_k.size()==_n);
    assert(p_k.size()==_n);
 
@@ -568,7 +530,7 @@ void Scalar_eom::set_level(
 /* Fourth order Runge-Kutta integrator; 
  * we reuse the levels and time derivatives (k) to save memory */
 /*==========================================================================*/
-void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
+void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p)
 {
    assert(f.size==_n);
    assert(p.size==_n);
@@ -584,57 +546,16 @@ void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
          grid.filter(p.n);
       }
    }
-   std::vector<double> _dr_f(     _n);
-   std::vector<double> _lap_f(    _n);
-   std::vector<double> _dr_p(     _n);
-   std::vector<double> _dr_dr_f(  _n);
-   std::vector<double> _dphi_f(   _n);
-   std::vector<double> _dphi_dr_f(_n);
-   std::vector<double> _sphereX_f(_n);
-
-   set_k(grid, f.n, p.n, 
-         _dr_f,
-         _lap_f,
-         _dr_p,
-         _dr_dr_f,
-         _dphi_f,
-         _dphi_dr_f,
-         _sphereX_f,
-         f.k, p.k);
-
+   set_k(grid, f.n, p.n, f.k, p.k);
    set_level(2, f, p);
 
-   set_k(grid, f.l, p.l, 
-         _dr_f,
-         _lap_f,
-         _dr_p,
-         _dr_dr_f,
-         _dphi_f,
-         _dphi_dr_f,
-         _sphereX_f,
-         f.k, p.k);
+   set_k(grid, f.l, p.l, f.k, p.k);
    set_level(3, f, p);
 
-   set_k(grid, f.l, p.l, 
-         _dr_f,
-         _lap_f,
-         _dr_p,
-         _dr_dr_f,
-         _dphi_f,
-         _dphi_dr_f,
-         _sphereX_f,
-         f.k, p.k);
+   set_k(grid, f.l, p.l, f.k, p.k);
    set_level(4, f, p);
 
-   set_k(grid, f.l, p.l, 
-         _dr_f,
-         _lap_f,
-         _dr_p,
-         _dr_dr_f,
-         _dphi_f,
-         _dphi_dr_f,
-         _sphereX_f,
-         f.k, p.k);
+   set_k(grid, f.l, p.l, f.k, p.k);
    set_level(5, f, p);
 }
 /*==========================================================================*/
@@ -643,15 +564,11 @@ void Scalar_eom::set_rho(
       const std::vector<double> &f,
       const std::vector<double> &p,
       std::vector<double> &rho
-      ) const
+      )
 {
    assert(f.size()  ==_n);
    assert(p.size()  ==_n);
    assert(rho.size()==_n);
-
-   std::vector<double> _dr_f(_n);
-   std::vector<double> _dphi_f(_n);
-   std::vector<double> _sphereX_f(_n);
 
    #pragma omp parallel sections
    {
