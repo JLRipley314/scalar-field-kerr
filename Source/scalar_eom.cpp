@@ -527,36 +527,46 @@ void Scalar_eom::set_level(
    if (level==2) {
 #pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
-         f.l2[i] = f.n[i] + 0.5*_dt*f.k1[i];
-         p.l2[i] = p.n[i] + 0.5*_dt*p.k1[i];
+         f.l[i] = f.n[i] + 0.5*_dt*f.k[i];
+         p.l[i] = p.n[i] + 0.5*_dt*p.k[i];
+
+         f.np1[i] = f.n[i] + (_dt/6.0)*(f.k[i]);
+         p.np1[i] = p.n[i] + (_dt/6.0)*(p.k[i]);
       }
    } else
    if (level==3) {
 #pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
-         f.l3[i] = f.n[i] + 0.5*_dt*f.k2[i];
-         p.l3[i] = p.n[i] + 0.5*_dt*p.k2[i];
+         f.l[i] = f.n[i] + 0.5*_dt*f.k[i];
+         p.l[i] = p.n[i] + 0.5*_dt*p.k[i];
+
+         f.np1[i] += (_dt/3.0)*(f.k[i]);
+         p.np1[i] += (_dt/3.0)*(p.k[i]);
       }
    } else
    if (level==4) {
 #pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
-         f.l4[i] = f.n[i] + _dt*f.k3[i];
-         p.l4[i] = p.n[i] + _dt*p.k3[i];
+         f.l[i] = f.n[i] + _dt*f.k[i];
+         p.l[i] = p.n[i] + _dt*p.k[i];
+
+         f.np1[i] += (_dt/3.0)*(f.k[i]);
+         p.np1[i] += (_dt/3.0)*(p.k[i]);
       }
    } else
    if (level==5) {
 #pragma omp parallel for
       for (size_t i=0; i<_n; i++) {
-         f.np1[i] = f.n[i] + (_dt/6.0)*(f.k1[i] + 2.0*f.k2[i] + 2.0*f.k3[i] + f.k4[i]);
-         p.np1[i] = p.n[i] + (_dt/6.0)*(p.k1[i] + 2.0*p.k2[i] + 2.0*p.k3[i] + p.k4[i]);
+         f.np1[i] += (_dt/6.0)*(f.k[i]);
+         p.np1[i] += (_dt/6.0)*(p.k[i]);
       }
    } else {
       std::cout<<"ERROR(set_level): level = "<<level<<std::endl;
    }
 }
 /*==========================================================================*/
-/* Fourth order Runge-Kutta integrator */
+/* Fourth order Runge-Kutta integrator; 
+ * we reuse the levels and time derivatives (k) to save memory */
 /*==========================================================================*/
 void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
 {
@@ -590,11 +600,11 @@ void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
          _dphi_f,
          _dphi_dr_f,
          _sphereX_f,
-         f.k1, p.k1);
+         f.k, p.k);
 
    set_level(2, f, p);
 
-   set_k(grid, f.l2, p.l2, 
+   set_k(grid, f.l, p.l, 
          _dr_f,
          _lap_f,
          _dr_p,
@@ -602,10 +612,10 @@ void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
          _dphi_f,
          _dphi_dr_f,
          _sphereX_f,
-         f.k2, p.k2);
+         f.k, p.k);
    set_level(3, f, p);
 
-   set_k(grid, f.l3, p.l3, 
+   set_k(grid, f.l, p.l, 
          _dr_f,
          _lap_f,
          _dr_p,
@@ -613,10 +623,10 @@ void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
          _dphi_f,
          _dphi_dr_f,
          _sphereX_f,
-         f.k3, p.k3);
+         f.k, p.k);
    set_level(4, f, p);
 
-   set_k(grid, f.l4, p.l4, 
+   set_k(grid, f.l, p.l, 
          _dr_f,
          _lap_f,
          _dr_p,
@@ -624,7 +634,7 @@ void Scalar_eom::time_step(const Grid &grid, Field &f, Field &p) const
          _dphi_f,
          _dphi_dr_f,
          _sphereX_f,
-         f.k4, p.k4);
+         f.k, p.k);
    set_level(5, f, p);
 }
 /*==========================================================================*/

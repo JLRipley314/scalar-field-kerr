@@ -50,12 +50,12 @@ class Sim:
 #-----------------------------------------------------------------------------
       if (self.use_cheb==True):
          self.dt= float(
-            9.*pow(max([self.nx,self.nlat,self.nphi]),-2)
+            6.*pow(max([self.nx,self.nlat,self.nphi]),-2)
          )
       else:
          self.dt= min(
                float(
-                  9.*pow(max([self.nlat,self.nphi]),-2)
+                  6.*pow(max([self.nlat,self.nphi]),-2)
                )
             ,
             self.cfl/(self.nx-1.0)

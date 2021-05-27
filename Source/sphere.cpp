@@ -52,7 +52,7 @@ Sphere::Sphere(
     * Low pass filter in spherical harmonic space 
     */
    for (size_t i=0; i<_lmax; i++) {
-      _low_pass[i] = exp(-40.0*pow(double(i)/_lmax,20));
+      _low_pass[i] = exp(-40.0*pow(double(i)/_lmax,16));
    }
    _nSph = NSPAT_ALLOC(_shtns);
    _nYlm = _shtns->nlm;
