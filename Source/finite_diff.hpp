@@ -26,10 +26,6 @@ private:
    const double _lower;
    const double _upper;
    const double _dx; 
-   /* 
-    * Points over interval [lower,upper] 
-    */
-   std::vector<double> _pts;
 };
 /*===========================================================================*/
 #endif /* _FD_HPP_ */

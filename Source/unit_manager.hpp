@@ -15,6 +15,7 @@ class Unit
 public:
    Unit(
       const Params &params,
+      const string loc,
       const double Rmin,
       const double Rmax,
       const size_t nx
@@ -25,9 +26,15 @@ public:
    void set_level(const int level);
    void shift();
 
+   const string loc;
+
+   const size_t local_nx;
+
    Field f;
    Field p;
 
+   std::vector<double> ghost_cells_left;
+   std::vector<double> ghost_cells_right;
    std::vector<double> rho;
 
    Grid grid;

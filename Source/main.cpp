@@ -10,7 +10,6 @@
 #include "initial_data.hpp"
 #include "scalar_eom.hpp"
 #include "io.hpp"
-#include "unit_manager.hpp"
 
 int main(int argc, char **argv)
 {
