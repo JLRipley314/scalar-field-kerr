@@ -1,0 +1,566 @@
+% ****** Start of file aipsamp.tex ******
+%
+%   This file is part of the AIP files in the AIP distribution for REVTeX 4.
+%   Version 4.1 of REVTeX, October 2009
+%
+%   Copyright (c) 2009 American Institute of Physics.
+%
+%   See the AIP README file for restrictions and more information.
+%
+% TeX'ing this file requires that you have AMS-LaTeX 2.0 installed
+% as well as the rest of the prerequisites for REVTeX 4.1
+% 
+% It also requires running BibTeX. The commands are as follows:
+%
+%  1)  latex  aipsamp
+%  2)  bibtex aipsamp
+%  3)  latex  aipsamp
+%  4)  latex  aipsamp
+%
+% Use this file as a source of example code for your aip document.
+% Use the file aiptemplate.tex as a template for your document.
+\documentclass[%
+ prd,
+% aip,
+% jmp,
+% bmf,
+% sd,
+% rsi,
+amsmath,amssymb,
+preprint,%
+%reprint,%
+%author-year,%
+%author-numerical,%
+% Conference Proceedings
+]{revtex4-1}
+
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+\newcommand{\edth}{\textnormal{\dh}}
+\newcommand{\thorn}{\textnormal{\th}}
+\newcommand{\Edth}{\textnormal{\DH}}
+\newcommand{\Thorn}{\textnormal{\TH}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+
+\begin{document}
+
+%\preprint{AIP/123-QED}
+
+\title{
+   The dynamics of scalar fields around (nearly) extremal Kerr black holes
+}
+% Force line breaks with \\
+
+\author{Justin L. Ripley}
+ \email{lloydripley@gmail.com}
+\affiliation{ 
+DAMTP,
+Centre for Mathematical Sciences,
+University of Cambridge,
+Wilberforce Road, Cambridge CB3 0WA, UK.
+}%
+
+\date{\today}% It is always \today, today,
+             %  but any date may be explicitly specified
+
+\begin{abstract}
+   A brief description of the code, and the equations of motion.
+\end{abstract}
+
+\maketitle
+
+%\begin{quotation}
+%The ``lead paragraph'' is encapsulated with the \LaTeX\ 
+%\verb+quotation+ environment and is formatted as a single paragraph before the first section heading. 
+%(The \verb+quotation+ environment reverts to its usual meaning after the first sectioning command.) 
+%Note that numbered references are allowed in the lead paragraph.
+%
+%The lead paragraph will only be found in an article being prepared for the journal \textit{Chaos}.
+%\end{quotation}
+%=============================================================================
+\section{\label{sec:introduction}Introduction}
+We use $-+++$ signature for the spacetime.
+%=============================================================================
+\section{\label{sec:scalar_fields}Scalar fields}
+   We consider the dynamics of the scalar field
+\begin{subequations}
+\label{eq:action_eom}
+\begin{align}
+   \label{eq:action}
+   S
+   =
+   \int d^4x\sqrt{-g}\left(
+      -
+      \frac{1}{2}k\left(\psi\right)g^{\mu\nu}\nabla_{\mu}\psi\nabla_{\nu}\psi
+      -
+      V\left(\psi\right)
+   \right)
+   ,\\
+   \label{eq:eom}
+   \implies
+   \Box\psi
+   +
+   \frac{1}{2}\frac{k'\left(\psi\right)}{k\left(\psi\right)}
+   \left(\nabla\psi\right)^2
+   -
+   \frac{1}{k\left(\psi\right)}V'\left(\psi\right)
+   =
+   0
+   .
+\end{align}
+\end{subequations}
+While it is common to consider a coupling $f\left(\psi\right)R$,
+we are only considering the dynamics of a scalar field about
+a fixed Kerr background, so that $R=0$.
+To relate \eqref{eq:action_eom} to some well known examples, in
+Brans-Dicke gravity we would have $k=\omega/\psi$ and $V=0$,
+and for a massive scalar field (as is often studied in scalar
+field superadiance), we'd have $k=1$, $V=m^2\psi^2/2$.
+We consider the scalar field equations of motion in a (nearly)
+extremal Kerr black hole spacetime.
+The main motivation for this is: we know for light scalar fields
+that they can undergo ``superradiant'' scattering around the black hole,
+and there is a lot of interesting physics that can occur when
+one adds nonlinear scalar field interactions on top of
+that \cite{Baryakhtar:2020gao}.
+Additionally, in the extremal limit scalar field perturbation gradients
+can grow unboundedly large on the horizon \cite{Aretakis:2012ei}.
+There is speculation about ``turbulence'' for nonlinear gravitational
+interactions around (nearly) extremal Kerr black holes \cite{Yang:2014tla}.
+A simpler model is to consider nonlinear scalar field models
+around a (nearly) extremal Kerr black hole, which is what we consider here.
+%=============================================================================
+\section{\label{sec:coordinates}
+   Evolution in horizon penetrating coordinates
+   }
+%=============================================================================
+\subsection{\label{sec:ief}
+   Ingoing Eddington-Finkelstein coordinates for asymptotically flat Kerr
+   }
+To motivate what we are looking for, we write out the scalar
+field equations of motion about a Kerr spacetime, using
+ingoing Eddington-Finkelstein coordinates:
+\begin{align}
+   ds^2
+   =&
+   -
+   \left(1-\frac{2Mr}{\Sigma}\right)dv^2
+   +
+   \frac{4Mr}{\Sigma}\left(dr-a\mathrm{sin}^2\theta d\phi\right)dv
+   +
+   \left(1+\frac{2Mr}{\Sigma}\right)\left(
+      dr^2-2a\mathrm{sin}^2\theta dr d\phi
+   \right)
+   \nonumber\\&
+   +
+   \Sigma d\theta^2
+   +
+   \left(
+      a^2+r^2+2Ma^2\frac{r\mathrm{sin}^2\theta}{\Sigma}
+   \right)
+   d\phi^2
+   ,
+\end{align}
+where
+\begin{subequations}
+\begin{align}
+   \Sigma
+   \equiv&
+   r^2+a^2\mathrm{cos}^2\theta
+   ,\\
+   \Delta
+   \equiv&
+   r^2-2Mr+a^2
+   .
+\end{align}
+\end{subequations}
+Spatial infinity lies at $r\to\infty$. Compactifying spatial infinity
+means that we would lose resolution of outgoing waves,
+as they become blueshifted.
+This isn't too big a concern for us though, as we are mainly
+interested in the dynamics near the horizon.
+In terms of ingoing Eddington-Finkelstein coordinates we have:
+\begin{align}
+   \Box\psi
+   =&
+   -
+   \left(1+\frac{2Mr}{\Sigma}\right)\partial_v^2\psi
+   +
+   \frac{4Mr}{\Sigma}\partial_v\partial_r\psi
+   +
+   \frac{\Delta}{\Sigma}\partial_r^2\psi
+   +
+   \frac{2a}{\Sigma}\partial_r\partial_{\phi}\psi
+   +
+   \frac{1}{\Sigma}\Delta_{\mathbb{S}_2}\psi
+   \nonumber\\&
+   +
+   \frac{2M}{\Sigma}\partial_v\psi
+   +
+   \frac{2\left(r-M\right)}{\Sigma}\partial_r\psi
+   ,\\
+   \left(\nabla\psi\right)^2
+   =&
+   -
+   \left(1+\frac{2Mr}{\Sigma}\right)\left(\partial_v\psi\right)^2
+   +
+   \frac{4Mr}{\Sigma}\partial_v\psi\partial_r\psi
+   +
+   \frac{\Delta}{\Sigma}\left(\partial_r\psi\right)^2
+   +
+   \frac{2a}{\Sigma}\partial_r\psi\partial_{\phi}\psi
+   \nonumber\\&
+   +
+   \frac{1}{\Sigma}
+   \left(
+      \left(\partial_{\theta}\psi\right)^2
+      +
+      \left(\frac{1}{\mathrm{sin}\theta}\partial_{\phi}\psi\right)^2
+   \right)
+   .
+\end{align}
+In ingoing/outgoing radial characteristic speeds of the
+wave equation are
+\begin{align}
+   c_{\pm}
+   =
+   \left(1+\frac{2Mr}{\Sigma}\right)^{-1}
+   \left(
+   -  \frac{2Mr}{\Sigma}
+      \pm
+      \left[
+         \frac{4M^2r^2}{\Sigma^2}
+      +  \left(1+\frac{2Mr}{\Sigma}\right)\frac{\Delta}{\Sigma}
+      \right]^{1/2}
+   \right)
+   .
+\end{align}
+We see that at $\Delta=0$ is the black hole horizon
+(that is $r_{\pm}=m\pm\sqrt{m^2-a^2}$).
+At spatial infinity ($r\to\infty$), we see that $c_{\pm}=\pm1$.
+%=============================================================================
+\section{\label{sec:diagnostics}
+   Diagnostics
+   }
+To characterize energy and angular momentum flux into the black hole
+we compute contractions of the stress-energy tensor
+\begin{align}
+   T_{\mu\nu}
+   =
+   k\left(\psi\right)
+   \nabla_{\mu}\psi\nabla_{\nu}\psi
+   -
+   g_{\mu\nu}
+   \left(
+      \frac{1}{2}k\left(\psi\right)
+      g^{\alpha\beta}\nabla_{\alpha}\psi\nabla_{\beta}\psi
+      +
+      V\left(\psi\right)
+   \right)
+   .
+\end{align}
+From the Killing vectors $V\equiv\partial_v$ and $\Phi\equiv\partial_{\phi}$,
+we can compute the total energy and angular momentum of the scalar field on
+a $v=const.$ hypersurface
+\begin{subequations}
+   \begin{align}
+      E(v)
+      \equiv&
+      \int_{\Sigma_v}n^{\mu}V^{\nu}T_{\mu\nu}
+      ,\\
+      L(v)
+      \equiv&
+      \int_{\Sigma_v}n^{\mu}\Phi^{\nu}T_{\mu\nu}
+      .
+   \end{align}
+\end{subequations}
+On the horizon we consider the ``power-spectrum'' of a given scalar quantity
+at a fixed radial distance $r$:
+\begin{align}
+   \mathcal{P}_l\left(v,r\right)
+   \equiv
+   \sum_{m=-l}^l \left|f_{l,m}\left(v,r\right)\right|^2
+   .
+\end{align}
+We will be most interested in the power spectrum of the local energy density
+on the black hole horizon, 
+\begin{align}
+   \rho
+   \equiv
+   n^{\mu}n^{\nu}T_{\mu\nu}
+   ,
+\end{align}
+where $n_{\mu}dx^{\mu}=\left|g^{vv}\right|^{-1/2}dv$.
+In ingoing Eddington-Finkelstein coordinates we have
+\begin{align}
+   \rho
+   =&
+   k\left(\psi\right)
+   \frac{1}{2}
+   \left[
+      \left(n^{\alpha}\nabla_{\alpha}\psi\right)^2
+      +
+      h^{\alpha\beta}\nabla_{\alpha}\psi\nabla_{\beta}\psi
+   \right]
+   +
+   V\left(\psi\right)
+   ,\nonumber\\
+   =&
+   k\left(\psi\right)
+   \frac{1}{2}\Bigg[
+      \left(1+\frac{2Mr}{\Sigma}\right)
+      \left(\partial_v\psi\right)^2
+      +
+      \frac{4Mr}{\Sigma}
+      \left(\partial_v\psi\right)\left(\partial_r\psi\right)
+      \nonumber\\&
+      +
+      \left(
+         \frac{r^2+2Mr+a^2}{\Sigma}
+         -
+         \frac{4Mr}{2Mr+\Sigma}
+      \right)
+      \left(\partial_r\psi\right)^2
+      \nonumber\\&
+      +
+      \frac{2a}{\Sigma}
+      \left(\partial_r\psi\right)
+      \left(\partial_{\phi}\psi\right)
+      +
+      \frac{1}{\Sigma}
+      \left(
+         \left(\partial_{\theta}\psi\right)^2
+         +
+         \frac{1}{\mathrm{sin}^2\theta}
+         \left(\partial_{\phi}\psi\right)^2
+      \right)
+   \Bigg]
+   +
+   V\left(\psi\right)
+   .
+\end{align}
+%=============================================================================
+\appendix
+%=============================================================================
+\section{\label{sec:code_description}
+   Code description
+   }
+   The code we use, which solves the equation \eqref{eq:eom},
+   can be accessed at 
+   \url{https://github.com/JLRipley314/scalar-field-kerr}.
+   It makes use of pseudospectral methods: we use a 
+   basis of Chebyshev polynomials to compute radial derivatives,
+   and a basis of spherical harmonics to compute angular derivatives 
+   (see Sec.~\ref{sec:properties_spherical_harmonics} for a review).
+   At every time step we apply a low-pass filter in spectral space of the form
+   \begin{align}
+      \phi_{n,l,m}
+      \to
+      \mathrm{exp}\left[-f\frac{n^{p_n}}{n_{max}}\right]
+      \mathrm{exp}\left[-f\frac{l^{p_l}}{l_{max}}\right]
+      \mathrm{exp}\left[-f\frac{m^{p_m}}{m_{max}}\right]
+      \phi_{n,l,m}
+      .
+   \end{align}
+   After some experimentation, we found $p_i\gtrsim12$ worked well.
+   The constant $f$ is chosen so that $e^{-f}$ was equal to the machine
+   precision we work with (in practice then, $e^{-f}\sim 10^{-16}$).
+%=============================================================================
+\section{\label{sec:properties_spherical_harmonics}
+   Properties of spherical harmonics
+   }
+As we are working with scalar fields on a topologically spherical set
+of coordinates, we find it convenient to compute angular derivatives
+of the scalar fields using a pseudospectral expansion
+in spherical harmonics
+\begin{align}
+   \psi
+   =&
+   \sum_{lm} \psi_{lm}Y_{lm}\left(\theta,\phi\right)
+   ,
+\end{align}
+where
+\begin{align}
+   Y_{lm}\left(\theta,\phi\right)
+   \equiv&
+   \sqrt{
+      \frac{2l+1}{4\pi}
+   }
+   \sqrt{
+      \frac{(l-m)!}{(l+m)!}
+   }
+   P^m_l\left(\mathrm{cos}\theta\right)
+   e^{im\phi}
+   ,\\
+   P^m_l\left(x\right)
+   \equiv&
+   \left(-1\right)^m
+   \left(1-x^2\right)^{m/2}\frac{d^m}{dx^m}P_l\left(x\right)
+   ,
+\end{align}
+notice we have used the Condon-Shortly phase convention in the
+definition of the associated Legendre functions.
+The most convenient thing about this expansion is that it can be
+very accurate for a sparse amount of data, and all the singular
+$1/\mathrm{sin}\theta$ terms in the derivative operators
+dissapear in the spectral representation of the derivatives.
+Morever, given the utility of spherical harmonic representations in a 
+wide variety of fields, there are several very fast libraries to 
+go to/from spherical harmonic space.
+Our code uses the library \texttt{shtns} \cite{2013GGG....14..751S}.
+
+The rest of this section serves as a review of some basic facts about
+the two sphere $\mathbb{S}_2$ and the spherical harmonics $Y_{lm}$.
+This is all textbook material;
+I mostly follow the presentation of Appendix A of \cite{Baumann:2019eav}.
+As above, we work in spherical polar coordinates
+\begin{align}
+   d\sigma^2
+   =
+   d\theta^2
+   +
+   \mathrm{sin}^2\theta d\phi^2
+   .
+\end{align}
+We write the three Killing vectors on the sphere as
+\begin{subequations}
+\begin{align}
+   k_x
+   \equiv&
+   - 
+   i\left(y\partial_z-z\partial_y\right)
+   =
+   i\left(
+      \mathrm{sin}\phi\partial_{\theta}
+      +
+      \mathrm{cot}\theta\mathrm{cos}\phi\partial_{\phi}
+   \right)
+   ,\\
+   k_y
+   \equiv&
+   -
+   i\left(z\partial_x-x\partial_z\right)
+   =
+   i\left(
+      -
+      \mathrm{cos}\phi\partial_{\theta}
+      +
+      \mathrm{cot}\theta\mathrm{sin}\phi\partial_{\phi}
+   \right)
+   ,\\
+   k_z
+   \equiv&
+   -
+   i\left(x\partial_y-y\partial_x\right)
+   =
+   -
+   i\partial_{\phi}
+   .
+\end{align}
+\end{subequations}
+In addition to being Killing vectors of $\mathbb{S}_2$, they are generators
+of the group $SO(3)$, i.e. they satisfy the algebra
+\begin{align}
+   \left[k_i,k_j\right]
+   =
+   i\epsilon_{ijk}k_k
+   ,
+\end{align}
+where $i,j,k\in\{1,2,3\}$ label
+$x\leftrightarrow1$,
+$y\leftrightarrow2$,
+$z\leftrightarrow3$.
+The algebra has the Casimir operator
+\begin{align}
+   L^2
+   \equiv 
+   L_x^2+L_y^2+L_z^2
+   =
+   -
+   \Delta_{\mathbb{S}_2}
+   ,
+\end{align}
+where $L_i$ is the Lie derivative along $k_i$, and
+$\Delta_{\mathbb{S}_2}$ is the spherical Laplace-Beltrami operator.
+The spherical harmonics form an irreducible representation of $SO(3)$,
+and satisfy
+\begin{subequations}
+\begin{align}
+   L^2Y^m_l
+   =&
+   \left(l+1\right)l
+   ,\\
+   L_zY^m_l
+   =&
+   mY^m_l
+   .
+\end{align}
+\end{subequations}
+The raising/lowering operators of the algebra $SO(3)$ are
+\begin{align}
+   L_{\pm}
+   \equiv&
+   k_x
+   \pm
+   i k_y
+   \nonumber\\
+   =&
+   e^{\pm i\phi}
+   \left(
+      \pm
+      \frac{\partial}{\partial\theta}
+      +
+      i\mathrm{cot}\theta
+      \frac{\partial}{\partial\phi}
+   \right)
+   .
+\end{align}
+With the Condon-Shortley phase convention for the spherical harmonics, we have
+\begin{align}
+   L_{\pm}Y_{lm}
+   =&
+   \sqrt{(l\mp m)(l\pm m+1)}Y_{l (m\pm1)}
+   .
+\end{align}
+With these relations, we can straightforwardly evaluate
+the following derivatives in spectral space
+\begin{subequations}
+\begin{align}
+   \frac{1}{\mathrm{sin}\theta}
+   \frac{\partial}{\partial\theta}
+   \left(
+      \mathrm{sin}\theta\frac{\partial\psi}{\partial\theta}
+   \right)
+   +
+   \frac{1}{\mathrm{sin}^2\theta}
+   \frac{\partial^2f}{\partial\phi^2}
+   =&
+   -
+   L^2\psi
+   ,\\
+   \left(\frac{\partial\psi}{\partial\theta}\right)^2
+   +
+   \left(
+      \frac{1}{\mathrm{sin}\theta}
+      \frac{\partial\psi}{\partial\phi}
+   \right)^2
+   =&
+   -
+   \left(L_+\psi\right)\left(L_-\psi\right)
+   +
+   \left(\partial_{\phi}\psi\right)^2
+   .
+\end{align}
+\end{subequations}
+%=============================================================================
+\bibliography{thebib.bib}
+%=============================================================================
+\end{document}
