@@ -343,23 +343,23 @@ In ingoing Eddington-Finkelstein coordinates we have
    The code we use, which solves the equation \eqref{eq:eom},
    can be accessed at 
    \url{https://github.com/JLRipley314/scalar-field-kerr}.
-   It makes use of pseudospectral methods: we use a 
-   basis of Chebyshev polynomials to compute radial derivatives,
-   and a basis of spherical harmonics to compute angular derivatives 
+   It makes use of pseudospectral methods 
+   (a basis of spherical harmonics) to compute angular derivatives,
+   and there are two options for radial derivatives: either Chebyshev
+   pseudospectral derivatives or sixth order finite differences.
    (see Sec.~\ref{sec:properties_spherical_harmonics} for a review).
-   At every time step we apply a low-pass filter in spectral space of the form
+   At every time step we apply a low-pass filter in spectral space 
    \begin{align}
       \phi_{n,l,m}
       \to
-      \mathrm{exp}\left[-f\frac{n^{p_n}}{n_{max}}\right]
       \mathrm{exp}\left[-f\frac{l^{p_l}}{l_{max}}\right]
       \mathrm{exp}\left[-f\frac{m^{p_m}}{m_{max}}\right]
       \phi_{n,l,m}
       .
    \end{align}
-   After some experimentation, we found $p_i\gtrsim12$ worked well.
-   The constant $f$ is chosen so that $e^{-f}$ was equal to the machine
-   precision we work with (in practice then, $e^{-f}\sim 10^{-16}$).
+   If we use Chebyshev pseudospectral radial derviatives we apply
+   a similar filter function to the radial direction; otherwise
+   we use 8th order Kreiss-Oliger dissipation.
 %=============================================================================
 \section{\label{sec:properties_spherical_harmonics}
    Properties of spherical harmonics
