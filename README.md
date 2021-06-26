@@ -1,7 +1,8 @@
 # Scalar field dynamics around a Kerr black hole
 
 A C++ (version C++11 onwards) code that solves the equations of 
-motion for a real scalar field around a Kerr black hole.
+motion for a real scalar field with a potential around a Kerr black hole.
+See the Documenation for more details about the equations of motion.
 
 Runtime parameters are configured in the `runscript.py` file
 (with some preprocessing done in `sim_params.py`).
@@ -14,16 +15,17 @@ To compile all the different executables I recommend using
 See `INSTALL.md` for more information on installing some
 of the below libraries.
 
-* [FFTW](http://fftw.org) 
-	Fast Fourier transforms	
-
 * [SHTns](https://nschaeff.bitbucket.io/shtns/)
 	Fast spherical harmonic transforms.
 
-* [OpenMP](https://www.openmp.org/)	
+* [FFTW](http://fftw.org) 
+	Optional (for the pseudospectral radial derivative option).
+
+* [OpenMP](https://www.openmp.org/)
+	Optional (and yes, not really a library).
 
 * [googletest](https://github.com/google/googletest)
-	This is only used to run unit tests under `Test/`.
+	Optional (this is only used to run unit tests under `Test/`).
 	
 ## Visualization
 
