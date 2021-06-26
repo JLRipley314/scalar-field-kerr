@@ -36,6 +36,9 @@ For the moment all data are saved as `.csv` files.
 
 ## Citation
 
+Exact citation a work in progress,
+but please do contact me if you'd like to use/cite this code.
+
 ## Contact
 
 For questions please contact
