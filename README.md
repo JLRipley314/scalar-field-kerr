@@ -42,4 +42,4 @@ but please do contact me if you'd like to use/cite this code.
 ## Contact
 
 For questions please contact
-Justin Ripley: lloydripley [at] gmail [dot] com
+Justin Ripley: ripley [at] illinois [dot] edu
